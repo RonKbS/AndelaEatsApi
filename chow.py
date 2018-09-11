@@ -45,7 +45,7 @@ class {name_clean}Repo(BaseRepo):
 
 def create_blueprint(name, url_prefix=None):
 	uprefix = '' if url_prefix is None else inflect_engine.plural(url_prefix)
-	blueprint_stub = '''from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, request, Security
+	blueprint_stub = '''from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, request, Security, Auth
 
 url_prefix = '{{}}/{url_prefix}'.format(BaseBlueprint.base_url_prefix)
 {name}_blueprint = Blueprint('{name}', __name__, url_prefix=url_prefix)

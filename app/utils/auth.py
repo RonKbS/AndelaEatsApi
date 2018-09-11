@@ -1,6 +1,8 @@
 import jwt
-import json
+from functools import wraps
 from flask import request, jsonify, make_response
+from app.repositories.permission_repo import PermissionRepo
+from app.repositories.user_role_repo import UserRoleRepo
 
 class Auth:
 	''' This class will house Authentication and Authorization Methods '''
@@ -18,7 +20,7 @@ class Auth:
 			return make_response(jsonify({'msg': str(e)}), 400)
 	
 	@staticmethod
-	def get_user():
+	def _get_user():
 		token = None
 		try:
 			token = Auth.get_token()
@@ -27,9 +29,23 @@ class Auth:
 		
 		try:
 			if token:
-				return json.loads(Auth.decode_token(token)['UserInfo'])
+				return Auth.decode_token(token)['UserInfo']
 		except Exception as e:
 			raise e
+	
+	@staticmethod
+	def user(*keys):
+		user = Auth._get_user()
+		if keys:
+			if len(keys) > 1:
+				values = list()
+				for key in keys:
+					values.append(user[key]) if key in user else values.append(None)
+				return values
+			if len(keys) == 1 and keys[0] in user:
+				return user[keys[0]]
+		
+		return user
 	
 	@staticmethod
 	def get_token():
@@ -55,4 +71,62 @@ class Auth:
 			raise Exception('Token is Expired')
 		except jwt.DecodeError:
 			raise Exception('Error Decoding')
+		
+	@staticmethod
+	def check_location_header():
+		''' Routes to Ignore'''
+		ignore = ['/locations']
+		
+		for endpoint in ignore:
+			if request.path.find(endpoint) > -1: # If endpoint in request.path, ignore this check
+				return None
+		try:
+			Auth.get_location()
+		except Exception as e:
+			return make_response(jsonify({'msg': str(e)}),400)
+		
+		
+	@staticmethod
+	def get_location():
+		location = request.headers.get('X-Location', None)
+		if not location:
+			raise Exception('Location Header is Expected')
+		if not location.isdigit():
+			raise Exception('Location Header Value is Invalid')
+		return location
+	
+	@staticmethod
+	def has_permission(permission):
+		
+		def permission_checker(f):
+			
+			@wraps(f)
+			def decorated(*args, **kwargs):
+				user_role_repo = UserRoleRepo()
+				permission_repo = PermissionRepo()
+				
+				user_id = Auth.user('id')
+				user_role = user_role_repo.find_first(**{'user_id': user_id})
+				
+				if not user_id:
+					return make_response(jsonify({'msg': 'Missing User ID in token'})), 400
+
+				if not user_role:
+					return make_response(jsonify({'msg': 'Access Error - No Role Granted'})), 400
+
+				user_perms = permission_repo.filter_by(**{'role_id': user_role.id})
+				
+				perms = [perm.keyword for perm in user_perms.items]
+				if len(perms) == 0:
+						return make_response(jsonify({'msg': 'Access Error - No Permission Granted'})), 400
+				
+				print(perms)
+				if permission not in perms:
+					return make_response(jsonify({'msg': 'Access Error - Permission Denied'})), 400
+				
+				return f(*args, **kwargs)
+			
+			return decorated
+		return permission_checker
+	
 		

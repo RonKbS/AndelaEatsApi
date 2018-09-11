@@ -3,7 +3,7 @@ from flask_cors import CORS
 from config import env, get_env
 from app.utils import db #, timedelta
 from app.blueprints.base_blueprint import BaseBlueprint
-
+from app.utils.auth import Auth
 
 def create_app(config_name):
 	app = FlaskAPI(__name__, instance_relative_config=False)

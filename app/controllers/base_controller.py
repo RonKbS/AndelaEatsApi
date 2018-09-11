@@ -6,8 +6,8 @@ class BaseController:
 	def __init__(self, request):
 		self.request = request
 		
-	def user(self):
-		return Auth.get_user()
+	def user(self, *keys):
+		return Auth.user(*keys)
 		
 	def request_params(self, *keys):
 		_json = self.get_json()
@@ -35,7 +35,6 @@ class BaseController:
 		response = jsonify(data)
 		response.status_code = status_code
 		return response
-	
 	
 	def missing_required(self, params):
 		return True if None in params or '' in params else False
