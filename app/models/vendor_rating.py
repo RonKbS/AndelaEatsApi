@@ -9,4 +9,4 @@ class VendorRating(BaseModel):
     vendor_engagement_id = db.Column(db.String(), db.ForeignKey('vendor_engagements.id'))
     order_id = db.Column(db.String(), db.ForeignKey('orders.id'))
     comment = db.Column(db.String(1000), nullable=True)
-    rating = db.Column(db.Integer)
+    rating = db.Column(db.Float)

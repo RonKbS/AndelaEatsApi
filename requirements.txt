@@ -14,6 +14,7 @@ Flask-Script==2.0.6
 Flask-SQLAlchemy==2.3.2
 gunicorn==19.8.1
 idna==2.6
+inflect==1.0.0
 itsdangerous==0.24
 Jinja2==2.10
 Mako==1.0.7
