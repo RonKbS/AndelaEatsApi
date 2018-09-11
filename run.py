@@ -16,6 +16,10 @@ manager.add_command('db', MigrateCommand)
 def check_token():
 	return Auth.check_token()
 
+@app.before_request
+def check_location_header():
+	return Auth.check_location_header()
+
 # Creates the db tables
 @manager.command
 def create_db():

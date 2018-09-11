@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 from app.utils.security import Security
+from app.utils.auth import Auth
 
 
 class BaseBlueprint:
