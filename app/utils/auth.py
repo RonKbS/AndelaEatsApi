@@ -1,6 +1,6 @@
 import jwt
 import json
-from flask import request, abort, jsonify, make_response
+from flask import request, jsonify, make_response
 
 class Auth:
 	''' This class will house Authentication and Authorization Methods '''

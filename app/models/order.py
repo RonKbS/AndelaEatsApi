@@ -3,7 +3,7 @@ from .base_model import BaseModel, db
 class Order(BaseModel):
 	__tablename__ = 'orders'
 	
-	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+	user_id = db.Column(db.String(100))
 	date_booked_for = db.Column(db.Date, nullable=False)
 	status = db.Column(db.SmallInteger(), default=0)
 # 	meal_item_orders = db.relationship('MealItem', secondary='meal_item_order')

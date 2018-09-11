@@ -5,5 +5,5 @@ class UserRole(BaseModel):
 	
 
 	role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'))
-	user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+	user_id = db.Column(db.String)
 	
