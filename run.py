@@ -1,9 +1,9 @@
-from flask_script import Manager
-from flask import request
-from flask_migrate import Migrate, MigrateCommand
-from app import create_app  #, controllers
 from app.utils import db
 from config import get_env
+from app import create_app
+from flask_script import Manager
+from app.utils.auth import Auth
+from flask_migrate import Migrate, MigrateCommand
 
 app = create_app(get_env('APP_ENV'))
 migrate = Migrate(app, db)
@@ -11,6 +11,10 @@ manager = Manager(app)
 
 # Migrations
 manager.add_command('db', MigrateCommand)
+
+@app.before_request
+def check_token():
+	return Auth.check_token()
 
 # Creates the db tables
 @manager.command

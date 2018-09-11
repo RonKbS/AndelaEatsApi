@@ -1,9 +1,13 @@
+from app.utils.auth import Auth
 from flask import jsonify, make_response
 
 class BaseController:
 	
 	def __init__(self, request):
 		self.request = request
+		
+	def user(self):
+		return Auth.get_user()
 		
 	def request_params(self, *keys):
 		_json = self.get_json()

@@ -21,4 +21,5 @@ def create_app(config_name):
 	from . import models
 	db.init_app(app)
 	
+	
 	return app

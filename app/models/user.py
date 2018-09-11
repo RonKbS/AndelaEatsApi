@@ -7,5 +7,6 @@ class User(BaseModel):
 	first_name = db.Column(db.String(100))
 	last_name = db.Column(db.String(100))
 	image = db.Column(db.String(1000))
+	location = db.Column(db.Integer(), db.ForeignKey('locations.id'))
 	# user_orders = db.relationship('Order', backref='users', lazy=True)
-	vendor_ratings = db.relationship('VendorRating', backref='users', lazy=True)
+	# vendor_ratings = db.relationship('VendorRating', backref='users', lazy=True)
