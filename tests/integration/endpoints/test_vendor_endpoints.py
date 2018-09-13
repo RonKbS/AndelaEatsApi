@@ -17,7 +17,7 @@ class TestVendorEndpoints(BaseTestCase):
 		self.assertJSONKeyPresent(response_json, 'payload')
 		self.assertEqual(payload['vendor']['name'], vendor.name)
 		self.assertEqual(payload['vendor']['tel'], vendor.tel)
-		self.assertEqual(payload['vendor']['contact_person'], vendor.contact_person)
+		self.assertEqual(payload['vendor']['contactPerson'], vendor.contact_person)
 		self.assertEqual(payload['vendor']['address'], vendor.address)
 		
 	def test_list_vendors_endpoint(self):
@@ -31,7 +31,7 @@ class TestVendorEndpoints(BaseTestCase):
 
 		self.assert200(response)
 		self.assertEqual(len(payload['vendors']), 3)
-		self.assertJSONKeysPresent(payload['vendors'][0], 'name', 'tel', 'id', 'address', 'contact_person','timestamps')
+		self.assertJSONKeysPresent(payload['vendors'][0], 'name', 'tel', 'id', 'address', 'contactPerson','timestamps')
 		
 	def test_get_specific_vendor_enpoint(self):
 		vendor = VendorFactory.create()
@@ -41,7 +41,7 @@ class TestVendorEndpoints(BaseTestCase):
 
 		self.assert200(response)
 		self.assertJSONKeyPresent(payload, 'vendor')
-		self.assertJSONKeysPresent(payload['vendor'], 'name', 'tel', 'id', 'address', 'contact_person', 'timestamps')
+		self.assertJSONKeysPresent(payload['vendor'], 'name', 'tel', 'id', 'address', 'contactPerson', 'timestamps')
 		self.assertEqual(payload['vendor']['id'], vendor.id)
 		self.assertEqual(payload['vendor']['name'], vendor.name)
 		self.assertEqual(payload['vendor']['address'], vendor.address)
@@ -65,7 +65,7 @@ class TestVendorEndpoints(BaseTestCase):
 		self.assertEqual(payload['vendor']['name'], data['name'])
 		self.assertEqual(payload['vendor']['address'], data['address'])
 		self.assertEqual(payload['vendor']['tel'], data['tel'])
-		self.assertEqual(payload['vendor']['contact_person'], data['contact_person'])
+		self.assertEqual(payload['vendor']['contactPerson'], data['contact_person'])
 		
 		'''Test invalid update request'''
 		# User arbitrary value of 100 as the Vendor ID

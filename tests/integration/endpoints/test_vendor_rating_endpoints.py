@@ -23,8 +23,8 @@ class TestVendorRatingEndpoints(BaseTestCase):
 
 		self.assertEqual(response.status_code, 201)
 		self.assertJSONKeyPresent(response_json, 'payload')
-		self.assertEqual(payload['rating']['vendor_id'], vendor_id)
-		self.assertEqual(payload['rating']['user_id'], rating.user_id)
+		self.assertEqual(payload['rating']['vendorId'], vendor_id)
+		self.assertEqual(payload['rating']['userId'], rating.user_id)
 		self.assertEqual(payload['rating']['rating'], rating.rating)
 		self.assertEqual(payload['rating']['comment'], rating.comment)
 		self.assertEqual(payload['rating']['channel'], rating.channel)
@@ -42,7 +42,7 @@ class TestVendorRatingEndpoints(BaseTestCase):
 
 		self.assert200(response)
 		self.assertEqual(len(payload['ratings']), 5)
-		self.assertJSONKeysPresent(payload['ratings'][0], 'vendor_id', 'user_id', 'id', 'comment', 'rating','channel')
+		self.assertJSONKeysPresent(payload['ratings'][0], 'vendorId', 'userId', 'id', 'comment', 'rating','channel')
 
 	def test_get_single_rating(self):
 		rating = VendorRatingFactory.create()
@@ -53,11 +53,11 @@ class TestVendorRatingEndpoints(BaseTestCase):
 
 		self.assert200(response)
 		self.assertJSONKeyPresent(payload, 'rating')
-		self.assertJSONKeysPresent(payload['rating'], 'vendor_id', 'user_id', 'id', 'comment', 'rating','channel')
+		self.assertJSONKeysPresent(payload['rating'], 'vendorId', 'userId', 'id', 'comment', 'rating','channel')
 
 		self.assertEqual(payload['rating']['id'], rating_id)
-		self.assertEqual(payload['rating']['user_id'], rating.user_id)
-		self.assertEqual(payload['rating']['vendor_id'], rating.vendor_id)
+		self.assertEqual(payload['rating']['userId'], rating.user_id)
+		self.assertEqual(payload['rating']['vendorId'], rating.vendor_id)
 		self.assertEqual(payload['rating']['comment'], rating.comment)
 		self.assertEqual(payload['rating']['rating'], rating.rating)
 
@@ -77,8 +77,8 @@ class TestVendorRatingEndpoints(BaseTestCase):
 
 		self.assert200(response)
 		self.assertEqual(payload['rating']['id'], rating.id)
-		self.assertEqual(payload['rating']['user_id'], rating.user_id)
-		self.assertEqual(payload['rating']['vendor_id'], rating.vendor_id)
+		self.assertEqual(payload['rating']['userId'], rating.user_id)
+		self.assertEqual(payload['rating']['vendorId'], rating.vendor_id)
 		self.assertEqual(payload['rating']['comment'], rating.comment)
 		self.assertEqual(payload['rating']['rating'], rating.rating)
 
