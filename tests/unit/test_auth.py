@@ -3,7 +3,6 @@ from app.utils.auth import Auth
 from factories.role_factory import RoleFactory
 from factories.user_role_factory import UserRoleFactory
 from factories.permission_factory import PermissionFactory
-from ppretty import ppretty
 
 class TestAuth(BaseTestCase):
 	
