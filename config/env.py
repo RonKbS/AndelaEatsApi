@@ -13,10 +13,11 @@ class DevelopmentEnv(EnvConfig):
     """Configurations for Development."""
     DEBUG = True
 
-
 class TestingEnv(EnvConfig):
     """Configurations for Testing, with a separate test database."""
     TESTING = True
+    # SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/andelaeats_test'
+    # SQLALCHEMY_POOL_TIMEOUT = 1000
     SQLALCHEMY_DATABASE_URI = 'sqlite:///andelaeats.db'
     DEBUG = True
 
