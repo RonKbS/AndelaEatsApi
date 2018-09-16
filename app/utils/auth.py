@@ -48,8 +48,11 @@ class Auth:
 		return user
 	
 	@staticmethod
-	def get_token():
-		header = request.headers.get('Authorization', None)
+	def get_token(request_obj=None):
+		if request_obj:
+			header = request_obj.headers.get('Authorization', None)
+		else:
+			header = request.headers.get('Authorization', None)
 		if not header:
 			raise Exception('Authorization Header is Expected')
 		
@@ -92,7 +95,7 @@ class Auth:
 			raise Exception('Location Header is Expected')
 		if not location.isdigit():
 			raise Exception('Location Header Value is Invalid')
-		return location
+		return int(location)
 	
 	@staticmethod
 	def has_permission(permission):
