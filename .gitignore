@@ -1,5 +1,5 @@
 *.py[cod]
-
+app/andelaeats.db
 venv/
 .env
 __pycache__

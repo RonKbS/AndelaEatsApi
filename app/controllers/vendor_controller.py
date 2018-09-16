@@ -21,7 +21,7 @@ class VendorController(BaseController):
 			vendor = vendor.serialize()
 			return self.handle_response('OK', payload={'vendor': vendor})
 		else:
-			return self.handle_response('Bad Request', status_code=400)
+			return self.handle_response('Bad Request - Invalid or Missing vendor_id', status_code=400)
 	
 	def create_vendor(self):
 		name, tel, address, contact_person = self.request_params('name', 'tel', 'address', 'contact_person')

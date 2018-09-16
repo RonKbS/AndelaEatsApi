@@ -85,7 +85,6 @@ class Auth:
 		except Exception as e:
 			return make_response(jsonify({'msg': str(e)}),400)
 		
-		
 	@staticmethod
 	def get_location():
 		location = request.headers.get('X-Location', None)
@@ -120,7 +119,6 @@ class Auth:
 				if len(perms) == 0:
 						return make_response(jsonify({'msg': 'Access Error - No Permission Granted'})), 400
 				
-				print(perms)
 				if permission not in perms:
 					return make_response(jsonify({'msg': 'Access Error - Permission Denied'})), 400
 				
