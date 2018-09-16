@@ -3,7 +3,7 @@ from app.repositories.base_repo import BaseRepo
 from factories.vendor_factory import VendorFactory
 from app.models.vendor import Vendor # One Model is required to test the base repo. Using Vendor
 
-class TestBaseController(BaseTestCase):
+class TestBaseRepository(BaseTestCase):
 
 	def setUp(self):
 		self.BaseSetUp()
