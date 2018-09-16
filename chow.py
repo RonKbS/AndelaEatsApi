@@ -17,6 +17,7 @@ AndelaEats Chow CLI Tool
 
 import sys, os
 import inflect
+from termcolor import colored
 
 inflect_engine = inflect.engine()
 
@@ -135,21 +136,21 @@ if __name__ == '__main__':
 		if len(args) > 3:
 			extras = args[3].split('--with_')[1].split('_')
 		m = create_model(name)
-		print('Model: {} Location: {}'.format(m[0], m[1]))
+		print(colored('Model: {} Location: {}'.format(m[0], m[1]), 'green'))
 		
 		if 'controller' in extras:
 			c = create_controller(name=name)
-			print('Controller: {}Controller Location: {}'.format(c[0], c[1]))
+			print(colored('Controller: {}Controller Location: {}'.format(c[0], c[1]), 'green'))
 			
 		if 'repo' in extras:
 			r = create_repo(name=name)
-			print('Repository: {}Repo Location: {}'.format(r[0], r[1]))
+			print(colored('Repository: {}Repo Location: {}'.format(r[0], r[1]), 'green'))
 		
 	
 	if command == 'make:repo' or command == 'make:repos':
 		name = args[2]
 		r = create_repo(name=name)
-		print('Repository: {}Repo Location: {}'.format(r[0], r[1]))
+		print(colored('Repository: {}Repo Location: {}'.format(r[0], r[1]), 'green'))
 	
 	
 	if command == 'make:blueprint' or command == 'make:blueprints':
@@ -160,13 +161,13 @@ if __name__ == '__main__':
 			url_prefix = args[3].split('--url_prefix=')[1]
 			
 		b = create_blueprint(name, url_prefix)
-		print('Blueprint: {} Location: {}'.format(b[0], b[1]))
+		print(colored('Blueprint: {} Location: {}'.format(b[0], b[1]), 'green'))
 	
 	
 	if command == 'make:controller' or command == 'make:controllers':
 		name = args[2]
 		c = create_controller(name=name)
-		print('Controller: {}Controller Location: {}'.format(c[0], c[1]))
+		print(colored('Controller: {}Controller Location: {}'.format(c[0], c[1]), 'green'))
 		
 	
 	if command == 'make:test' or command == 'make:tests':
@@ -179,13 +180,16 @@ if __name__ == '__main__':
 			name = arr[1]
 		
 		t = create_test(name=name, test_path=test_path)
-		print('Test: {} Created Location: {}'.format(t[0], t[1]))
+		print(colored('Test: {} Created Location: {}'.format(t[0], t[1]), 'green'))
 	
 	
 	if command == 'make:factory' or command == 'make:factories':
 		name = args[2]
 		
 		f = create_factory(name)
-		print('Factory: {}Factory Location: {}'.format(f[0], f[1]))
+		print(colored('Factory: {}Factory Location: {}'.format(f[0], f[1]), 'green'))
+		
+	if command == 'show_routes':
+		os.system('python run.py show_routes')
 		
 	
