@@ -158,28 +158,16 @@ class VendorController(BaseController):
 
 	def update_vendor_rating(self, rating_id):
 		'''edits an existing rating'''
-		comment, rating = self.request_params('comment', 'rating')
+
 		rtng = self.vendor_rating_repo.get(rating_id)
+		comment = self.get_json()['comment']
 
-		if rtng:
-			updates = {}
-
-			if comment:
-				updates['comment'] = comment
-			if rating:
-				updates['rating'] = rating
-
-			self.vendor_rating_repo.update(rtng, **updates)
-			return self.handle_response('OK', payload={'rating': rtng.serialize()})
-
-		return self.handle_response('Invalid or incorrect rating_id provided', status_code=400)
-
-	def delete_vendor_rating(self, rating_id):
-		'''deletes an existing rating'''
-		rating = self.vendor_rating_repo.get(rating_id)
-
-		if rating:
-			rating.delete()
-			return self.handle_response('rating successfully deleted')
-
-		return self.handle_response('Invalid or incorrect rating_id provided', status_code=400)
+		if Auth.user('id') == rtng.user_id: #You cannot update someone else's rating
+			if rtng:
+				updates = {}
+				if comment:
+					updates['comment'] = comment
+				self.vendor_rating_repo.update(rtng, **updates)
+				return self.handle_response('OK', payload={'rating': rtng.serialize()})
+			return self.handle_response('Invalid or incorrect rating_id provided', status_code=400)
+		return self.handle_response('You are not allowed to update a rating that is not yours', status_code=403)

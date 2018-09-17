@@ -73,7 +73,3 @@ def create_vendor_rating():
 @Security.validator(['rating|int'])
 def update_rating(rating_id):
 	return vendor_controller.update_vendor_rating(rating_id)
-
-@rating_blueprint.route('/<int:rating_id>', methods=['DELETE'])
-def delete_rating(rating_id):
-	return vendor_controller.delete_vendor_rating(rating_id)
