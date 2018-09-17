@@ -7,7 +7,7 @@ class VendorRatingRepo(BaseRepo):
 	def __init__(self):
 		BaseRepo.__init__(self, VendorRating)
 
-	def new_vendor_rating(self, vendor_id, user_id, vendor_engagement_id, rating, comment=''):
-		vendor_rating = VendorRating(vendor_id=vendor_id, user_id=user_id, vendor_engagement_id=vendor_engagement_id, rating=rating, comment=comment)
+	def new_vendor_rating(self, vendor_id, user_id, rating, channel, comment=''):
+		vendor_rating = VendorRating(vendor_id=vendor_id, user_id=user_id, rating=rating, channel=channel, comment=comment)
 		vendor_rating.save()
 		return vendor_rating

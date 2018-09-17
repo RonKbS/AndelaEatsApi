@@ -121,20 +121,16 @@ class VendorController(BaseController):
 
 
 	''' VENDOR RATING '''
-	def list_ratings(self, switch, id):
-		'''retrieves a list of ratings for a specific vendor or for a 
-		specific engagement. The value switch variable is either vendor or engagement'''
+	def list_ratings(self, vendor_id):
+		'''retrieves a list of ratings for a specific vendor'''
 
-		if switch == 'vendor':
-			ratings = self.vendor_rating_repo.filter_by(vendor_id=id)
-		if switch == 'engagement':
-			ratings = self.vendor_rating_repo.filter_by(vendor_engagement_id=id)
+		ratings = self.vendor_rating_repo.filter_by(vendor_id=vendor_id)
 
 		if ratings:
 			ratings_list = [rating.serialize() for rating in ratings.items]
-			return self.handle_response('OK', payload={'switch':switch, 'ratings': ratings_list, 'meta': self.pagination_meta(ratings)})
+			return self.handle_response('OK', payload={'ratings': ratings_list, 'meta': self.pagination_meta(ratings)})
 
-		return self.handle_response('Expected vendor or engagement in request')
+		return self.handle_response('Expected vendor in request')
 
 	def get_vendor_rating(self, rating_id):
 		'''retrieves the details of a specific rating, giving the rating id'''
@@ -148,21 +144,18 @@ class VendorController(BaseController):
 
 	def create_vendor_rating(self):
 		'''Adds a vendor rating during a specific engagement'''
-		(vendor_id, vendor_engagement_id, comment,
-		rating) = self.request_params('vendor_id', 'vendor_engagement_id', 'comment', 'rating')
-		#user_id = Auth._get_user('id')
-		user_id = self.request_params('user_id')[0] #temporary place holder
+		(vendor_id, comment, rating, channel) = self.request_params('vendor_id', 'comment', 'rating', 'channel')
+		user_id = Auth.user('id')
 
 		if self.vendor_repo.get(vendor_id):
 
-			rating = self.vendor_rating_repo.new_vendor_rating(
-			vendor_id, user_id, vendor_engagement_id, rating, comment)
+			rating = self.vendor_rating_repo.new_vendor_rating(vendor_id, user_id, rating, channel, comment)
 			rtng = rating.serialize()
 
-			return self.handle_response('OK', payload={'rating': rtng})
+			return self.handle_response('Rating created', payload={'rating': rtng}, status_code=201)
 
 		return self.handle_response('Invalid vendor_id provided', status_code=400)
-	# @Auth.has_permission('create')
+
 	def update_vendor_rating(self, rating_id):
 		'''edits an existing rating'''
 		comment, rating = self.request_params('comment', 'rating')
