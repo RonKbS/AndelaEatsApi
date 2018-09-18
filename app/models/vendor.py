@@ -8,5 +8,4 @@ class Vendor(BaseModel):
 	tel = db.Column(db.String(20), nullable=False)
 	contact_person = db.Column(db.String(120), nullable=False)
 	engagements = db.relationship('VendorEngagement', lazy=True)
- 
-	# ratings = db.relationship('VendorRating', backref='vendors', lazy=True)
+
