@@ -10,3 +10,5 @@ class VendorRating(BaseModel):
 	comment = db.Column(db.String(1000), nullable=True)
 	rating = db.Column(db.Float())
 	channel = db.Column(db.String(100))
+	
+	vendor = db.relationship('Vendor', lazy=False)
