@@ -1,7 +1,6 @@
 '''Module for VendorRating Model class'''
 from .base_model import BaseModel, db
 
-
 class VendorRating(BaseModel):
 	__tablename__='vendor_ratings'
 
@@ -10,3 +9,4 @@ class VendorRating(BaseModel):
 	comment = db.Column(db.String(1000), nullable=True)
 	rating = db.Column(db.Float())
 	channel = db.Column(db.String(100))
+	vendor = db.relationship('Vendor')
