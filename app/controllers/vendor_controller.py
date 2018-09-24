@@ -95,8 +95,13 @@ class VendorController(BaseController):
 	def update_vendor_engagement(self, engagement_id):
 		vendor_id, start_date, end_date, status, termination_reason = self.request_params('vendor_id', 'start_date', 'end_date', 'status', 'termination_reason')
 		engagement = self.vendor_engagement_repo.get(engagement_id)
-		print(self.request_params('vendor_id', 'start_date', 'end_date', 'status', 'termination_reason'))
-
+		
+		if start_date:
+			start_date = datetime.strptime(start_date, '%Y-%m-%d')
+			
+		if end_date:
+			end_date = datetime.strptime(end_date, '%Y-%m-%d')
+		
 		if engagement:
 			updates = {'vendor_id': vendor_id}
 			if start_date:
@@ -105,16 +110,15 @@ class VendorController(BaseController):
 				updates['end_date'] = end_date
 			if status is not None:
 				updates['status'] = status
-				print(status, updates)
 			if termination_reason:
 				updates['termination_reason'] = termination_reason
 
 			self.vendor_engagement_repo.update(engagement, **updates)
-			return self.handle_response('OK', payload={'vendor': engagement.serialize()})
+			e = engagement.serialize()
+			e['vendor'] = engagement.vendor.serialize()
+			return self.handle_response('OK', payload={'engagement': e})
 
 		return self.handle_response('Invalid or incorrect engagement_id provided', status_code=400)
-
-		pass
 
 	def delete_vendor_engagement(self, vendor_id):
 		pass

@@ -15,8 +15,8 @@ class VendorEngagementFactory(factory.alchemy.SQLAlchemyModelFactory):
 	
 	id = factory.Sequence(lambda n: n)
 	vendor_id = factory.SelfAttribute('vendor.id')
-	start_date = date.today() #factory.Faker('date')
-	end_date = datetime.now() + timedelta(weeks=+1) # factory.Faker('date')
+	start_date = date.today()
+	end_date = (datetime.now() + timedelta(weeks=+1)).date()
 	status = 1
 	termination_reason = factory.Faker('paragraph')
 	# cohort_position = fake_cohort_position
