@@ -1,7 +1,5 @@
 from app.controllers.base_controller import BaseController
 from app.repositories.meal_repo import MealItemRepo
-from app.utils.unique_id import PushID
-from app.utils.meal_items_validation import validate_meal_items
 
 
 class MealController(BaseController):
@@ -28,9 +26,9 @@ class MealController(BaseController):
 		Creates a new meal item
 		"""
 		
-		name, description, imageUrl, meal_type = self.request_params('mealName', 'description', 'image', 'mealType')
+		name, description, image_url, meal_type = self.request_params('mealName', 'description', 'image', 'mealType')
 
-		new_meal_item = self.meal_repo.new_meal_item(name, description, imageUrl, meal_type).serialize()
+		new_meal_item = self.meal_repo.new_meal_item(name, description, image_url, meal_type).serialize()
 		
 		return self.handle_response('OK', payload={'mealItem': new_meal_item})
 		

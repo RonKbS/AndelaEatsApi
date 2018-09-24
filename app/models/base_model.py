@@ -1,14 +1,9 @@
 from app.utils import db
 from sqlalchemy import exc
 from datetime import datetime
+from app.utils import to_camel_case
 from sqlalchemy.inspection import inspect
 from app.repositories.base_repo import BaseRepo
-
-
-def to_camel_case(snake_str):
-    """Format string to camel case."""
-    title_str = snake_str.title().replace("_", "")
-    return title_str[0].lower() + title_str[1:]
 
 class BaseModel(db.Model):
 	__abstract__ = True

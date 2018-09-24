@@ -29,12 +29,12 @@ class VendorController(BaseController):
 			return self.handle_response('Bad Request - Invalid or Missing vendor_id', status_code=400)
 	
 	def create_vendor(self):
-		name, tel, address, contact_person = self.request_params('name', 'tel', 'address', 'contact_person')
+		name, tel, address, contact_person = self.request_params('name', 'tel', 'address', 'contactPerson')
 		vendor = self.vendor_repo.new_vendor(name, address, tel, contact_person).serialize()
 		return self.handle_response('OK', payload={'vendor': vendor})
 
 	def update_vendor(self, vendor_id):
-		name, tel, address, contact_person = self.request_params('name', 'tel', 'address', 'contact_person')
+		name, tel, address, contact_person = self.request_params('name', 'tel', 'address', 'contactPerson')
 		vendor = self.vendor_repo.get(vendor_id)
 		if vendor:
 			updates = {}
@@ -78,7 +78,7 @@ class VendorController(BaseController):
 			return self.handle_response('Bad Request', status_code=400)
 
 	def create_vendor_engagement(self):
-		vendor_id, start_date, end_date = self.request_params('vendor_id', 'start_date', 'end_date')
+		vendor_id, start_date, end_date = self.request_params('vendorId', 'startDate', 'endDate')
 
 		if self.vendor_repo.get(vendor_id):
 
@@ -93,7 +93,7 @@ class VendorController(BaseController):
 		return self.handle_response('Invalid vendor_id provided', status_code=400)
 
 	def update_vendor_engagement(self, engagement_id):
-		vendor_id, start_date, end_date, status, termination_reason = self.request_params('vendor_id', 'start_date', 'end_date', 'status', 'termination_reason')
+		vendor_id, start_date, end_date, status, termination_reason = self.request_params('vendorId', 'startDate', 'endDate', 'status', 'terminationReason')
 		engagement = self.vendor_engagement_repo.get(engagement_id)
 		
 		if start_date:
