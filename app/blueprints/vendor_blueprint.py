@@ -17,7 +17,6 @@ def list_vendors():
 def get_vendor(vendor_id):
 	return vendor_controller.get_vendor(vendor_id)
 
-from app.utils.auth import Auth
 @vendor_blueprint.route('/', methods=['POST'])
 @Security.validator(['name|required', 'address|required', 'tel|required:int', 'contact_person|required' ])
 def create_vendor():

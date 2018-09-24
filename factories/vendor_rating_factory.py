@@ -13,8 +13,9 @@ class VendorRatingFactory(factory.alchemy.SQLAlchemyModelFactory):
 		model = VendorRating
 		sqlalchemy_session = db.session
 
-	id = factory.Sequence(lambda n: n)
 	vendor = factory.SubFactory(VendorFactory)
+	
+	id = factory.Sequence(lambda n: n)
 	vendor_id = factory.SelfAttribute('vendor.id')
 	user_id = BaseTestCase.user_id()
 	comment = factory.Faker('sentence')
