@@ -5,7 +5,7 @@ from flask_script import Manager
 from app.utils.auth import Auth
 from flask_migrate import Migrate, MigrateCommand
 
-app = create_app(get_env('APP_ENV'))
+app = create_app('development')
 migrate = Migrate(app, db)
 manager = Manager(app)
 

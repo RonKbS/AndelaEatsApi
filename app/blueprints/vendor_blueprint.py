@@ -1,4 +1,4 @@
-from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, request, Security
+from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, request, Security, Auth
 from app.controllers.vendor_controller import VendorController
 from app.utils.auth import Auth
 
@@ -54,17 +54,19 @@ def update_engagement(engagement_id):
 
 '''VENDOR RATING'''
 @rating_blueprint.route('/vendor/<int:vendor_id>', methods=['GET'])
+@Auth.has_permission('view_ratings')
 def list_ratings(vendor_id):
 	'''Gets all the ratings for a given vendor'''
 	return vendor_controller.list_ratings(vendor_id)
 
 
 @rating_blueprint.route('/<int:rating_id>', methods=['GET'])
+@Auth.has_permission('view_ratings')
 def get_vendor_rating(rating_id):
 	return vendor_controller.get_vendor_rating(rating_id)
 
 @rating_blueprint.route('/', methods=['POST'])
-@Security.validator(['vendor_id|required:int', 'rating|required:int' ])
+@Security.validator(['vendor_id|required:int', 'rating|required:int'])
 def create_vendor_rating():
 	return vendor_controller.create_vendor_rating()
 
