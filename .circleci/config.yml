@@ -63,7 +63,6 @@ jobs:
       - run:
           name: Deploy Edge to Heroku
           command: |
-            git remote add origin https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git
             git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master -f
 
 workflows:
