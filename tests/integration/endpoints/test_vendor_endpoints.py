@@ -8,7 +8,7 @@ class TestVendorEndpoints(BaseTestCase):
 	
 	def test_create_vendor_endpoint(self):
 		vendor = VendorFactory.build()
-		data = {'name': vendor.name, 'address': vendor.address, 'tel': vendor.tel, 'contact_person': vendor.contact_person}
+		data = {'name': vendor.name, 'address': vendor.address, 'tel': vendor.tel, 'contactPerson': vendor.contact_person}
 		response = self.client().post(self.make_url('/vendors/'), data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		payload = response_json['payload']
@@ -56,7 +56,7 @@ class TestVendorEndpoints(BaseTestCase):
 	def test_update_vendors_endpoint(self):
 		
 		vendor = VendorFactory.create()
-		data = {'name': 'Jays Place', 'address':'123 Awesome Ave', 'tel':'10101010101', 'contact_person':'Joseph Cobhams'}
+		data = {'name': 'Jays Place', 'address':'123 Awesome Ave', 'tel':'10101010101', 'contactPerson':'Joseph Cobhams'}
 		response = self.client().put(self.make_url('/vendors/{}'.format(vendor.id)), data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		payload = response_json['payload']
@@ -65,7 +65,7 @@ class TestVendorEndpoints(BaseTestCase):
 		self.assertEqual(payload['vendor']['name'], data['name'])
 		self.assertEqual(payload['vendor']['address'], data['address'])
 		self.assertEqual(payload['vendor']['tel'], data['tel'])
-		self.assertEqual(payload['vendor']['contactPerson'], data['contact_person'])
+		self.assertEqual(payload['vendor']['contactPerson'], data['contactPerson'])
 		
 		'''Test invalid update request'''
 		# User arbitrary value of 100 as the Vendor ID
