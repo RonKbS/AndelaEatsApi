@@ -1,8 +1,7 @@
 '''Module of integration tests for vendor rating endpoints'''
 import factory
 from tests.base_test_case import BaseTestCase
-from factories.vendor_rating_factory import VendorRatingFactory
-from factories.vendor_factory import VendorFactory
+from factories import VendorFactory, VendorRatingFactory, UserRoleFactory, RoleFactory, PermissionFactory
 from app.models import VendorRating
 
 class TestVendorRatingEndpoints(BaseTestCase):
@@ -30,14 +29,21 @@ class TestVendorRatingEndpoints(BaseTestCase):
 		self.assertEqual(payload['rating']['channel'], rating.channel)
 
 	def test_list_vendor_ratings_endpoint(self):
+		'''Test that users with the right permission can view list of vendor ratings'''
 
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
 		vendor_id = VendorFactory.create().id
+		permission = PermissionFactory.create(keyword='view_ratings', role_id=role.id)
+		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
 		for i in range(5):
-			vendor_rating = VendorRating(vendor_id=vendor_id, user_id=BaseTestCase.user_id(), comment=f'comment-{i}', rating=f'{i}', channel='slack')
+			vendor_rating = VendorRating(vendor_id=vendor_id, user_id=user_id, comment=f'comment-{i}', rating=f'{i}', channel='slack')
 			vendor_rating.save()
 
 		response = self.client().get(self.make_url(f'/ratings/vendor/{vendor_id}'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
 		payload = response_json['payload']
 
 		self.assert200(response)
@@ -45,8 +51,14 @@ class TestVendorRatingEndpoints(BaseTestCase):
 		self.assertJSONKeysPresent(payload['ratings'][0], 'vendorId', 'userId', 'id', 'comment', 'rating','channel')
 
 	def test_get_single_rating(self):
+		'''Test that users with the right permission can see details of a single rating vendor rating'''
+
 		rating = VendorRatingFactory.create()
 		rating_id = rating.id
+		role = RoleFactory.create(name='Admin')
+		permission = PermissionFactory.create(keyword='view_ratings', role_id=role.id)
+		user_role = UserRoleFactory.create(user_id=rating.user_id, role_id=role.id)
+
 		response = self.client().get(self.make_url(f'/ratings/{rating_id}'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		payload = response_json['payload']
@@ -64,6 +76,19 @@ class TestVendorRatingEndpoints(BaseTestCase):
 
 		'''Search for a non-existing rating returns 400 error'''
 		response = self.client().get(self.make_url('/ratings/100'), headers=self.headers())
+		self.assert400(response)
+
+	def test_get_single_rating_without_permission(self):
+		'''Test that users without the right permission cannot see details of a single rating vendor rating'''
+
+		rating = VendorRatingFactory.create()
+		rating_id = rating.id
+		role = RoleFactory.create(name='Admin')
+		permission = PermissionFactory.create(keyword='view_ratings', role_id=100)
+		user_role = UserRoleFactory.create(user_id=rating.user_id, role_id=role.id)
+
+		response = self.client().get(self.make_url(f'/ratings/{rating_id}'), headers=self.headers())
+
 		self.assert400(response)
 
 	def test_update_vendor_rating_endpoint(self):
