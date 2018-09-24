@@ -26,8 +26,7 @@ class TestMealItemEndpoints(BaseTestCase):
     def test_list_meal_item_endpoint(self):
         # Create Three Dummy Vendors
         meals = MealItemFactory.create_batch(3)
-        
-        # import pdb;pdb.set_trace()
+
 
         response = self.client().get(self.make_url('/meal-items/'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
