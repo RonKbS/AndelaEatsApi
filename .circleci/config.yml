@@ -65,8 +65,6 @@ jobs:
           command: |
             git config --global user.email "joseph.cobhams@andela.com"
             git config --global user.name "Joseph Cobhams"
-            git add .
-            git commit -m "Deployment"
             git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git edge:master
 
 workflows:
