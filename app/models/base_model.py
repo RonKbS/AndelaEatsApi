@@ -5,6 +5,11 @@ from sqlalchemy.inspection import inspect
 from app.repositories.base_repo import BaseRepo
 
 
+def to_camel_case(snake_str):
+    """Format string to camel case."""
+    title_str = snake_str.title().replace("_", "")
+    return title_str[0].lower() + title_str[1:]
+
 class BaseModel(db.Model):
 	__abstract__ = True
 	
@@ -24,7 +29,7 @@ class BaseModel(db.Model):
 		db.session.commit()
 		
 	def serialize(self):
-		s = {column.name: getattr(self, column.name) for column in self.__table__.columns if column.name not in ['created_at', 'updated_at']}
+		s = {to_camel_case(column.name): getattr(self, column.name) for column in self.__table__.columns if column.name not in ['created_at', 'updated_at']}
 		s['timestamps'] = {'created_at': self.created_at, 'updated_at': self.updated_at, 'date_pretty_short': self.created_at.strftime('%b %d, %Y'),
 						   'date_pretty': self.created_at.strftime('%B %d, %Y')}
 		return s
