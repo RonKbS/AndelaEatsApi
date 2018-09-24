@@ -1,4 +1,4 @@
-from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, request
+from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, Security, request
 from app.controllers.meal_controller import MealController
 
 url_prefix = '{}/meal-items'.format(BaseBlueprint.base_url_prefix)
@@ -14,10 +14,12 @@ def get_meal(meal_item_id):
 	return meal_controller.get_meal(meal_item_id)
 
 @meal_blueprint.route('/', methods=['POST'])
+@Security.validator(['mealName|required:string', 'description|required:string', 'image|required', 'mealType|required'])
 def create_meal():
 	return meal_controller.create_meal()
 
 @meal_blueprint.route('/<int:meal_item_id>/', methods=['PATCH', 'PUT'])
+@Security.validator(['mealName|required:string', 'description|required:string', 'image|required', 'mealType|required'])
 def update_meal(meal_item_id):
 	return meal_controller.update_meal(meal_item_id)
 
