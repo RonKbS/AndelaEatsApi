@@ -2,7 +2,7 @@ from tests.base_test_case import BaseTestCase
 from factories.vendor_factory import VendorFactory
 
 class TestVendorEndpoints(BaseTestCase):
-	
+
 	def setUp(self):
 		self.BaseSetUp()
 	
