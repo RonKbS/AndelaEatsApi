@@ -59,6 +59,9 @@ class Security:
 									datetime.strptime(payload[request_key], '%Y-%m-%d')
 								except Exception as e:
 									return make_response(jsonify({'msg': 'Bad Request - {} should be valid date. Format: YYYY-MM-DD'.format(request_key)})), 400
+
+							if validator == 'list' and type(payload[request_key]) is not list:
+								return make_response(jsonify({'msg': 'Bad Request - {} must be a list'.format(request_key)})), 400
 							
 				return f(*args, **kwargs)
 			
