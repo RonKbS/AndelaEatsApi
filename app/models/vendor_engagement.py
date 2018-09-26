@@ -9,7 +9,7 @@ class VendorEngagement(BaseModel):
     status = db.Column(db.Integer(), nullable=False, default=1)
     termination_reason = db.Column(db.Text(), nullable=True)
     vendor = db.relationship('Vendor', lazy=False)
+    menus = db.relationship('Menu', backref='vendor_engagements', lazy=True)
     
     # meal_items = db.relationship('MealItem', backref='vendor_engagements', lazy=True)
-    # menus = db.relationship('Menu', backref='vendor_engagements', lazy=True)
     # vendor_ratings = db.relationship('VendorRating', backref='vendor_engagements', lazy=True)

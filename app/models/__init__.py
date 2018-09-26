@@ -5,6 +5,7 @@ from .role import Role
 from .permission import Permission
 from .user_role import UserRole
 from .vendor_rating import VendorRating
+from .menu import Menu
 
 
 # from .order import Order
