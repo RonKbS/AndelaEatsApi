@@ -7,7 +7,7 @@ class Security:
 	@staticmethod
 	def validator(rules):
 		"""
-		:rules: list -  The sets of keys and rules to be appliesd
+		:rules: list -  The sets of keys and rules to be applied
 		example: [username|required:max-255:min-120, email|required:email]
 		"""
 		
@@ -49,11 +49,38 @@ class Security:
 								return make_response(jsonify({'msg': 'Bad Request - {} is required'.format(request_key)})), 400
 							
 							if validator.find('max') > -1:
-								pass
+								max_value = int(validator.split('-')[1])
+								if int(payload[request_key]) > max_value:
+									return make_response(jsonify({'msg': 'Bad Request - {} can only have a max value of {}'.format(request_key, max_value)})), 400
 							
 							if validator.find('min') > -1:
-								pass
+								min_value = int(validator.split('-')[1])
+								if int(payload[request_key]) < min_value:
+									return make_response(jsonify({'msg': 'Bad Request - {} can only have a min value of {}'.format(request_key, min_value)})), 400
 							
+							if validator.find('length') > -1:
+								length_value = int(validator.split('-')[1])
+								if len(str(payload[request_key])) > length_value:
+									return make_response(jsonify({'msg': 'Bad Request - {} can only have a len of {}'.format(request_key, length_value)})), 400
+								
+							if validator == 'exists':
+								import importlib
+								from app.utils import to_pascal_case
+								
+								repo_name = rule_array[2]
+								column_name = rule_array[3]
+								
+								rep = 'app.repositories.{}_repo'.format(repo_name)
+								mod = importlib.import_module(rep)
+								repo_class = getattr(mod, '{}Repo'.format(to_pascal_case(repo_name)))
+								repo = repo_class()
+								
+								for val in payload[request_key]:
+									v = repo.find_first(**{column_name:val})
+									
+									if not v:
+										return make_response(jsonify({'msg': 'Bad Request - {} contains invalid {}(s) for {} table '.format(request_key, column_name, repo_name)})), 400
+
 							if validator == 'date':
 								try:
 									datetime.strptime(payload[request_key], '%Y-%m-%d')

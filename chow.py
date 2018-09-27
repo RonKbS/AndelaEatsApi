@@ -18,11 +18,9 @@ AndelaEats Chow CLI Tool
 import sys, os
 import inflect
 from termcolor import colored
+from app.utils import to_pascal_case
 
 inflect_engine = inflect.engine()
-
-def to_pascal_case(word, sep='_'):
-	return ''.join(list(map(lambda x: x.capitalize(), word.split(sep))))
 
 def create_model(name):
 	name_clean = to_pascal_case(name)

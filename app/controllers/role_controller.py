@@ -24,6 +24,7 @@ class RoleController(BaseController):
 	
 	def create_role(self):
 		name, help = self.request_params('name', 'help')
+		return self.handle_response('OK')
 		role = self.role_repo.new_role(name=name, help=help)
 		if role:
 			return self.handle_response('OK', payload={'role': role.serialize()})
