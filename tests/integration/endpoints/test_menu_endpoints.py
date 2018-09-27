@@ -1,6 +1,9 @@
+from datetime import date, datetime, timedelta
 from tests.base_test_case import BaseTestCase
 from factories import VendorFactory, RoleFactory, PermissionFactory, UserRoleFactory, MenuFactory, VendorEngagementFactory, MealItemFactory
 from app.utils import db
+from app.models import MealItem, Menu
+from app.repositories.menu_repo import MenuRepo
 
 
 class MenuEndpoints(BaseTestCase):
@@ -74,3 +77,37 @@ class MenuEndpoints(BaseTestCase):
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
 		self.assert400(response)
+
+	def test_list_menu_endpoint(self):
+		'''Test that users with the right permission can view list of menus'''
+
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		permission = PermissionFactory.create(keyword='view_menu', role_id=role.id)
+		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		current_date = str(datetime.now().date())
+
+		m = MenuFactory()
+		results = Menu.query.all()
+		
+		response = self.client().get(self.make_url(f'/admin/menu/lunch/{current_date}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		print(results[0].date.date())
+		# payload = response_json['payload']
+		# print(payload)
+		# print(f'/admin/menu/lunch/{current_date}')
+		# print(m.date.date())
+		# print(type(current_date))
+		# print(m.meal_period)
+
+
+		# print('<><><><><><><><><><><><><', payload)
+		# print('<><><><><><><><><><><><><', results)
+		# print('+++++++++++++++++', results[1].date.date(), date1.date())
+		# print('+++++++++++++++++', results[0].meal_period)
+
+
+		self.assert200(response)
+		self.assertEqual(len(payload['menuList']), 1)
+		# self.assertJSONKeysPresent(payload['ratings'][0], 'vendorId', 'userId', 'id', 'comment', 'rating','channel')

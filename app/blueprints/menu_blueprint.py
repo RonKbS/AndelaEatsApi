@@ -24,3 +24,8 @@ def create_menu():
 @Auth.has_permission('delete_menu')
 def delete_menu(menu_id):
 	return menu_controller.delete_menu(menu_id)
+
+@menu_blueprint.route('/<meal_period>/<date>', methods=['GET'])
+@Auth.has_permission('view_menu')
+def list_menu(meal_period, date):
+	return menu_controller.list_menus(meal_period, date)

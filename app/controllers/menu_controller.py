@@ -1,6 +1,7 @@
 from app.controllers.base_controller import BaseController
 from app.repositories.menu_repo import MenuRepo
 from app.repositories.meal_item_repo import MealItemRepo
+from datetime import datetime
 
 
 class MenuController(BaseController):
@@ -32,3 +33,18 @@ class MenuController(BaseController):
 			self.meal_repo.update(menu, **updates)
 			return self.handle_response('OK', payload={"status": "success"})
 		return self.handle_response('Invalid or incorrect menu_id provided', status_code=400)
+
+	def list_menus(self, period, date):
+		'''retrieves a list of menus for a specific date for a specific meal period.
+		date fornat: "YYYY-MM-DD"
+		'''
+		date_value = datetime.strptime(date, '%Y-%m-%d')
+		print(date_value)
+		menus = self.menu_repo.filter_by(**{'date':date_value, 'meal_period':period})
+		print(len(menus.items))
+
+		if len(menus.items) > 0:
+			menu_list = [menu.serialize() for menu in menus.items]
+			return self.handle_response('OK', payload={'dateOfMeal': date, 'mealPeriod': period, 'menuList': menu_list, 'meta': self.pagination_meta(menus)})
+
+		return self.handle_response('Expected vendor in request')
