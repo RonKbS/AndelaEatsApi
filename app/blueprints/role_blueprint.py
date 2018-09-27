@@ -17,8 +17,8 @@ def get_role(role_id):
 	return role_controller.get_role(role_id)
 
 @role_blueprint.route('/', methods=['POST'])
-@Security.validator(['name|required', 'p|min-10', 'p|max-100', 'p|length-4', 'sideItems|exists|user_role|id'])
-# @Auth.has_permission('create_roles')
+@Security.validator(['name|required'])
+@Auth.has_permission('create_roles')
 def create_role():
 	return role_controller.create_role()
 
