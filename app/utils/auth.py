@@ -7,8 +7,24 @@ from app.repositories.user_role_repo import UserRoleRepo
 class Auth:
 	''' This class will house Authentication and Authorization Methods '''
 	
+	''' Routes The Location Header Should  Not Be Applied Ignore'''
+	location_header_ignore = [
+		'/locations'
+	]
+	
+	''' Routes The Authentication Header Should  Not Be Applied Ignore'''
+	authentication_header_ignore = [
+		'/locations',
+		'/docs'
+	]
+	
 	@staticmethod
 	def check_token():
+		
+		for endpoint in Auth.authentication_header_ignore:
+			if request.path.find(endpoint) > -1: # If endpoint in request.path, ignore this check
+				return None
+			
 		try:
 			token = Auth.get_token()
 		except Exception as e:
@@ -77,10 +93,8 @@ class Auth:
 		
 	@staticmethod
 	def check_location_header():
-		''' Routes to Ignore'''
-		ignore = ['/locations']
 		
-		for endpoint in ignore:
+		for endpoint in Auth.location_header_ignore:
 			if request.path.find(endpoint) > -1: # If endpoint in request.path, ignore this check
 				return None
 		try:
