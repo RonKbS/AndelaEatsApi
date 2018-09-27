@@ -13,7 +13,7 @@ class TestMenuRepo(BaseTestCase):
   def test_new_menu_method_returns_new_menu_object(self):
     menu = MenuFactory.build()
     new_menu = self.repo.new_menu(
-      menu.date, menu.meal_period, 1, menu.allowed_side,
+      menu.date.strftime('%Y-%m-%d'), menu.meal_period, 1, menu.allowed_side,
       menu.allowed_protein, [1,2], [3,4], 1
     )
 
