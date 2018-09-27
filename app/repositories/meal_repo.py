@@ -1,5 +1,5 @@
 from app.repositories.base_repo import BaseRepo
-from app.models.meal import MealItem
+from app.models.meal_item import MealItem
 
 
 class MealItemRepo(BaseRepo):
