@@ -1,8 +1,8 @@
 from app.controllers.base_controller import BaseController
-from app.repositories.meal_repo import MealItemRepo
+from app.repositories.meal_item_repo import MealItemRepo
 
 
-class MealController(BaseController):
+class MealItemController(BaseController):
 	
 	def __init__(self, request):
 		BaseController.__init__(self, request)
