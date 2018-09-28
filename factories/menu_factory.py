@@ -26,4 +26,4 @@ class MenuFactory(factory.alchemy.SQLAlchemyModelFactory):
 	main_meal = factory.SubFactory(MealItemFactory)
 	vendor_engagement = factory.SubFactory(VendorEngagementFactory)
 
-	date = datetime.now()
+	date = datetime.now().date()

@@ -34,17 +34,24 @@ class MenuController(BaseController):
 			return self.handle_response('OK', payload={"status": "success"})
 		return self.handle_response('Invalid or incorrect menu_id provided', status_code=400)
 
-	def list_menus(self, period, date):
+	def list_menus(self, menu_period, menu_date):
 		'''retrieves a list of menus for a specific date for a specific meal period.
 		date fornat: "YYYY-MM-DD"
 		'''
-		date_value = datetime.strptime(date, '%Y-%m-%d')
-		print(date_value)
-		menus = self.menu_repo.filter_by(**{'date':date_value, 'meal_period':period})
-		print(len(menus.items))
+		menus = self.menu_repo.filter_by(date=menu_date, meal_period=menu_period)
 
-		if len(menus.items) > 0:
-			menu_list = [menu.serialize() for menu in menus.items]
-			return self.handle_response('OK', payload={'dateOfMeal': date, 'mealPeriod': period, 'menuList': menu_list, 'meta': self.pagination_meta(menus)})
+		if menus:
+			menu_list = []
+			for menu in menus.items:
+				serialised_menu = menu.serialize()
+				proteins = self.menu_repo.get_meal_items(menu.protein_items)
+				sides = self.menu_repo.get_meal_items(menu.side_items)
 
-		return self.handle_response('Expected vendor in request')
+				serialised_menu['mainMeal'] = self.meal_repo.get(menu.main_meal_id).serialize()['name']
+				serialised_menu['proteinItems'] = [protein['name'] for protein in proteins]
+				serialised_menu['sideItems'] = [side['name'] for side in sides]		
+				menu_list.append(serialised_menu)
+
+			return self.handle_response('OK', payload={'dateOfMeal': menu_date, 'mealPeriod': menu_period, 'menuList': menu_list, 'meta': self.pagination_meta(menus)})
+
+		return self.handle_response('Provide valid meal period and date')
