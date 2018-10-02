@@ -15,7 +15,9 @@ menu_controller = MenuController(request)
 	'date|required:date', 'mealPeriod|required',
 	'mainMealId|required:int', 'allowedSide|required:int',
 	'allowedProtein|required:int', 'sideItems|required:list',
-	'proteinItems|required:list', 'vendorEngagementId|required:int'
+	'proteinItems|required:list', 'vendorEngagementId|required:int',
+	'sideItems|exists|meal_item|id', 'proteinItems|exists|meal_item|id',
+	'mainMealId|exists|meal_item|id'
 	])
 def create_menu():
 	return menu_controller.create_menu()
@@ -36,7 +38,9 @@ def list_menu(meal_period, date):
 	'date|required:date', 'mealPeriod|required',
 	'mainMealId|required:int', 'allowedSide|required:int',
 	'allowedProtein|required:int', 'sideItems|required:list',
-	'proteinItems|required:list', 'vendorEngagementId|required:int'
+	'proteinItems|required:list', 'vendorEngagementId|required:int',
+	'sideItems|exists|meal_item|id', 'proteinItems|exists|meal_item|id',
+	'mainMealId|exists|meal_item|id'
 	])
 def update_menu(menu_id):
 	return menu_controller.update_menu(menu_id)

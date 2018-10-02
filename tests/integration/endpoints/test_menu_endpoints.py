@@ -28,10 +28,10 @@ class MenuEndpoints(BaseTestCase):
 		db.session.commit()
 
 		data = {
-		'date': menu.date.strftime('%Y-%m-%d'), 'mealPeriod': menu.meal_period,
-		'mainMealId': main_meal_item.id, 'allowedSide': menu.allowed_side,
-		'allowedProtein': menu.allowed_protein, 'sideItems': [side_meal_item.id],
-		'proteinItems': [protein_meal_item.id], 'vendorEngagementId': vendor_engagement.id
+			'date': menu.date.strftime('%Y-%m-%d'), 'mealPeriod': menu.meal_period,
+			'mainMealId': main_meal_item.id, 'allowedSide': menu.allowed_side,
+			'allowedProtein': menu.allowed_protein, 'sideItems': [side_meal_item.id],
+			'proteinItems': [protein_meal_item.id], 'vendorEngagementId': vendor_engagement.id
 		}
 
 		response = self.client().post(self.make_url('/admin/menu/'), data=self.encode_to_json_string(data), headers=self.headers())
@@ -41,7 +41,7 @@ class MenuEndpoints(BaseTestCase):
 		self.assertEqual(response.status_code, 201)
 		self.assertJSONKeysPresent(payload, 'menu')
 		self.assertJSONKeysPresent(payload['menu'], 'mainMeal', 'proteinItems', 'sideItems', 'allowedProtein', 'allowedSide',
-		'date', 'id', 'mealPeriod', 'timestamps', 'vendorEngagementId'
+			'date', 'id', 'mealPeriod', 'timestamps', 'vendorEngagementId'
 		)
 
 		self.assertEqual(payload['menu']['vendorEngagementId'], vendor_engagement.id)
@@ -49,6 +49,36 @@ class MenuEndpoints(BaseTestCase):
 		self.assertEqual(payload['menu']['mainMealId'], main_meal_item.id)
 		self.assertEqual(payload['menu']['allowedSide'], menu.allowed_side)
 		self.assertEqual(payload['menu']['allowedProtein'], menu.allowed_protein)
+
+		'''Test invalid main item id request'''
+		data = {
+			'date': menu.date.strftime('%Y-%m-%d'), 'mealPeriod': menu.meal_period,
+			'mainMealId': 1000, 'allowedSide': menu.allowed_side,
+			'allowedProtein': menu.allowed_protein, 'sideItems': [side_meal_item.id],
+			'proteinItems': [protein_meal_item.id], 'vendorEngagementId': vendor_engagement.id
+		}
+		response = self.client().post(self.make_url('/admin/menu/'), data=self.encode_to_json_string(data), headers=self.headers())
+		self.assertEqual(response.status_code, 400)
+
+		'''Test invalid side item id request'''
+		data = {
+			'date': menu.date.strftime('%Y-%m-%d'), 'mealPeriod': menu.meal_period,
+			'mainMealId': main_meal_item.id, 'allowedSide': menu.allowed_side,
+			'allowedProtein': menu.allowed_protein, 'sideItems': [side_meal_item.id, 1000],
+			'proteinItems': [protein_meal_item.id], 'vendorEngagementId': vendor_engagement.id
+		}
+		response = self.client().post(self.make_url('/admin/menu/'), data=self.encode_to_json_string(data), headers=self.headers())
+		self.assertEqual(response.status_code, 400)
+
+		'''Test invalid protein item id request'''
+		data = {
+			'date': menu.date.strftime('%Y-%m-%d'), 'mealPeriod': menu.meal_period,
+			'mainMealId': main_meal_item.id, 'allowedSide': menu.allowed_side,
+			'allowedProtein': menu.allowed_protein, 'sideItems': [side_meal_item.id],
+			'proteinItems': [protein_meal_item.id, 1000], 'vendorEngagementId': vendor_engagement.id
+		}
+		response = self.client().post(self.make_url('/admin/menu/'), data=self.encode_to_json_string(data), headers=self.headers())
+		self.assertEqual(response.status_code, 400)
 
 	def test_delete_menu_endpoint_with_right_permission(self):
 		menu = MenuFactory.create()
@@ -154,3 +184,33 @@ class MenuEndpoints(BaseTestCase):
 		response = self.client().put(self.make_url('/admin/menu/100/'), data=self.encode_to_json_string(data), headers=self.headers())
 		self.assertEqual(response.status_code, 404)
 
+		'''Test invalid main item id request'''
+		data = {
+			'date': menu.date.strftime('%Y-%m-%d'), 'mealPeriod': menu.meal_period,
+			'mainMealId': 1000, 'allowedSide': 2,
+			'allowedProtein': 2, 'sideItems': [side_meal_item.id],
+			'proteinItems': [protein_meal_item.id], 'vendorEngagementId': vendor_engagement.id
+		}
+		response = self.client().put(self.make_url('/admin/menu/{}/'.format(menu.id)), data=self.encode_to_json_string(data), headers=self.headers())
+		self.assertEqual(response.status_code, 400)
+
+		'''Test invalid side item id request'''
+		data = {
+			'date': menu.date.strftime('%Y-%m-%d'), 'mealPeriod': menu.meal_period,
+			'mainMealId': main_meal_item.id, 'allowedSide': 2,
+			'allowedProtein': 2, 'sideItems': [side_meal_item.id, 1000],
+			'proteinItems': [protein_meal_item.id], 'vendorEngagementId': vendor_engagement.id
+		}
+		response = self.client().put(self.make_url('/admin/menu/{}/'.format(menu.id)), data=self.encode_to_json_string(data), headers=self.headers())
+		self.assertEqual(response.status_code, 400)
+
+		'''Test invalid protein item id request'''
+		data = {
+			'date': menu.date.strftime('%Y-%m-%d'), 'mealPeriod': menu.meal_period,
+			'mainMealId': main_meal_item.id, 'allowedSide': 2,
+			'allowedProtein': 2, 'sideItems': [side_meal_item.id],
+			'proteinItems': [protein_meal_item.id, 1000], 'vendorEngagementId': vendor_engagement.id
+		}
+
+		response = self.client().put(self.make_url('/admin/menu/{}/'.format(menu.id)), data=self.encode_to_json_string(data), headers=self.headers())
+		self.assertEqual(response.status_code, 400)
