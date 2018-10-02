@@ -1,6 +1,10 @@
+from datetime import date, datetime, timedelta
 from tests.base_test_case import BaseTestCase
 from factories import VendorFactory, RoleFactory, PermissionFactory, UserRoleFactory, MenuFactory, VendorEngagementFactory, MealItemFactory
 from app.utils import db
+from app.models import MealItem, Menu
+from app.repositories.menu_repo import MenuRepo
+from app.utils.enums import MealPeriods
 
 
 class MenuEndpoints(BaseTestCase):
@@ -74,6 +78,41 @@ class MenuEndpoints(BaseTestCase):
 
 		self.assert400(response)
 
+
+	def test_list_menu_endpoint_without_right_permission(self):
+		'''Test that users without the right permission can view list of menus'''
+
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		permission = PermissionFactory.create(keyword='view_menu', role_id=100)
+		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		current_date = datetime.now().date()
+
+		MenuFactory.create_batch(5)
+		results = Menu.query.all()
+
+		response = self.client().get(self.make_url(f'/admin/menu/{MealPeriods.lunch}/{current_date}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assert400(response)
+
+	def test_list_menu_endpoint_with_right_permission(self):
+		'''Test that users with the right permission can view list of menus'''
+
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		permission = PermissionFactory.create(keyword='view_menu', role_id=role.id)
+		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		current_date = datetime.now().date()
+
+		MenuFactory.create_batch(5)
+
+
+		response = self.client().get(self.make_url(f'/admin/menu/{MealPeriods.lunch}/{current_date}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assert200(response)
+
 	def test_update_menu_endpoint(self):
 
 		main_meal_item = MealItemFactory.build()
@@ -114,3 +153,4 @@ class MenuEndpoints(BaseTestCase):
 		'''Test invalid update request'''
 		response = self.client().put(self.make_url('/admin/menu/100/'), data=self.encode_to_json_string(data), headers=self.headers())
 		self.assertEqual(response.status_code, 404)
+
