@@ -25,7 +25,19 @@ def create_menu():
 def delete_menu(menu_id):
 	return menu_controller.delete_menu(menu_id)
 
+
 @menu_blueprint.route('/<meal_period>/<date>', methods=['GET'])
 @Auth.has_permission('view_menu')
 def list_menu(meal_period, date):
 	return menu_controller.list_menus(meal_period, date)
+
+@menu_blueprint.route('/<int:menu_id>/', methods=['PATCH', 'PUT'])
+@Security.validator([
+	'date|required:date', 'mealPeriod|required',
+	'mainMealId|required:int', 'allowedSide|required:int',
+	'allowedProtein|required:int', 'sideItems|required:list',
+	'proteinItems|required:list', 'vendorEngagementId|required:int'
+	])
+def update_menu(menu_id):
+	return menu_controller.update_menu(menu_id)
+
