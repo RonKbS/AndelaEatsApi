@@ -48,7 +48,6 @@ class MenuEndpoints(BaseTestCase):
 
 	def test_delete_menu_endpoint_with_right_permission(self):
 		menu = MenuFactory.create()
-		# menu.save()
 
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
@@ -74,3 +73,44 @@ class MenuEndpoints(BaseTestCase):
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
 		self.assert400(response)
+
+	def test_update_menu_endpoint(self):
+
+		main_meal_item = MealItemFactory.build()
+		side_meal_item = MealItemFactory.build()
+		protein_meal_item = MealItemFactory.build()
+		vendor = VendorFactory.build()
+		db.session.add(vendor)
+		db.session.commit()
+		vendor_engagement = VendorEngagementFactory.build(vendor_id=vendor.id)
+		db.session.add(vendor_engagement)
+		db.session.add(main_meal_item)
+		db.session.add(side_meal_item)
+		db.session.add(protein_meal_item)
+		db.session.commit()
+		menu = MenuFactory.create()
+		menu.main_meal_id = main_meal_item.id
+		menu.side_items = side_meal_item.id
+		menu.protein_items = protein_meal_item.id
+		menu.vendor_engagement_id = vendor_engagement.id
+		db.session.add(menu)
+		db.session.commit()
+
+		data = {
+			'date': menu.date.strftime('%Y-%m-%d'), 'mealPeriod': menu.meal_period,
+			'mainMealId': main_meal_item.id, 'allowedSide': 2,
+			'allowedProtein': 2, 'sideItems': [side_meal_item.id],
+			'proteinItems': [protein_meal_item.id], 'vendorEngagementId': vendor_engagement.id
+    	}
+
+		response = self.client().put(self.make_url('/admin/menu/{}/'.format(menu.id)), data=self.encode_to_json_string(data), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+		payload = response_json['payload']
+
+		self.assert200(response)
+		self.assertEqual(payload['menu']['allowedProtein'], data['allowedProtein'])
+		self.assertEqual(payload['menu']['allowedSide'], data['allowedSide'])
+
+		'''Test invalid update request'''
+		response = self.client().put(self.make_url('/admin/menu/100/'), data=self.encode_to_json_string(data), headers=self.headers())
+		self.assertEqual(response.status_code, 404)

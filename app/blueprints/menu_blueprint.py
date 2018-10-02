@@ -24,3 +24,13 @@ def create_menu():
 @Auth.has_permission('delete_menu')
 def delete_menu(menu_id):
 	return menu_controller.delete_menu(menu_id)
+
+@menu_blueprint.route('/<int:menu_id>/', methods=['PATCH', 'PUT'])
+@Security.validator([
+	'date|required:date', 'mealPeriod|required',
+	'mainMealId|required:int', 'allowedSide|required:int',
+	'allowedProtein|required:int', 'sideItems|required:list',
+	'proteinItems|required:list', 'vendorEngagementId|required:int'
+	])
+def update_menu(menu_id):
+	return menu_controller.update_menu(menu_id)
