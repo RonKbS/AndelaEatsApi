@@ -3,6 +3,7 @@ from config import get_env
 from app import create_app
 from flask_script import Manager
 from app.utils.auth import Auth
+from app.utils.seed_data import seed_db
 from flask_migrate import Migrate, MigrateCommand
 
 app = create_app(get_env('APP_ENV'))
@@ -29,7 +30,14 @@ def create_db():
 @manager.command
 def drop_db():
 	db.drop_all()
-	
+
+
+# seeds database
+@manager.command
+def seed_all():
+    seed_db()
+
+
 @manager.command
 def show_routes():
 	from termcolor import colored
