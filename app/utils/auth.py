@@ -129,7 +129,7 @@ class Auth:
 				if not user_role:
 					return make_response(jsonify({'msg': 'Access Error - No Role Granted'})), 400
 
-				user_perms = permission_repo.filter_by(**{'role_id': user_role.id})
+				user_perms = permission_repo.filter_by(**{'role_id': user_role.role_id})
 				
 				perms = [perm.keyword for perm in user_perms.items]
 				if len(perms) == 0:
