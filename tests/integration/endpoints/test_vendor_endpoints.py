@@ -1,5 +1,7 @@
+import datetime
 from tests.base_test_case import BaseTestCase
-from factories.vendor_factory import VendorFactory
+from app.repositories.vendor_engagement_repo import VendorEngagementRepo
+from factories import VendorFactory, PermissionFactory, RoleFactory, UserRoleFactory
 
 class TestVendorEndpoints(BaseTestCase):
 
@@ -71,3 +73,62 @@ class TestVendorEndpoints(BaseTestCase):
 		# User arbitrary value of 100 as the Vendor ID
 		response = self.client().put(self.make_url('/vendors/100'), data=self.encode_to_json_string(data), headers=self.headers())
 		self.assert400(response)
+
+	def test_delete_vendor_endpoint_with_right_permission(self):
+		vendor = VendorFactory.create()
+
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		permission = PermissionFactory.create(keyword='delete_vendor', role_id=role.id)
+		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+		response = self.client().delete(self.make_url(f'/vendors/{vendor.id}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+		payload = response_json['payload']
+
+		self.assert200(response)
+		self.assertEqual(payload['status'], 'success')
+		self.assertEqual(response_json['msg'], 'Vendor deleted')
+
+	def test_delete_vendor_endpoint_without_right_permission(self):
+		vendor = VendorFactory.create()
+
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		permission = PermissionFactory.create(keyword='delete_vendor', role_id=100)
+		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+		response = self.client().delete(self.make_url(f'/vendors/{vendor.id}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assert400(response)
+		self.assertEqual(response_json['msg'], 'Access Error - No Permission Granted')
+
+	def test_delete_vendor_endpoint_with_wrong_vendor_id(self):
+		vendor = VendorFactory.create()
+
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		permission = PermissionFactory.create(keyword='delete_vendor', role_id=role.id)
+		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+		response = self.client().delete(self.make_url(f'/vendors/-576A'), headers=self.headers())
+
+		self.assert404(response)
+
+	def test_delete_vendor_with_associated_engagement(self):
+		current_date = datetime.datetime.now().date()
+		vendor = VendorFactory.create()
+		vendor_engagement_repo = VendorEngagementRepo()
+		vendor_engagement = vendor_engagement_repo.new_vendor_engagement(vendor_id=vendor.id, start_date=current_date)
+
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		permission = PermissionFactory.create(keyword='delete_vendor', role_id=role.id)
+		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+		response = self.client().delete(self.make_url(f'/vendors/{vendor.id}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assert400(response)
+		self.assertEqual(response_json['msg'], 'Vendor cannot be deleted because it has a child object')

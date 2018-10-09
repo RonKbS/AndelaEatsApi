@@ -53,7 +53,20 @@ class VendorController(BaseController):
 		return self.handle_response('Invalid or incorrect vendor_id provided', status_code=400)
 
 	def delete_vendor(self, vendor_id):
-		pass
+		vendor = self.vendor_repo.get(vendor_id)
+		if vendor:
+			if vendor.is_deleted:
+				return self.handle_response('Vendor has already been deleted', status_code=400)
+
+			if any( not dependent.is_deleted for dependent in(vendor.engagements or vendor.ratings)):
+				return self.handle_response('Vendor cannot be deleted because it has a child object', status_code=400)
+			updates = {}
+			updates['is_deleted'] = True
+
+			self.vendor_repo.update(vendor, **updates)
+			return self.handle_response('Vendor deleted', payload={"status": "success"})
+		return self.handle_response('Invalid or incorrect vendor_id provided', status_code=400)
+
 
 	''' VENDOR ENGAGEMENT '''
 	def list_vendor_engagements(self):
@@ -72,7 +85,7 @@ class VendorController(BaseController):
 		if engagement:
 			e = engagement.serialize()
 			e['vendor'] = engagement.vendor.serialize()
-			
+
 			return self.handle_response('OK', payload={'engagement': e})
 		else:
 			return self.handle_response('Bad Request', status_code=400)

@@ -12,7 +12,6 @@ class Menu(BaseModel):
 	allowed_protein = db.Column(db.Integer(), default=1)
 	side_items = db.Column(db.String(), nullable=False)
 	protein_items = db.Column(db.String(), nullable=False)
-	is_deleted = db.Column(db.Boolean, default=False, nullable=False)
 	vendor_engagement_id = db.Column(db.Integer(), db.ForeignKey('vendor_engagements.id'))
 
 	main_meal = db.relationship('MealItem', lazy=False)
