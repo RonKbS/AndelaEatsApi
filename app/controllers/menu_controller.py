@@ -28,10 +28,13 @@ class MenuController(BaseController):
 		menu = self.menu_repo.get(menu_id)
 		updates = {}
 		if menu:
+			if menu.is_deleted:
+				return self.handle_response('Menu has already been deleted', status_code=400)
+
 			updates['is_deleted'] = True
 
 			self.meal_repo.update(menu, **updates)
-			return self.handle_response('OK', payload={"status": "success"})
+			return self.handle_response('Menu deleted', payload={"status": "success"})
 		return self.handle_response('Invalid or incorrect menu_id provided', status_code=400)
 
 

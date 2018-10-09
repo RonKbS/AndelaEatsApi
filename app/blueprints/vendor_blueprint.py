@@ -28,6 +28,7 @@ def update_vendor(vendor_id):
 	return vendor_controller.update_vendor(vendor_id)
 
 @vendor_blueprint.route('/<int:vendor_id>', methods=['DELETE'])
+@Auth.has_permission('delete_vendor')
 def delete_vendor(vendor_id):
 	return vendor_controller.delete_vendor(vendor_id)
 
