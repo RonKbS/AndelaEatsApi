@@ -76,7 +76,7 @@ class Security:
 								repo = repo_class()
 								
 								if type(payload[request_key]) == int:
-									v = repo.find_first(**{column_name:payload[request_key]})
+    									v = repo.find_first(**{column_name:payload[request_key]})
 										
 									if not v:
 										return make_response(jsonify({'msg': 'Bad Request - {} contains invalid {}(s) for {} table '.format(request_key, column_name, repo_name)})), 400
