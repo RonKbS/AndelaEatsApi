@@ -52,6 +52,11 @@ def create_engagement():
 def update_engagement(engagement_id):
 	return vendor_controller.update_vendor_engagement(engagement_id)
 
+@engagement_blueprint.route('/<int:engagement_id>', methods=['DELETE'])
+@Auth.has_permission('delete_engagement')
+def delete_engagement(engagement_id):
+	return vendor_controller.delete_engagement(engagement_id)
+
 
 '''VENDOR RATING'''
 @rating_blueprint.route('/vendor/<int:vendor_id>', methods=['GET'])
