@@ -35,7 +35,7 @@ def drop_db():
 # seeds database
 @manager.command
 def seed_all():
-    seed_db()
+	seed_db()
 
 
 @manager.command
