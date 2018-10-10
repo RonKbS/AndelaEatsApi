@@ -69,6 +69,7 @@ jobs:
       - run:
          name: Seed the data to environment
          command: |
+            python -v
             python run.py seed_all
       
 
