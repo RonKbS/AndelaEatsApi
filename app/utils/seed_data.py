@@ -17,6 +17,7 @@ user_role_data = [{'role_id': '1', 'user_id': 'eno.bassey@andela.com'},
             {'role_id': '1', 'user_id': 'victor.adukwu@andela.com'},
             {'role_id': '1', 'user_id': 'chibueze.ayogu@andela.com'},
             {'role_id': '1', 'user_id': 'kayode.adeola@andela.com'},
+            {'role_id': '1', 'user_id': 'joseph.cobhams@andela.com'},
             {'role_id': '1', 'user_id': 'abdulfatai.aka@andela.com'}]
 
 permission_data = [{'name': 'delete_menu', 'role_id': '1', 'keyword': 'delete'},
