@@ -66,6 +66,10 @@ jobs:
             git config --global user.email "joseph.cobhams@andela.com"
             git config --global user.name "Joseph Cobhams"
             git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git edge:master
+      - run:
+         name: Seed the data to environment
+         command: python run.py seed_all
+      
 
 workflows:
   version: 2
