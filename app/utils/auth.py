@@ -19,20 +19,21 @@ class Auth:
 	
 	@staticmethod
 	def check_token():
-		
-		for endpoint in Auth.authentication_header_ignore:
-			if request.path.find(endpoint) > -1: # If endpoint in request.path, ignore this check
-				return None
-			
-		try:
-			token = Auth.get_token()
-		except Exception as e:
-			return make_response(jsonify({'msg': str(e)}),400)
-		
-		try:
-			decoded = Auth.decode_token(token)
-		except Exception as e:
-			return make_response(jsonify({'msg': str(e)}), 400)
+		if request.method != 'OPTIONS':
+
+			for endpoint in Auth.authentication_header_ignore:
+				if request.path.find(endpoint) > -1: # If endpoint in request.path, ignore this check
+					return None
+
+			try:
+				token = Auth.get_token()
+			except Exception as e:
+				return make_response(jsonify({'msg': str(e)}),400)
+
+			try:
+				decoded = Auth.decode_token(token)
+			except Exception as e:
+				return make_response(jsonify({'msg': str(e)}), 400)
 	
 	@staticmethod
 	def _get_user():
