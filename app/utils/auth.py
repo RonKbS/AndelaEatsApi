@@ -93,14 +93,14 @@ class Auth:
 		
 	@staticmethod
 	def check_location_header():
-		
-		for endpoint in Auth.location_header_ignore:
-			if request.path.find(endpoint) > -1: # If endpoint in request.path, ignore this check
-				return None
-		try:
-			Auth.get_location()
-		except Exception as e:
-			return make_response(jsonify({'msg': str(e)}),400)
+		if request.method != 'OPTIONS':
+			for endpoint in Auth.location_header_ignore:
+				if request.path.find(endpoint) > -1: # If endpoint in request.path, ignore this check
+					return None
+			try:
+				Auth.get_location()
+			except Exception as e:
+				return make_response(jsonify({'msg': str(e)}), 400)
 		
 	@staticmethod
 	def get_location():
