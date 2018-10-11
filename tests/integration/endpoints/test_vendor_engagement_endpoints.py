@@ -1,7 +1,7 @@
-from datetime import date
+from datetime import date, datetime
+from app.repositories.menu_repo import MenuRepo
 from tests.base_test_case import BaseTestCase
-from factories.vendor_factory import VendorFactory
-from factories.vendor_engagement_factory import VendorEngagementFactory
+from factories import VendorFactory, RoleFactory, UserRoleFactory, PermissionFactory, VendorEngagementFactory, MenuFactory
 
 class TestVendorEngagementEndpoints(BaseTestCase):
 
@@ -116,3 +116,64 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 		response = self.client().put(self.make_url('/engagements/100'), data=self.encode_to_json_string(data),
 									 headers=self.headers())
 		self.assert400(response)
+
+	
+	def test_delete_engagement_endpoint_with_right_permission(self):
+		engagement = VendorEngagementFactory.create()
+
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		permission = PermissionFactory.create(keyword='delete_engagement', role_id=role.id)
+		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+		response = self.client().delete(self.make_url(f'/engagements/{engagement.id}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+		payload = response_json['payload']
+
+		self.assert200(response)
+		self.assertEqual(payload['status'], 'success')
+		self.assertEqual(response_json['msg'], 'Engagement deleted')
+
+	def test_delete_engagement_endpoint_without_right_permission(self):
+		engagement = VendorEngagementFactory.create()
+
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		permission = PermissionFactory.create(keyword='delete_engagement', role_id=100)
+		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+		response = self.client().delete(self.make_url(f'/engagements/{engagement.id}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assert400(response)
+		self.assertEqual(response_json['msg'], 'Access Error - No Permission Granted')
+
+	def test_delete_engagement_endpoint_with_wrong_vendor_id(self):
+		engagement = VendorEngagementFactory.create()
+
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		permission = PermissionFactory.create(keyword='delete_engagement', role_id=role.id)
+		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+		response = self.client().delete(self.make_url(f'/engagement/-576A'), headers=self.headers())
+
+		self.assert404(response)
+
+	def test_delete_engagement_with_associated_menus(self):
+		current_date = datetime.now().date()
+		engagement = VendorEngagementFactory.create()
+		menu_repo = MenuRepo()
+		menu = menu_repo.new_menu(date='2018-10-15', meal_period='lunch', main_meal_id=1, allowed_side=1, allowed_protein=1,
+    side_items=[2], protein_items=[3], vendor_engagement_id=engagement.id)
+
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		permission = PermissionFactory.create(keyword='delete_engagement', role_id=role.id)
+		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+		response = self.client().delete(self.make_url(f'/engagements/{engagement.id}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assert400(response)
+		self.assertEqual(response_json['msg'], 'This engagement cannot be deleted because it has a child object')
