@@ -7,6 +7,7 @@ from .user_role import UserRole
 from .vendor_rating import VendorRating
 from .menu import Menu
 from .meal_item import MealItem
+from .order import Order
 
 
 # from .order import Order

@@ -1,7 +1,8 @@
 from app.controllers.base_controller import BaseController
-from app.repositories.order_repo import OrderRepo
+from app.repositories import OrderRepo
 from app.repositories.meal_item_repo import MealItemRepo
 from datetime import datetime
+from app.utils.auth import Auth
 
 
 class OrderController(BaseController):
@@ -28,15 +29,16 @@ class OrderController(BaseController):
         Creates a new order
         """
 
-        user_id, date_booked_for, channel, meal_items = self.request_params('userId', 'dateBookedFor', 'channel', 'mealItems')
+        user_id, date_booked, date_booked_for, channel, meal_items = self.request_params('userId', 'dateBooked', 'dateBookedFor', 'channel', 'mealItems')
 
         meal_object_items = []
+        
         for meal_item_id in meal_items:
             meal_item = self.meal_item_repo.get(meal_item_id)
             meal_object_items.append(meal_item)
 
-        new_order = self.order_repo.create_order(user_id, date_booked_for, channel, meal_object_items).serialize()
-
+        new_order = self.order_repo.create_order(user_id, date_booked_for, date_booked,  meal_object_items, channel).serialize()
+        
         return self.handle_response('OK', payload={'order': new_order})
 
     def update_order(self, order_id):
@@ -66,11 +68,18 @@ class OrderController(BaseController):
         return self.handle_response('Invalid or incorrect order_id provided', status_code=400)
 
     def delete_order(self, order_id):
-        order = self.order_repo.get(order_id)
-        updates = {}
+
+        order = self.order_repo.get(order_id)		
+        
         if order:
+            if order.is_deleted:
+                return self.handle_response('Order has already been deleted', status_code=400)
+            if Auth.user('id') != order.user_id:
+                return self.handle_response('You cannot delete an order that is not yours', status_code=403)
+
+            updates = {}
             updates['is_deleted'] = True
 
             self.order_repo.update(order, **updates)
-            return self.handle_response('OK', payload={"status": "success"})
+            return self.handle_response('Order deleted', payload={"status": "success"})
         return self.handle_response('Invalid or incorrect order_id provided', status_code=400)
