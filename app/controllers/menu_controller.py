@@ -48,8 +48,10 @@ class MenuController(BaseController):
 			menu_list = []
 			for menu in menus.items:
 				serialised_menu = menu.serialize()
-				proteins = self.menu_repo.get_meal_items(menu.protein_items)
-				sides = self.menu_repo.get_meal_items(menu.side_items)
+				arr_protein = menu.protein_items.split(",")
+				arr_side = menu.protein_items.split(",")
+				proteins = self.menu_repo.get_meal_items(arr_protein)
+				sides = self.menu_repo.get_meal_items(arr_side)
 
 				serialised_menu['mainMeal'] = self.meal_repo.get(menu.main_meal_id).serialize()['name']
 				serialised_menu['proteinItems'] = [protein['name'] for protein in proteins]
