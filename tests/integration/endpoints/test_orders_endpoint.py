@@ -22,7 +22,7 @@ class TestOrderEndpoints(BaseTestCase):
         meal_items = [meal_item1.id, meal_item2.id, meal_item3.id]
         meal_item_objects = [meal_item1, meal_item2, meal_item3]
 
-        data = {'userId': order.user_id, 'dateBookedFor': order.date_booked_for.strftime('%Y-%m-%d'), 'channel': order.channel, 'mealItems': meal_items}
+        data = {'userId': order.user_id, 'dateBookedFor': order.date_booked_for.strftime('%Y-%m-%d'), 'dateBooked': order.date_booked.strftime('%Y-%m-%d'), 'channel': order.channel, 'mealItems': meal_items}
 
         response = self.client().post(self.make_url('/orders/'), data=self.encode_to_json_string(data), headers=self.headers())
 
@@ -87,12 +87,3 @@ class TestOrderEndpoints(BaseTestCase):
         response = self.client().put(self.make_url('/orders/100/'), data=self.encode_to_json_string(data), headers=self.headers())
         self.assert400(response)
 
-    def test_delete_order_endpoint(self):
-        order = OrderFactory.create()
-
-        response = self.client().delete(self.make_url('/orders/{}/'.format(order.id)), headers=self.headers())
-        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
-        payload = response_json['payload']
-      
-        self.assert200(response)
-        self.assertEqual(payload['status'], "success")
