@@ -80,6 +80,17 @@ class VendorController(BaseController):
 
 		return self.handle_response('OK', payload={'engagements': engagements_list, 'meta': self.pagination_meta(engagements)})
 
+	def upcoming_vendor_engagements(self):
+		engagements = self.vendor_engagement_repo.get_engagement_by_date()
+
+		engagements_list = []
+		for e in engagements.items:
+			engagement = e.serialize()
+			engagement['vendor'] = e.vendor.serialize()
+			engagements_list.append(engagement)
+
+		return self.handle_response('OK', payload={'engagements': engagements_list, 'meta': self.pagination_meta(engagements)})
+
 	def get_vendor_engagement(self, engagement_id):
 		engagement = self.vendor_engagement_repo.get(engagement_id)
 		if engagement:

@@ -38,6 +38,10 @@ def delete_vendor(vendor_id):
 def list_engagements():
 	return vendor_controller.list_vendor_engagements()
 
+@engagement_blueprint.route('/upcoming', methods=['GET'])
+def upcoming_engagements():
+	return vendor_controller.upcoming_vendor_engagements()
+
 @engagement_blueprint.route('/<int:engagement_id>', methods=['GET'])
 def get_engagements(engagement_id):
 	return vendor_controller.get_vendor_engagement(engagement_id)

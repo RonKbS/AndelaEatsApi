@@ -1,6 +1,6 @@
 from app.repositories.base_repo import BaseRepo
 from app.models.vendor_engagement import VendorEngagement
-
+from datetime import datetime
 
 class VendorEngagementRepo(BaseRepo):
 	
@@ -11,3 +11,6 @@ class VendorEngagementRepo(BaseRepo):
 		vendor_engagement = VendorEngagement(vendor_id=vendor_id, start_date=start_date, end_date=end_date, status=status, termination_reason=termination_reason)
 		vendor_engagement.save()
 		return vendor_engagement
+
+	def get_engagement_by_date(self):
+		return VendorEngagement.query.filter(VendorEngagement.start_date >= datetime.now().date()).paginate(error_out=False)
