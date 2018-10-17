@@ -21,12 +21,7 @@ def check_token():
 def check_location_header():
 	return Auth.check_location_header()
 
-#@app.after_request
-#def handle_preflight(response):
-#    response.headers.add('Access-Control-Allow-Origin', '*')
-#    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Location')
-#    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS')
-#    return response
+
 
 # Creates the db tables
 @manager.command

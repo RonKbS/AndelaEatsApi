@@ -1,6 +1,7 @@
 from functools import wraps
 from datetime import datetime
 from flask import request, make_response, jsonify
+import pdb
 
 class Security:
     
@@ -95,8 +96,15 @@ class Security:
                                     return make_response(jsonify({'msg': 'Bad Request - {} should be valid date. Format: YYYY-MM-DD'.format(request_key)})), 400
 
                             if validator == 'list' and type(payload[request_key]) is not list:
-                                return make_response(jsonify({'msg': 'Bad Request - {} must be a list'.format(request_key)})), 400
-                            
+                                return make_response(jsonify({'msg': 'Bad Request - {} must be a list'.format(request_key)})), 400\
+
+                            if validator == 'list_int':
+                                if type(payload[request_key]) is not list:
+                                    return make_response(jsonify({'msg': 'Bad Request - {} must be a list'.format(request_key)})), 400
+                                for val in payload[request_key]:
+                                    if type(val) is not int:
+                                        return make_response(jsonify({'msg': 'Bad Request - [{}] in list must be integer'.format(val)})), 400
+
                 return f(*args, **kwargs)
             
             return decorated
