@@ -22,6 +22,7 @@ def check_location_header():
 	return Auth.check_location_header()
 
 
+
 # Creates the db tables
 @manager.command
 def create_db():

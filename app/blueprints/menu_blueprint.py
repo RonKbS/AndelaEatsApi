@@ -14,8 +14,8 @@ menu_controller = MenuController(request)
 @Security.validator([
 	'date|required:date', 'mealPeriod|required',
 	'mainMealId|required:int', 'allowedSide|required:int',
-	'allowedProtein|required:int', 'sideItems|required:list',
-	'proteinItems|required:list', 'vendorEngagementId|required:int',
+	'allowedProtein|required:int', 'sideItems|required:list_int',
+	'proteinItems|required:list_int', 'vendorEngagementId|required:int',
 	'sideItems|exists|meal_item|id', 'proteinItems|exists|meal_item|id',
 	'mainMealId|exists|meal_item|id'
 	])

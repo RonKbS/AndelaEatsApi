@@ -2,7 +2,7 @@ from app.repositories.base_repo import BaseRepo
 from app.models.menu import Menu
 from app.repositories.meal_item_repo import MealItemRepo
 from datetime import datetime
-
+import pdb
 
 class MenuRepo(BaseRepo):
 
@@ -13,6 +13,7 @@ class MenuRepo(BaseRepo):
   def new_menu(self, date, meal_period, main_meal_id, allowed_side, allowed_protein,
     side_items, protein_items, vendor_engagement_id):
     date = datetime.strptime(date, '%Y-%m-%d')
+    meal_period = meal_period.lower()
     menu = Menu(
       date=date, meal_period=meal_period,
       main_meal_id=main_meal_id, allowed_side=allowed_side,

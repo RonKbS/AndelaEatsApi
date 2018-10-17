@@ -15,10 +15,12 @@ class MenuController(BaseController):
 			'date', 'mealPeriod', 'mainMealId', 'allowedSide',
 			'allowedProtein', 'sideItems', 'proteinItems', 'vendorEngagementId'
 		)
+
 		menu = self.menu_repo.new_menu(
 			date, meal_period, main_meal_id, allowed_side,
 			allowed_protein, side_items, protein_items, vendor_engagement_id
 		).serialize()
+
 		menu['mainMeal'] = self.meal_repo.get(main_meal_id).serialize()
 		menu['proteinItems'] = self.menu_repo.get_meal_items(protein_items)
 		menu['sideItems'] = self.menu_repo.get_meal_items(side_items)
@@ -49,13 +51,13 @@ class MenuController(BaseController):
 			for menu in menus.items:
 				serialised_menu = menu.serialize()
 				arr_protein = menu.protein_items.split(",")
-				arr_side = menu.protein_items.split(",")
+				arr_side = menu.side_items.split(",")
 				proteins = self.menu_repo.get_meal_items(arr_protein)
 				sides = self.menu_repo.get_meal_items(arr_side)
 
 				serialised_menu['mainMeal'] = self.meal_repo.get(menu.main_meal_id).serialize()['name']
-				serialised_menu['proteinItems'] = [protein['name'] for protein in proteins]
-				serialised_menu['sideItems'] = [side['name'] for side in sides]		
+				serialised_menu['proteinItems'] = [{'id': protein['id'], 'name': protein['name']} for protein in proteins]
+				serialised_menu['sideItems'] = [{'id': side['id'], 'name': side['name']} for side in sides]
 				menu_list.append(serialised_menu)
 
 			return self.handle_response('OK', payload={'dateOfMeal': menu_date, 'mealPeriod': menu_period, 'menuList': menu_list, 'meta': self.pagination_meta(menus)})
