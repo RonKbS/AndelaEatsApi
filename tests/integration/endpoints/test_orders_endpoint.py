@@ -22,7 +22,7 @@ class TestOrderEndpoints(BaseTestCase):
         meal_items = [meal_item1.id, meal_item2.id, meal_item3.id]
         meal_item_objects = [meal_item1, meal_item2, meal_item3]
 
-        data = {'userId': order.user_id, 'dateBookedFor': order.date_booked_for.strftime('%Y-%m-%d'), 'dateBooked': order.date_booked.strftime('%Y-%m-%d'), 'channel': order.channel, 'mealItems': meal_items}
+        data = {'userId': BaseTestCase.user_id(), 'dateBookedFor': order.date_booked_for.strftime('%Y-%m-%d'), 'dateBooked': order.date_booked.strftime('%Y-%m-%d'), 'channel': order.channel, 'mealItems': meal_items}
 
         response = self.client().post(self.make_url('/orders/'), data=self.encode_to_json_string(data), headers=self.headers())
 
@@ -31,7 +31,7 @@ class TestOrderEndpoints(BaseTestCase):
 
         self.assert200(response)
         self.assertJSONKeyPresent(response_json, 'payload')
-        self.assertEqual(payload['order']['userId'], order.user_id)
+        self.assertEqual(payload['order']['userId'], BaseTestCase.user_id())
         self.assertEqual(payload['order']['channel'], order.channel)
 
     def test_list_order_endpoint(self):
