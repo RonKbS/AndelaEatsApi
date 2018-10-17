@@ -23,6 +23,6 @@ def create_order():
 def update_order(order_id):
     return order_controller.update_order(order_id)
 
-@order_blueprint.route('/<int:order_id>/', methods=['DELETE'])
+@order_blueprint.route('/<int:order_id>', methods=['DELETE'])
 def delete_order(order_id):
     return order_controller.delete_order(order_id)
