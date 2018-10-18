@@ -14,7 +14,7 @@ def get_order(order_id):
     return order_controller.get_order(order_id)
 
 @order_blueprint.route('/', methods=['POST'])
-@Security.validator(['userId|required:string', 'dateBookedFor|required:string', 'channel|string', 'mealItems|required:list'])
+@Security.validator(['dateBookedFor|required:string', 'channel|string', 'mealItems|required:list'])
 def create_order():
     return order_controller.create_order()
 
