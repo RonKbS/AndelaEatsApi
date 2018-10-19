@@ -15,15 +15,18 @@ class OrderController(BaseController):
     def list_orders(self):
         orders = self.order_repo.filter_by(is_deleted=False)
         orders_list = [order.serialize() for order in orders.items]
+        for order in orders_list:
+            meal_items = self.order_repo.get(order['id']).meal_item_orders
+            order['mealItems'] = [item.name for item in meal_items]
         return self.handle_response('OK', payload={'orders': orders_list, 'meta': self.pagination_meta(orders)})
 
     def get_order(self, order_id):
         order = self.order_repo.get(order_id)
         if order:
-            order = order.serialize()
-            return self.handle_response('OK', payload={'order': order})
-        else:
-            return self.handle_response('Bad Request', status_code=400)
+            order_serialized = order.serialize()
+            order_serialized['mealItems'] = [item.name for item in order.meal_item_orders]
+            return self.handle_response('OK', payload={'order': order_serialized})
+        return self.handle_response('Order not found', status_code=400)
 
     def create_order(self):
         """
