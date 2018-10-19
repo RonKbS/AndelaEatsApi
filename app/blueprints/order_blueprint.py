@@ -1,11 +1,13 @@
 from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, Security, request
 from app.controllers.order_controller import OrderController
+from app.utils.auth import Auth
 
 url_prefix = '{}/orders'.format(BaseBlueprint.base_url_prefix)
 order_blueprint = Blueprint('order', __name__, url_prefix=url_prefix)
 order_controller = OrderController(request)
 
 @order_blueprint.route('/', methods=['GET'])
+@Auth.has_permission('view_orders')
 def list_order():
     return order_controller.list_orders()
 

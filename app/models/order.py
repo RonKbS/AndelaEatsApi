@@ -13,7 +13,7 @@ class Order(BaseModel):
 	channel = db.Column(db.Enum(Channels))
 	status = db.Column(db.SmallInteger(), default=0)
 	is_deleted = db.Column(db.Boolean, default=False, nullable=False)
-	meal_item_orders = db.relationship('MealItem', secondary='meal_item_orders', lazy='subquery', backref=db.backref('orders', lazy=True))
+	meal_item_orders = db.relationship('MealItem', secondary='meal_item_orders', lazy=False, backref=db.backref('orders', lazy=True))
 
 # many to many relationship between meal item and order
 meal_item_orders = db.Table(

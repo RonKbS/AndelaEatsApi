@@ -1,5 +1,5 @@
 from tests.base_test_case import BaseTestCase
-from factories import OrderFactory, MealItemFactory
+from factories import OrderFactory, MealItemFactory, RoleFactory, PermissionFactory, UserRoleFactory
 from app.utils.enums import MealTypes
 from datetime import datetime
 from app.utils import db
@@ -35,6 +35,10 @@ class TestOrderEndpoints(BaseTestCase):
     def test_list_order_endpoint(self):
         # Create Three Dummy Vendors
         orders = OrderFactory.create_batch(3)
+        role = RoleFactory.create(name='admin')
+        user_id = BaseTestCase.user_id()
+        permission = PermissionFactory.create(keyword='view_orders', role_id=role.id)
+        user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
         response = self.client().get(self.make_url('/orders/'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
