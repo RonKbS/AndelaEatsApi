@@ -2,8 +2,7 @@ from sqlalchemy import and_
 from app.controllers.base_controller import BaseController
 from app.repositories import OrderRepo
 from app.repositories.meal_item_repo import MealItemRepo
-from app.models import Order
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.utils.auth import Auth
 
 
@@ -32,8 +31,14 @@ class OrderController(BaseController):
         """
 
         user_id = Auth.user('id')
-        date_booked, date_booked_for, channel, meal_items = self.request_params('dateBooked', 'dateBookedFor', 'channel', 'mealItems')
+        date_booked_for, channel, meal_items = self.request_params('dateBookedFor', 'channel', 'mealItems')
         orders = self.order_repo.filter_by(is_deleted=False).items
+
+        order_date_midnight = datetime.strptime(date_booked_for, '%Y-%m-%d').replace(hour=00).replace(minute=00).replace(second=00)
+        current_time = datetime.now()
+        if order_date_midnight - current_time < timedelta('hours'==7):
+            return self.handle_response('It is too late to book meal for the selected date ', status_code=400)
+
         if orders and any(order.user_id == user_id and order.date_booked_for == datetime.strptime(date_booked_for, '%Y-%m-%d').date() for order in orders):
             return self.handle_response('you have already booked for this date.', status_code=400)
 
@@ -43,7 +48,7 @@ class OrderController(BaseController):
             meal_item = self.meal_item_repo.get(meal_item_id)
             meal_object_items.append(meal_item)
 
-        new_order = self.order_repo.create_order(user_id, date_booked_for, date_booked, meal_object_items, channel).serialize()
+        new_order = self.order_repo.create_order(user_id, date_booked_for, meal_object_items, channel).serialize()
         new_order['mealItems'] = [item.name for item in meal_object_items]
         return self.handle_response('OK', payload={'order': new_order})
 
