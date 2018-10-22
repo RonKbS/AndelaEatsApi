@@ -1,7 +1,7 @@
 from tests.base_test_case import BaseTestCase
 from factories import OrderFactory, MealItemFactory, RoleFactory, PermissionFactory, UserRoleFactory
 from app.utils.enums import MealTypes
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.utils import db
 from app.repositories import OrderRepo
 
@@ -20,7 +20,7 @@ class TestOrderEndpoints(BaseTestCase):
         meal_item2.meal_type = MealTypes.main
 
         meal_items = [meal_item1.id, meal_item2.id, meal_item3.id]
-        data = {'userId': BaseTestCase.user_id(), 'dateBookedFor': order.date_booked_for.strftime('%Y-%m-%d'), 'dateBooked': order.date_booked.strftime('%Y-%m-%d'), 'channel': order.channel, 'mealItems': meal_items}
+        data = {'userId': order.user_id, 'dateBookedFor': order.date_booked_for.strftime('%Y-%m-%d'), 'dateBooked': order.date_booked.strftime('%Y-%m-%d'), 'channel': order.channel, 'mealItems': meal_items}
 
         response = self.client().post(self.make_url('/orders/'), data=self.encode_to_json_string(data), headers=self.headers())
 
@@ -52,7 +52,7 @@ class TestOrderEndpoints(BaseTestCase):
         order = OrderFactory.create()
         print('/orders/{}/'.format(order.id))
 
-        response = self.client().get(self.make_url('/orders/{}/'.format(order.id)), headers=self.headers())
+        response = self.client().get(self.make_url('/orders/{}'.format(order.id)), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
         payload = response_json['payload']
 
@@ -75,18 +75,17 @@ class TestOrderEndpoints(BaseTestCase):
 
         meal_items = [meal_item1.id, meal_item2.id, meal_item3.id]
         
-        data = {'channel': 'slack', 'userId': 'another Id', 'dateBookedFor': order2.date_booked_for.strftime('%Y-%m-%d'), 'mealItems': meal_items}
-        response = self.client().put(self.make_url('/orders/{}/'.format(order1.id)), data=self.encode_to_json_string(data), headers=self.headers())
+        data = {'channel': 'slack', 'dateBookedFor': order2.date_booked_for.strftime('%Y-%m-%d'), 'mealItems': meal_items}
+        response = self.client().put(self.make_url('/orders/{}'.format(order1.id)), data=self.encode_to_json_string(data), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
         payload = response_json['payload']
 
         self.assert200(response)
         self.assertEqual(payload['order']['channel'], data['channel'])
-        self.assertEqual(payload['order']['userId'], data['userId'])
 
         '''Test invalid update request'''
         # User arbitrary value of 100 as the meal item ID
-        response = self.client().put(self.make_url('/orders/100/'), data=self.encode_to_json_string(data), headers=self.headers())
+        response = self.client().put(self.make_url('/orders/100'), data=self.encode_to_json_string(data), headers=self.headers())
         self.assert400(response)
 
     def test_delete_order_endpoint_with_right_permission(self):

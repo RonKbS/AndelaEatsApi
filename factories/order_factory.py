@@ -4,6 +4,7 @@ from random import randint
 from app.models.order import Order
 from app.utils.enums import Channels
 from datetime import date, timedelta
+from tests.base_test_case import BaseTestCase
 
 
 class OrderFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -16,4 +17,3 @@ class OrderFactory(factory.alchemy.SQLAlchemyModelFactory):
     channel = Channels.web
     date_booked_for = date.today() + timedelta(days=2)
     date_booked = date.today()
-    user_id = "a valid user"

@@ -11,7 +11,7 @@ order_controller = OrderController(request)
 def list_order():
     return order_controller.list_orders()
 
-@order_blueprint.route('/<int:order_id>/', methods=['GET'])
+@order_blueprint.route('/<int:order_id>', methods=['GET'])
 def get_order(order_id):
     return order_controller.get_order(order_id)
 
@@ -20,8 +20,8 @@ def get_order(order_id):
 def create_order():
     return order_controller.create_order()
 
-@order_blueprint.route('/<int:order_id>/', methods=['PATCH', 'PUT'])
-@Security.validator(['userId|required:string', 'dateBookedFor|required:date', 'channel|string', 'mealItems|required:list'])
+@order_blueprint.route('/<int:order_id>', methods=['PUT'])
+@Security.validator(['dateBookedFor|required:date', 'channel|string', 'mealItems|required:list'])
 def update_order(order_id):
     return order_controller.update_order(order_id)
 
