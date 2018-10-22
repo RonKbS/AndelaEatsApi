@@ -58,8 +58,7 @@ class OrderController(BaseController):
 
     def update_order(self, order_id):
 
-        user_id, date_booked_for, channel, meal_items = self.request_params('userId', 'dateBookedFor', 'channel', 'mealItems')
-
+        date_booked_for, channel, meal_items = self.request_params('dateBookedFor', 'channel', 'mealItems')
         meal_object_items = []
         for meal_item_id in meal_items:
             meal_item = self.meal_item_repo.get(meal_item_id)
@@ -67,18 +66,23 @@ class OrderController(BaseController):
 
         order = self.order_repo.get(order_id)
         if order:
+            if order.is_deleted:
+                return self.handle_response('Order has already been deleted', status_code=400)
             updates = {}
-            if user_id:
-                updates['user_id'] = user_id
             if date_booked_for:
+                order_date_midnight = datetime.strptime(date_booked_for, '%Y-%m-%d').replace(hour=00).replace(minute=00).replace(second=00)
+                current_time = datetime.now()
+                if order_date_midnight - current_time < timedelta('hours'==7):
+                    return self.handle_response('It is too late to book meal for the selected date ', status_code=400)
                 updates['date_booked_for'] = datetime.strptime(date_booked_for, '%Y-%m-%d')
             if channel:
                 updates['channel'] = channel
             if meal_items:
                 updates['meal_item_orders'] = meal_object_items
 
-            self.order_repo.update(order, **updates)
-            return self.handle_response('OK', payload={'order': order.serialize()})
+            updated_order = self.order_repo.update(order, **updates).serialize()
+            updated_order['mealItems'] = [item.name for item in order.meal_item_orders]
+            return self.handle_response('OK', payload={'order': updated_order})
 
         return self.handle_response('Invalid or incorrect order_id provided', status_code=400)
 
