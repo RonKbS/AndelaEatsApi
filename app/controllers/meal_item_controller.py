@@ -1,5 +1,6 @@
 from app.controllers.base_controller import BaseController
 from app.repositories.meal_item_repo import MealItemRepo
+from app.utils.enums import MealTypes
 
 
 class MealItemController(BaseController):
@@ -27,10 +28,11 @@ class MealItemController(BaseController):
 		"""
 		
 		name, description, image_url, meal_type = self.request_params('mealName', 'description', 'image', 'mealType')
-
-		new_meal_item = self.meal_repo.new_meal_item(name, description, image_url, meal_type).serialize()
+		if MealTypes.has_value(meal_type):
+			new_meal_item = self.meal_repo.new_meal_item(name, description, image_url, meal_type).serialize()
 		
-		return self.handle_response('OK', payload={'mealItem': new_meal_item})
+			return self.handle_response('OK', payload={'mealItem': new_meal_item})
+		return self.handle_response('Invalid meal type. Must be main, protein or side', status_code=400)
 		
 
 	def update_meal(self, meal_id):
