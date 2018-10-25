@@ -10,9 +10,14 @@ class MealItemController(BaseController):
 		self.meal_repo = MealItemRepo()
 	
 	def list_meals(self):
-		meals = self.meal_repo.filter_by(is_deleted=False)
-		meals_list = [meal.serialize() for meal in meals.items]
-		return self.handle_response('OK', payload={'mealItems': meals_list, 'meta': self.pagination_meta(meals)})
+		meals = self.meal_repo.get_unpaginated(is_deleted=False)
+		meals_list = [meal.serialize() for meal in meals]
+		return self.handle_response('OK', payload={'mealItems': meals_list})
+
+	# def list_meals_page(self,page_id):
+	# 	meals = self.meal_repo.filter_by(is_deleted=False)
+    #     meals_list = [meal.serialize() for meal in meals.items]
+    #     return self.handle_response('OK', payload={'mealItems': meals_list, 'meta': self.pagination_meta(meals)})
 	
 	def get_meal(self, meal_id):
 		meal = self.meal_repo.get(meal_id)
