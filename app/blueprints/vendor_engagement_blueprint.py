@@ -24,7 +24,6 @@ def create_engagement():
 	return vendor_engagement_controller.create_vendor_engagement()
 
 @engagement_blueprint.route('/<int:engagement_id>', methods=['PUT', 'PATCH'])
-@Security.validator(['vendorId|required:int', 'startDate|date', 'endDate|date', 'status|int', ])
 def update_engagement(engagement_id):
 	return vendor_engagement_controller.update_vendor_engagement(engagement_id)
 

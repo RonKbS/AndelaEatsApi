@@ -28,7 +28,7 @@ def create_role():
 def update_role(role_id):
 	return role_controller.update_role(role_id)
 
-@role_blueprint.route('/<int:role_id>', methods=['GET'])
+@role_blueprint.route('/<int:role_id>', methods=['DELETE'])
 @Auth.has_permission('delete_roles')
 def delete_role(role_id):
 	return role_controller.delete_role(role_id)

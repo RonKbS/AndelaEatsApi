@@ -22,7 +22,6 @@ def create_vendor():
 	return vendor_controller.create_vendor()
 
 @vendor_blueprint.route('/<int:vendor_id>', methods=['PUT', 'PATCH'])
-@Security.validator(['name|required', 'address|required', 'tel|required:int', 'contactPerson|required' ])
 def update_vendor(vendor_id):
 	return vendor_controller.update_vendor(vendor_id)
 
