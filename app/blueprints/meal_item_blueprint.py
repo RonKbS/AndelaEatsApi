@@ -9,9 +9,10 @@ meal_item_controller = MealItemController(request)
 def list_meals():
 	return meal_item_controller.list_meals()
 
-# @meal_item_blueprint.route('/page/<int:page_id>', methods=['GET'])
-# def list_meals():
-	# return meal_item_controller.list_meals_page()
+@meal_item_blueprint.route('/page/<int:page_id>', methods=['GET'])
+def list_meals_page(page_id):
+	meals_per_page = int(request.args.get('per_page')) if request.args.get('per_page') != None else 10
+	return meal_item_controller.list_meals_page(page_id, meals_per_page)
 
 @meal_item_blueprint.route('/<int:meal_item_id>/', methods=['GET'])
 def get_meal(meal_item_id):

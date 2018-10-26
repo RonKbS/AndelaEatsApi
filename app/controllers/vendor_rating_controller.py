@@ -13,11 +13,11 @@ class VendorRatingController(BaseController):
 	def list_ratings(self, vendor_id):
 		'''retrieves a list of ratings for a specific vendor'''
 
-		ratings = self.vendor_rating_repo.filter_by(vendor_id=vendor_id)
+		ratings = self.vendor_rating_repo.get_unpaginated(vendor_id=vendor_id)
 
 		if ratings:
-			ratings_list = [rating.serialize() for rating in ratings.items]
-			return self.handle_response('OK', payload={'ratings': ratings_list, 'meta': self.pagination_meta(ratings)})
+			ratings_list = [rating.serialize() for rating in ratings]
+			return self.handle_response('OK', payload={'ratings': ratings_list})
 
 		return self.handle_response('Expected vendor in request')
 

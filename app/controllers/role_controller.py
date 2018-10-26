@@ -23,12 +23,12 @@ class RoleController(BaseController):
 		return self.handle_response('Invalid or Missing role_id')
 	
 	def create_role(self):
-		name, help = self.request_params('name', 'help')
-		return self.handle_response('OK')
-		role = self.role_repo.new_role(name=name, help=help)
-		if role:
+		name, help_ = self.request_params('name', 'help')
+		role1 = self.role_repo.find_first(name=name)
+		if not role1:
+			role = self.role_repo.new_role(name=name, help_=help_)
 			return self.handle_response('OK', payload={'role': role.serialize()})
-		return self.handle_response('Application Error')
+		return self.handle_response('Role with this name already exists')
 	
 	def update_role(self, role_id):
 		pass
@@ -55,9 +55,9 @@ class RoleController(BaseController):
 	
 	''' PERMISSIONS '''
 	def get_role_permissions(self, role_id):
-		permissions = self.permission_repo.filter_by(**{'role_id':role_id})
-		perm_list = [permission.serialize() for permission in permissions.items]
-		return self.handle_response('OK', payload={'role_id':role_id, 'role_permissions': perm_list, 'meta': self.pagination_meta(permissions)})
+		permissions = self.permission_repo.get_unpaginated(**{'role_id':role_id})
+		perm_list = [permission.serialize() for permission in permissions]
+		return self.handle_response('OK', payload={'role_id':role_id, 'role_permissions': perm_list})
 	
 	def create_role_permission(self):
 		role_id, name, keyword = self.request_params('role_id', 'name', 'keyword')

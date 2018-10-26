@@ -43,7 +43,7 @@ class BaseRepo:
 	
 	def filter_by(self, **kwargs):
 		"""Query and filter the data of the model."""
-		return self._model.query.filter_by(**kwargs).paginate(error_out=False)
+		return self._model.query.filter_by(is_deleted=False).paginate(**kwargs, error_out=False)
 
 	def get_unpaginated(self, **kwargs):
 		"""Query and filter the data of the model."""

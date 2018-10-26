@@ -13,12 +13,12 @@ class OrderController(BaseController):
         self.meal_item_repo = MealItemRepo()
 
     def list_orders(self):
-        orders = self.order_repo.filter_by(is_deleted=False)
-        orders_list = [order.serialize() for order in orders.items]
+        orders = self.order_repo.get_unpaginated(is_deleted=False)
+        orders_list = [order.serialize() for order in orders]
         for order in orders_list:
             meal_items = self.order_repo.get(order['id']).meal_item_orders
             order['mealItems'] = [item.name for item in meal_items]
-        return self.handle_response('OK', payload={'orders': orders_list, 'meta': self.pagination_meta(orders)})
+        return self.handle_response('OK', payload={'orders': orders_list})
 
     def get_order(self, order_id):
         order = self.order_repo.get(order_id)
@@ -35,7 +35,7 @@ class OrderController(BaseController):
 
         user_id = Auth.user('id')
         date_booked_for, channel, meal_items = self.request_params('dateBookedFor', 'channel', 'mealItems')
-        orders = self.order_repo.filter_by(is_deleted=False).items
+        orders = self.order_repo.get_unpaginated(is_deleted=False)
 
         order_date_midnight = datetime.strptime(date_booked_for, '%Y-%m-%d').replace(hour=00).replace(minute=00).replace(second=00)
         current_time = datetime.now()

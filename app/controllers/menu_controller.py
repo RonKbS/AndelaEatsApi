@@ -1,6 +1,7 @@
 from app.controllers.base_controller import BaseController
 from app.repositories.menu_repo import MenuRepo
 from app.repositories.meal_item_repo import MealItemRepo
+from app.utils.enums import MealPeriods
 from datetime import datetime
 
 
@@ -44,11 +45,10 @@ class MenuController(BaseController):
 		'''retrieves a list of menus for a specific date for a specific meal period.
 		date fornat: "YYYY-MM-DD"
 		'''
-		menus = self.menu_repo.filter_by(date=menu_date, meal_period=menu_period)
-
-		if menus:
+		if MealPeriods.has_value(menu_period):
+			menus = self.menu_repo.get_unpaginated(date=menu_date, meal_period=menu_period)
 			menu_list = []
-			for menu in menus.items:
+			for menu in menus:
 				serialised_menu = menu.serialize()
 				arr_protein = menu.protein_items.split(",")
 				arr_side = menu.side_items.split(",")
@@ -60,7 +60,7 @@ class MenuController(BaseController):
 				serialised_menu['sideItems'] = [{'id': side['id'], 'name': side['name']} for side in sides]
 				menu_list.append(serialised_menu)
 
-			return self.handle_response('OK', payload={'dateOfMeal': menu_date, 'mealPeriod': menu_period, 'menuList': menu_list, 'meta': self.pagination_meta(menus)})
+			return self.handle_response('OK', payload={'dateOfMeal': menu_date, 'mealPeriod': menu_period, 'menuList': menu_list})
 
 		return self.handle_response('Provide valid meal period and date')
 
