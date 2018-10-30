@@ -23,7 +23,6 @@ def create_role():
 	return role_controller.create_role()
 
 @role_blueprint.route('/<int:role_id>', methods=['PUT', 'PATCH'])
-@Security.validator(['name|required'])
 @Auth.has_permission('create_roles')
 def update_role(role_id):
 	return role_controller.update_role(role_id)
