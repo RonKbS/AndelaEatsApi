@@ -9,65 +9,83 @@ class RoleController(BaseController):
 		self.role_repo = RoleRepo()
 		self.user_role_repo = UserRoleRepo()
 		self.permission_repo = PermissionRepo()
-	
+
 	''' ROLES '''
 	def list_roles(self):
 		roles = self.role_repo.fetch_all()
 		role_list = [role.serialize() for role in roles.items]
 		return self.handle_response('OK', payload={'roles': role_list, 'meta': self.pagination_meta(roles)})
-	
+
 	def get_role(self, role_id):
 		role = self.role_repo.get(role_id)
 		if role:
 			return self.handle_response('OK', payload={'role': role.serialize()})
 		return self.handle_response('Invalid or Missing role_id')
-	
+
 	def create_role(self):
 		name, help_ = self.request_params('name', 'help')
 		role1 = self.role_repo.find_first(name=name)
 		if not role1:
 			role = self.role_repo.new_role(name=name, help_=help_)
 			return self.handle_response('OK', payload={'role': role.serialize()})
-		return self.handle_response('Role with this name already exists')
-	
+		return self.handle_response('Role with this name already exists', status_code=400)
+
 	def update_role(self, role_id):
-		pass
-	
-	def delete_role(self, delete_role):
-		pass
-	
+		name, help_ = self.request_params('name', 'help')
+		role = self.role_repo.get(role_id)
+		if role:
+			updates = {}
+			if name:
+				role1 = self.role_repo.find_first(name=name)
+				if role1:
+					return self.handle_response('Role with this name already exists', status_code=400)
+				updates['name'] = name
+			if help_:
+				updates['help'] = help_
+
+			self.role_repo.update(role, **updates)
+			return self.handle_response('OK', payload={'role': role.serialize()})
+		return self.handle_response('Invalid or incorrect role_id provided', status_code=400)
+
+	def delete_role(self, role_id):
+		role = self.role_repo.get(role_id)
+		if role:
+			updates = {}
+			updates['is_deleted'] = True
+			self.role_repo.update(role, **updates)
+			return self.handle_response('role deleted', payload={"status": "success"})
+		return self.handle_response('Invalid or incorrect role_id provided', status_code=400)
+
 	''' USER ROLES '''
 	def get_user_role(self, user_id):
 		user_role = self.user_role_repo.get(user_id)
 		if user_role:
 			return self.handle_response('OK', payload={'user_role': user_role.serialize()})
 		return self.handle_response('Invalid or Missing user_id')
-		
+
 	def create_user_role(self):
 		role_id, user_id = self.request_params('role_id', 'user_id')
 		user_role = self.user_role_repo.new_user_role(role_id=role_id, user_id=user_id)
 		if user_role:
 			return self.handle_response('OK', payload={'user_role': user_role.serialize()})
 		return self.handle_response('Application Error')
-	
+
 	def delete_user_role(self, user_id):
 		pass
-	
+
 	''' PERMISSIONS '''
 	def get_role_permissions(self, role_id):
 		permissions = self.permission_repo.get_unpaginated(**{'role_id':role_id})
 		perm_list = [permission.serialize() for permission in permissions]
 		return self.handle_response('OK', payload={'role_id':role_id, 'role_permissions': perm_list})
-	
+
 	def create_role_permission(self):
 		role_id, name, keyword = self.request_params('role_id', 'name', 'keyword')
 		permission = self.permission_repo.new_permission(role_id=role_id, name=name, keyword=keyword)
 		if permission:
 			return self.handle_response('OK', payload={'permission': permission.serialize()})
 		return self.handle_response('Application Error')
-	
+
 	def delete_role_permission(self, permission_id):
 		pass
-		
-		
 		
