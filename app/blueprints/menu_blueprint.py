@@ -33,6 +33,11 @@ def delete_menu(menu_id):
 def list_menu(meal_period, date):
 	return menu_controller.list_menus(meal_period, date)
 
+@menu_blueprint.route('/<meal_period>/<start_date>/<end_date>', methods=['GET'])
+@Auth.has_permission('view_menu')
+def list_menu_range(meal_period, start_date, end_date):
+	return menu_controller.list_menus_range(meal_period, start_date, end_date)
+
 @menu_blueprint.route('/<int:menu_id>/', methods=['PATCH', 'PUT'])
 @Security.validator([
 	'date|required:date', 'mealPeriod|required',

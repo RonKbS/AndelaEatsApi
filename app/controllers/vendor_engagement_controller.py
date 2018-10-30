@@ -20,7 +20,9 @@ class VendorEngagementController(BaseController):
 			engagement['vendor'] = e.vendor.serialize()
 			engagements_list.append(engagement)
 
-		return self.handle_response('OK', payload={'engagements': engagements_list, 'meta': self.pagination_meta(engagements)})
+		return self.handle_response(
+			'OK', payload={'engagements': engagements_list, 'meta': self.pagination_meta(engagements)}
+		)
 
 	def upcoming_vendor_engagements(self):
 		engagements = self.vendor_engagement_repo.get_engagement_by_date()
@@ -31,7 +33,9 @@ class VendorEngagementController(BaseController):
 			engagement['vendor'] = e.vendor.serialize()
 			engagements_list.append(engagement)
 
-		return self.handle_response('OK', payload={'engagements': engagements_list, 'meta': self.pagination_meta(engagements)})
+		return self.handle_response(
+			'OK', payload={'engagements': engagements_list, 'meta': self.pagination_meta(engagements)}
+		)
 
 	def get_vendor_engagement(self, engagement_id):
 		engagement = self.vendor_engagement_repo.get(engagement_id)
@@ -59,7 +63,8 @@ class VendorEngagementController(BaseController):
 		return self.handle_response('Invalid vendor_id provided', status_code=400)
 
 	def update_vendor_engagement(self, engagement_id):
-		vendor_id, start_date, end_date, status, termination_reason = self.request_params('vendorId', 'startDate', 'endDate', 'status', 'terminationReason')
+		vendor_id, start_date, end_date, status,\
+			termination_reason = self.request_params('vendorId', 'startDate', 'endDate', 'status', 'terminationReason')
 		engagement = self.vendor_engagement_repo.get(engagement_id)
 
 		if start_date:
@@ -93,7 +98,9 @@ class VendorEngagementController(BaseController):
 				return self.handle_response('This engagement has already been deleted', status_code=400)
 
 			if any(not dependent.is_deleted for dependent in engagement.menus):
-				return self.handle_response('This engagement cannot be deleted because it has a child object', status_code=400)
+				return self.handle_response(
+					'This engagement cannot be deleted because it has a child object', status_code=400
+				)
 			updates = {}
 			updates['is_deleted'] = True
 
