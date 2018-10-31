@@ -3,7 +3,6 @@ from app.repositories.menu_repo import MenuRepo
 from app.repositories.meal_item_repo import MealItemRepo
 from app.utils.enums import MealPeriods
 from datetime import datetime
-import pdb
 
 
 class MenuController(BaseController):
@@ -63,7 +62,7 @@ class MenuController(BaseController):
 				'OK', payload={'dateOfMeal': menu_date, 'mealPeriod': menu_period, 'menuList': menu_list}
 			)
 
-		return self.handle_response('Provide valid meal period and date')
+		return self.handle_response('Provide valid meal period and date', status_code=404)
 
 	def list_menus_range(self, menu_period, menu_start_date, menu_end_date):
 		'''retrieves a list of menus for a specific date for a specific meal period.

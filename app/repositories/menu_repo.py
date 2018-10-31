@@ -2,7 +2,6 @@ from app.repositories.base_repo import BaseRepo
 from app.models.menu import Menu
 from app.repositories.meal_item_repo import MealItemRepo
 from datetime import datetime
-import pdb
 
 class MenuRepo(BaseRepo):
 
