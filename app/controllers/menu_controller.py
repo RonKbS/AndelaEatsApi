@@ -62,7 +62,7 @@ class MenuController(BaseController):
 
 			return self.handle_response('OK', payload={'dateOfMeal': menu_date, 'mealPeriod': menu_period, 'menuList': menu_list})
 
-		return self.handle_response('Provide valid meal period and date')
+		return self.handle_response('Provide valid meal period and date', status_code=400)
 
 	def update_menu(self, menu_id):
 		date, meal_period, main_meal_id, allowed_side, allowed_protein, side_items, protein_items, vendor_engagement_id = self.request_params(

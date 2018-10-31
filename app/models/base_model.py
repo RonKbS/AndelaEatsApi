@@ -26,7 +26,6 @@ class BaseModel(db.Model):
 		
 	def serialize(self):
 		s = {to_camel_case(column.name): getattr(self, column.name) for column in self.__table__.columns if column.name not in ['created_at', 'updated_at']}
-		s['timestamps'] = {'created_at': self.created_at, 'updated_at': self.updated_at, 'date_pretty_short': self.created_at.strftime('%b %d, %Y'),
-						   'date_pretty': self.created_at.strftime('%B %d, %Y')}
+		s['timestamps'] = {'created_at': self.created_at, 'updated_at': self.updated_at}
 		return s
 
