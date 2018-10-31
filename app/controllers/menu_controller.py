@@ -10,12 +10,14 @@ class MenuController(BaseController):
 		BaseController.__init__(self, request)
 		self.menu_repo = MenuRepo()
 		self.meal_repo = MealItemRepo()
-    
+
 	def create_menu(self):
-		date, meal_period, main_meal_id, allowed_side, allowed_protein, side_items, protein_items, vendor_engagement_id = self.request_params(
-			'date', 'mealPeriod', 'mainMealId', 'allowedSide',
-			'allowedProtein', 'sideItems', 'proteinItems', 'vendorEngagementId'
-		)
+		date, meal_period, main_meal_id, allowed_side,\
+			allowed_protein, side_items, protein_items,\
+			vendor_engagement_id = self.request_params(
+				'date', 'mealPeriod', 'mainMealId', 'allowedSide',
+				'allowedProtein', 'sideItems', 'proteinItems', 'vendorEngagementId'
+			)
 
 		menu = self.menu_repo.new_menu(
 			date, meal_period, main_meal_id, allowed_side,
@@ -40,7 +42,6 @@ class MenuController(BaseController):
 			return self.handle_response('Menu deleted', payload={"status": "success"})
 		return self.handle_response('Invalid or incorrect menu_id provided', status_code=400)
 
-
 	def list_menus(self, menu_period, menu_date):
 		'''retrieves a list of menus for a specific date for a specific meal period.
 		date fornat: "YYYY-MM-DD"
@@ -52,23 +53,53 @@ class MenuController(BaseController):
 				serialised_menu = menu.serialize()
 				arr_protein = menu.protein_items.split(",")
 				arr_side = menu.side_items.split(",")
-				proteins = self.menu_repo.get_meal_items(arr_protein)
-				sides = self.menu_repo.get_meal_items(arr_side)
-
-				serialised_menu['mainMeal'] = self.meal_repo.get(menu.main_meal_id).serialize()['name']
-				serialised_menu['proteinItems'] = [{'id': protein['id'], 'name': protein['name']} for protein in proteins]
-				serialised_menu['sideItems'] = [{'id': side['id'], 'name': side['name']} for side in sides]
+				serialised_menu['mainMeal'] = self.meal_repo.get(menu.main_meal_id).serialize()
+				serialised_menu['proteinItems'] = self.menu_repo.get_meal_items(arr_protein)
+				serialised_menu['sideItems'] = self.menu_repo.get_meal_items(arr_side)
 				menu_list.append(serialised_menu)
 
-			return self.handle_response('OK', payload={'dateOfMeal': menu_date, 'mealPeriod': menu_period, 'menuList': menu_list})
+			return self.handle_response(
+				'OK', payload={'dateOfMeal': menu_date, 'mealPeriod': menu_period, 'menuList': menu_list}
+			)
+
+		return self.handle_response('Provide valid meal period and date', status_code=404)
+
+	def list_menus_range(self, menu_period, menu_start_date, menu_end_date):
+		'''retrieves a list of menus for a specific date for a specific meal period.
+		date fornat: "YYYY-MM-DD"
+		'''
+		if MealPeriods.has_value(menu_period):
+
+			menus = self.menu_repo.get_range_unpaginated(
+				start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period
+			)
+			menu_list = []
+			for menu in menus:
+				serialised_menu = menu.serialize()
+				arr_protein = menu.protein_items.split(",")
+				arr_side = menu.side_items.split(",")
+				serialised_menu['mainMeal'] = self.meal_repo.get(menu.main_meal_id).serialize()
+				serialised_menu['proteinItems'] = self.menu_repo.get_meal_items(arr_protein)
+				serialised_menu['sideItems'] = self.menu_repo.get_meal_items(arr_side)
+				menu_list.append(serialised_menu)
+
+			return self.handle_response(
+				'OK',
+				payload={
+					'startDateOfSearch': menu_start_date, 'endDateOfSearch': menu_end_date,
+					'mealPeriod': menu_period, 'menuList': menu_list
+				}
+			)
 
 		return self.handle_response('Provide valid meal period and date')
 
 	def update_menu(self, menu_id):
-		date, meal_period, main_meal_id, allowed_side, allowed_protein, side_items, protein_items, vendor_engagement_id = self.request_params(
-			'date', 'mealPeriod', 'mainMealId', 'allowedSide',
-			'allowedProtein', 'sideItems', 'proteinItems', 'vendorEngagementId'
-		)
+		date, meal_period, main_meal_id, allowed_side,\
+			allowed_protein, side_items, protein_items,\
+			vendor_engagement_id = self.request_params(
+				'date', 'mealPeriod', 'mainMealId', 'allowedSide',
+				'allowedProtein', 'sideItems', 'proteinItems', 'vendorEngagementId'
+				)
 
 		menu = self.menu_repo.get(menu_id)
 
@@ -90,6 +121,6 @@ class MenuController(BaseController):
 			menu['proteinItems'] = self.menu_repo.get_meal_items(protein_items)
 			menu['sideItems'] = self.menu_repo.get_meal_items(side_items)
 			return self.handle_response('OK', payload={'menu': menu}, status_code=200)
-    
+
 		return self.handle_response('This menu_id does not exist', status_code=404)
 

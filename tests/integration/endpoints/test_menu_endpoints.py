@@ -12,6 +12,9 @@ class MenuEndpoints(BaseTestCase):
 	def setUp(self):
 		self.BaseSetUp()
 
+	def test_create_menu_endpoint_without_permission(self):
+		pass
+
 	def test_create_menu_endpoint(self):
 		menu = MenuFactory.build()
 		main_meal_item = MealItemFactory.build()
@@ -143,6 +146,18 @@ class MenuEndpoints(BaseTestCase):
 
 		self.assert200(response)
 
+	def test_list_menu_range_endpoint_without_right_permission(self):
+		pass
+
+	def test_list_menu_range_endpoint_with_right_permission(self):
+		pass
+
+	def test_list_menu_range_endpoint_with_right_permission_wrong_range(self):
+		pass
+
+	def test_list_menu_range_endpoint_with_right_permission_wrong_period(self):
+		pass
+
 	def test_update_menu_endpoint(self):
 
 		main_meal_item = MealItemFactory.build()
@@ -214,3 +229,10 @@ class MenuEndpoints(BaseTestCase):
 
 		response = self.client().put(self.make_url('/admin/menu/{}/'.format(menu.id)), data=self.encode_to_json_string(data), headers=self.headers())
 		self.assertEqual(response.status_code, 400)
+
+	def test_update_menu_endpoint_with_wrong_values(self):
+		pass
+
+	def test_update_menu_endpoint_with_wrong_permission(self):
+		pass
+
