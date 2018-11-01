@@ -65,9 +65,9 @@ class MenuController(BaseController):
 		return self.handle_response('Provide valid meal period and date', status_code=404)
 
 	def list_menus_range(self, menu_period, menu_start_date, menu_end_date):
-		'''retrieves a list of menus for a specific date for a specific meal period.
-		date fornat: "YYYY-MM-DD"
-		'''
+		'''retrieves a list of menus for a specific date range for a specific meal period.
+			date fornat: "YYYY-MM-DD"
+			'''
 		if MealPeriods.has_value(menu_period):
 
 			menus = self.menu_repo.get_range_unpaginated(
@@ -91,7 +91,38 @@ class MenuController(BaseController):
 				}
 			)
 
-		return self.handle_response('Provide valid meal period and date', status_code=400)
+		return self.handle_response('Provide valid meal period and date', status_code=404)
+
+	def list_menus_range_page(self, menu_period, menu_start_date, menu_end_date, page_id, page_num):
+		'''retrieves a list of menus for a specific date range for a specific meal period with pagination.
+			date fornat: "YYYY-MM-DD"
+			'''
+		if MealPeriods.has_value(menu_period):
+
+			menus = self.menu_repo.get_range_paginated(
+				start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period,
+				page_id=page_id, page_num=page_num
+			)
+			menu_list = []
+			for menu in menus:
+				serialised_menu = menu.serialize()
+				arr_protein = menu.protein_items.split(",")
+				arr_side = menu.side_items.split(",")
+				serialised_menu['mainMeal'] = self.meal_repo.get(menu.main_meal_id).serialize()
+				serialised_menu['proteinItems'] = self.menu_repo.get_meal_items(arr_protein)
+				serialised_menu['sideItems'] = self.menu_repo.get_meal_items(arr_side)
+				menu_list.append(serialised_menu)
+
+			return self.handle_response(
+				'OK',
+				payload={
+					'startDateOfSearch': menu_start_date, 'endDateOfSearch': menu_end_date,
+					'mealPeriod': menu_period, 'menuList': menu_list
+				}
+			)
+
+		return self.handle_response('Provide valid meal period and date', status_code=404)
+
 
 	def update_menu(self, menu_id):
 		date, meal_period, main_meal_id, allowed_side,\

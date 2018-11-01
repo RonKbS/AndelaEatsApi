@@ -19,6 +19,7 @@ menu_controller = MenuController(request)
 	'sideItems|exists|meal_item|id', 'proteinItems|exists|meal_item|id',
 	'mainMealId|exists|meal_item|id'
 	])
+@Auth.has_permission('create_menu')
 def create_menu():
 	return menu_controller.create_menu()
 
@@ -33,10 +34,18 @@ def delete_menu(menu_id):
 def list_menu(meal_period, date):
 	return menu_controller.list_menus(meal_period, date)
 
+
+@menu_blueprint.route('/<meal_period>/<start_date>/<end_date>/page/<int:page_id>', methods=['GET'])
+@Auth.has_permission('view_menu')
+def list_menu_range_page(meal_period, start_date, end_date, page_id):
+	meals_per_page = int(request.args.get('per_page')) if request.args.get('per_page') != None else 10
+	return menu_controller.list_menus_range_page(meal_period, start_date, end_date, page_id, meals_per_page)
+
 @menu_blueprint.route('/<meal_period>/<start_date>/<end_date>', methods=['GET'])
 @Auth.has_permission('view_menu')
 def list_menu_range(meal_period, start_date, end_date):
 	return menu_controller.list_menus_range(meal_period, start_date, end_date)
+
 
 @menu_blueprint.route('/<int:menu_id>/', methods=['PATCH', 'PUT'])
 @Security.validator([
