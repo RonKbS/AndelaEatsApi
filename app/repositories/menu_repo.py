@@ -10,7 +10,7 @@ class MenuRepo(BaseRepo):
 		self.meal_repo = MealItemRepo()
 
 	def new_menu(self, date, meal_period, main_meal_id, allowed_side, allowed_protein,
-				 side_items, protein_items, vendor_engagement_id):
+						side_items, protein_items, vendor_engagement_id):
 		date = datetime.strptime(date, '%Y-%m-%d')
 		meal_period = meal_period.lower()
 		menu = Menu(
@@ -30,4 +30,10 @@ class MenuRepo(BaseRepo):
 		return meal_items
 
 	def get_range_unpaginated(self, start_date, end_date, meal_period):
-		return Menu.query.filter(Menu.date >= start_date, Menu.date <= end_date, Menu.meal_period == meal_period)
+		return Menu.query.filter(
+			Menu.date >= start_date, Menu.date <= end_date, Menu.meal_period == meal_period, Menu.is_deleted is False
+		)
+
+	def get_range_paginated(self, start_date, end_date, meal_period, **kwargs):
+		return Menu.query.filter(Menu.date >= start_date, Menu.date <= end_date, Menu.meal_period == meal_period)\
+			.filter_by(is_deleted=False).paginate(**kwargs, error_out=False)

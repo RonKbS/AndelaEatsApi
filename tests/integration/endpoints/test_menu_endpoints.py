@@ -13,7 +13,10 @@ class MenuEndpoints(BaseTestCase):
 		self.BaseSetUp()
 
 	def test_create_menu_endpoint_without_permission(self):
-		pass
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		permission = PermissionFactory.create(keyword='delete_menu', role_id=role.id)
+		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 	def test_create_menu_endpoint(self):
 		menu = MenuFactory.build()
@@ -29,6 +32,12 @@ class MenuEndpoints(BaseTestCase):
 		db.session.add(side_meal_item)
 		db.session.add(protein_meal_item)
 		db.session.commit()
+
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		permission = PermissionFactory.create(keyword='create_menu', role_id=role.id)
+		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
 
 		data = {
 			'date': menu.date.strftime('%Y-%m-%d'), 'mealPeriod': menu.meal_period,
