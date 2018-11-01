@@ -7,7 +7,7 @@ class TestRoleEndpoints(BaseTestCase):
 
 	def setUp(self):
 		self.BaseSetUp()
-	
+
 	def test_create_role_endpoint(self):
 		role = RoleFactory.build()
 		role1 = RoleFactory.create(name='admin')
@@ -19,12 +19,12 @@ class TestRoleEndpoints(BaseTestCase):
 		response = self.client().post(self.make_url('/roles/'), data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		payload = response_json['payload']
-		
+
 		self.assert200(response)
 		self.assertJSONKeyPresent(response_json, 'payload')
 		self.assertEqual(payload['role']['name'], role.name)
 		self.assertEqual(payload['role']['help'], role.help)
-		
+
 	def test_list_roles_endpoint(self):
 		
 		RoleFactory.create_batch(3)
@@ -32,7 +32,7 @@ class TestRoleEndpoints(BaseTestCase):
 		user_id = BaseTestCase.user_id()
 		permission = PermissionFactory.create(keyword='view_roles', role_id=role1.id)
 		user_role = UserRoleFactory.create(user_id=user_id, role_id=role1.id)
-		
+
 		response = self.client().get(self.make_url('/roles/'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		payload = response_json['payload']
@@ -40,7 +40,7 @@ class TestRoleEndpoints(BaseTestCase):
 		self.assert200(response)
 		self.assertEqual(len(payload['roles']), 4)
 		self.assertJSONKeysPresent(payload['roles'][0], 'name', 'help')
-		
+
 	def test_get_specific_role_enpoint(self):
 		role = RoleFactory.create()
 		role1 = RoleFactory.create(name='admin')
@@ -66,7 +66,8 @@ class TestRoleEndpoints(BaseTestCase):
 		permission = PermissionFactory.create(keyword='create_roles', role_id=role1.id)
 		user_role = UserRoleFactory.create(user_id=user_id, role_id=role1.id)
 		data = {'name': 'Super Admin'}
-		response = self.client().put(self.make_url('/roles/{}'.format(role.id)), data=self.encode_to_json_string(data), headers=self.headers())
+		response = self.client().put(self.make_url('/roles/{}'
+		.format(role.id)), data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		payload = response_json['payload']
 
@@ -114,13 +115,14 @@ class TestRoleEndpoints(BaseTestCase):
 		self.assertEqual(response_json['msg'], 'Access Error - No Permission Granted')
 
 	def test_delete_role_endpoint_with_wrong_role_id(self):
-		role = RoleFactory.create()
 
 		role1 = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='delete_roles', role_id=role1.id)
-		user_role = UserRoleFactory.create(user_id=user_id, role_id=role1.id)
+		PermissionFactory.create(keyword='delete_roles', name='delete_roles', role_id=role1.id)
+		UserRoleFactory.create(user_id=user_id, role_id=role1.id)
 
-		response = self.client().delete(self.make_url(f'/vendors/-576A'), headers=self.headers())
+		response = self.client().delete(self.make_url(f'/roles/1576'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
 		self.assert404(response)
+		self.assertEqual(response_json['msg'], 'Invalid or incorrect role_id provided')

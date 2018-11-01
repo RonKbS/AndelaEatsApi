@@ -33,30 +33,45 @@ def delete_role(role_id):
 	return role_controller.delete_role(role_id)
 
 ''' USER ROLES '''
-@role_blueprint.route('/user/<int:user_id>', methods=['GET'])
+@role_blueprint.route('/user/<user_id>', methods=['GET'])
+@Auth.has_permission('view_user_roles')
 def get_user_role(user_id):
-	return role_controller.get_user_role(user_id)
+	return role_controller.get_user_roles(user_id)
 
 @role_blueprint.route('/user', methods=['POST'])
-@Security.validator(['role_id|required:int', 'user_id|requied:int'])
+@Security.validator(['role_id|required:int', 'user_id|required'])
+@Auth.has_permission('create_user_roles')
 def create_user_role():
 	return role_controller.create_user_role()
 
-@role_blueprint.route('/user/<int:user_id>', methods=['DELETE'])
-def delete_user_role(user_id):
-	return role_controller.delete_user_role(user_id)
+@role_blueprint.route('/user/<int:user_role_id>', methods=['DELETE'])
+@Auth.has_permission('delete_user_roles')
+def delete_user_role(user_role_id):
+	return role_controller.delete_user_role(user_role_id)
 
 ''' ROLE PERMISSIONS '''
 @role_blueprint.route('/permissions/<int:role_id>', methods=['GET'])
+@Auth.has_permission('view_permissions')
 def get_role_permissions(role_id):
 	return role_controller.get_role_permissions(role_id)
 
+@role_blueprint.route('/permissions', methods=['GET'])
+@Auth.has_permission('view_permissions')
+def get_all_permissions():
+	return role_controller.get_all_permissions()
+
 @role_blueprint.route('/permissions', methods=['POST'])
 @Security.validator(['role_id|required:int', 'name|required', 'keyword|required'])
+@Auth.has_permission('create_permissions')
 def create_role_permission():
 	return role_controller.create_role_permission()
 
+@role_blueprint.route('/permissions/<int:permission_id>', methods=['PUT', 'PATCH'])
+@Auth.has_permission('create_permissions')
+def update_permission(permission_id):
+	return role_controller.update_permission(permission_id)
+
 @role_blueprint.route('/permissions/<int:permission_id>', methods=['DELETE'])
+@Auth.has_permission('delete_permissions')
 def delete_role_permission(permission_id):
 	return role_controller.delete_role_permission(permission_id)
-
