@@ -91,7 +91,7 @@ class MenuController(BaseController):
 				}
 			)
 
-		return self.handle_response('Provide valid meal period and date')
+		return self.handle_response('Provide valid meal period and date', status_code=400)
 
 	def update_menu(self, menu_id):
 		date, meal_period, main_meal_id, allowed_side,\
