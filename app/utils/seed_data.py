@@ -51,13 +51,14 @@ def map_model_data():
 
 
 def seed_db():
-    errors = []
-    mapped_model_data = map_model_data()
-    for model_data in mapped_model_data:
-        try:
-            db.session.bulk_insert_mappings(
-                model_data['model'], model_data['data'])
-            db.session.commit()
-        except SQLAlchemyError as error:
-            errors.append({model_data['model'].__tablename__: error})
-            db.session.rollback()
+	pass
+    # errors = []
+    # mapped_model_data = map_model_data()
+    # for model_data in mapped_model_data:
+    #     try:
+    #         db.session.bulk_insert_mappings(
+    #             model_data['model'], model_data['data'])
+    #         db.session.commit()
+    #     except SQLAlchemyError as error:
+    #         errors.append({model_data['model'].__tablename__: error})
+    #         db.session.rollback()

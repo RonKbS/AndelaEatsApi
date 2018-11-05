@@ -12,6 +12,10 @@ class MenuController(BaseController):
 		self.meal_repo = MealItemRepo()
 
 	def create_menu(self):
+		'''
+		params are gotten from request object
+		:return: json object with status of menu created with menu
+		'''
 		date, meal_period, main_meal_id, allowed_side,\
 			allowed_protein, side_items, protein_items,\
 			vendor_engagement_id = self.request_params(
@@ -30,6 +34,11 @@ class MenuController(BaseController):
 		return self.handle_response('OK', payload={'menu': menu}, status_code=201)
 
 	def delete_menu(self, menu_id):
+		'''
+
+		:param menu_id: id of the menu
+		:return: json object
+		'''
 		menu = self.menu_repo.get(menu_id)
 		updates = {}
 		if menu:
@@ -44,7 +53,9 @@ class MenuController(BaseController):
 
 	def list_menus(self, menu_period, menu_date):
 		'''retrieves a list of menus for a specific date for a specific meal period.
-		date fornat: "YYYY-MM-DD"
+			date fornat: "YYYY-MM-DD"
+			meal period: breakfast or lunch
+			menu_date:  date of request
 		'''
 		if MealPeriods.has_value(menu_period):
 			menus = self.menu_repo.get_unpaginated(date=menu_date, meal_period=menu_period)
@@ -67,7 +78,10 @@ class MenuController(BaseController):
 	def list_menus_range(self, menu_period, menu_start_date, menu_end_date):
 		'''retrieves a list of menus for a specific date range for a specific meal period.
 			date fornat: "YYYY-MM-DD"
-			'''
+			meal period: breakfast or lunch
+			menu_start_date: start date of search
+			menu_end_date: end date of search
+		'''
 		if MealPeriods.has_value(menu_period):
 
 			menus = self.menu_repo.get_range_unpaginated(
@@ -125,6 +139,12 @@ class MenuController(BaseController):
 
 
 	def update_menu(self, menu_id):
+		'''
+
+		:param menu_id: id of menu record
+		:params other params sent via request_param
+		:return:
+		'''
 		date, meal_period, main_meal_id, allowed_side,\
 			allowed_protein, side_items, protein_items,\
 			vendor_engagement_id = self.request_params(
