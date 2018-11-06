@@ -58,7 +58,7 @@ class MenuController(BaseController):
 			menu_date:  date of request
 		'''
 		if MealPeriods.has_value(menu_period):
-			menus = self.menu_repo.get_unpaginated(date=menu_date, meal_period=menu_period)
+			menus = self.menu_repo.get_unpaginated(date=menu_date, meal_period=menu_period, is_deleted=False)
 			menu_list = []
 			for menu in menus:
 				serialised_menu = menu.serialize()
