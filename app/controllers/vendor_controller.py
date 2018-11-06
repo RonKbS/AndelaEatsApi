@@ -15,7 +15,7 @@ class VendorController(BaseController):
 		self.vendor_rating_repo = VendorRatingRepo()
 
 	def list_vendors(self):
-		vendors = self.vendor_repo.filter_all(is_deleted=False)
+		vendors = self.vendor_repo.filter_by()
 		vendors_list = [vendor.serialize() for vendor in vendors.items]
 		return self.handle_response('OK', payload={'vendors': vendors_list, 'meta': self.pagination_meta(vendors)})
 
