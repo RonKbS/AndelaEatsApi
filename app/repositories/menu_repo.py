@@ -31,8 +31,8 @@ class MenuRepo(BaseRepo):
 
 	def get_range_unpaginated(self, start_date, end_date, meal_period):
 		return Menu.query.filter(
-			Menu.date >= start_date, Menu.date <= end_date, Menu.meal_period == meal_period, Menu.is_deleted is False
-		)
+			Menu.date >= start_date, Menu.date <= end_date, Menu.meal_period == meal_period
+		).filter_by(is_deleted=False)
 
 	def get_range_paginated(self, start_date, end_date, meal_period, **kwargs):
 		return Menu.query.filter(Menu.date >= start_date, Menu.date <= end_date, Menu.meal_period == meal_period)\
