@@ -4,6 +4,7 @@ from app.repositories.menu_repo import MenuRepo
 from app.repositories.meal_item_repo import MealItemRepo
 from app.utils.enums import MealPeriods
 from datetime import datetime
+from flasgger import swag_from
 
 
 class MenuController(BaseController):
@@ -13,6 +14,7 @@ class MenuController(BaseController):
 		self.menu_repo = MenuRepo()
 		self.meal_repo = MealItemRepo()
 
+	@swag_from('test_create_menu.yml')
 	def create_menu(self):
 		'''
 		params are gotten from request object

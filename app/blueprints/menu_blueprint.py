@@ -21,6 +21,7 @@ menu_controller = MenuController(request)
 	'mainMealId|exists|meal_item|id'
 	])
 @Auth.has_permission('create_menu')
+
 def create_menu():
 	'''Blueprint function for creating a menu'''
 	return menu_controller.create_menu()

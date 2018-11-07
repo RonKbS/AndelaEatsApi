@@ -9,12 +9,12 @@ class Auth:
 	
 	''' Routes The Location Header Should  Not Be Applied Ignore'''
 	location_header_ignore = [
-		'/locations'
+		'/locations', '/docs', '/apidocs'
 	]
 	
 	''' Routes The Authentication Header Should  Not Be Applied Ignore'''
 	authentication_header_ignore = [
-		'/docs'
+		'/docs', '/apidocs'
 	]
 	
 	@staticmethod
