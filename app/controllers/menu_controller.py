@@ -24,6 +24,7 @@ class MenuController(BaseController):
 				'date', 'mealPeriod', 'mainMealId', 'allowedSide',
 				'allowedProtein', 'sideItems', 'proteinItems', 'vendorEngagementId'
 			)
+		print('YYYYYYYYYYYYYYYYYYYY', protein_items)
 
 		menu = self.menu_repo.new_menu(
 			date, meal_period, main_meal_id, allowed_side,
@@ -176,11 +177,13 @@ class MenuController(BaseController):
 				updates['vendor_engagement_id'] = vendor_engagement_id
 
 			updated_menu = self.menu_repo.update(menu, **updates)
+			prot_items = [int(prot_id) for prot_id in updated_menu.protein_items if prot_id != ',']
+			sid_items = [int(side_id) for side_id in updated_menu.protein_items if side_id != ',']
 
 			menu = updated_menu.serialize()
 			menu['mainMeal'] = self.meal_repo.get(updated_menu.main_meal_id).serialize()
-			menu['proteinItems'] = self.menu_repo.get_meal_items(updated_menu.protein_items)
-			menu['sideItems'] = self.menu_repo.get_meal_items(updated_menu.side_items)
+			menu['proteinItems'] = self.menu_repo.get_meal_items(prot_items)
+			menu['sideItems'] = self.menu_repo.get_meal_items(sid_items)
 			return self.handle_response('OK', payload={'menu': menu}, status_code=200)
 
 		return self.handle_response('This menu_id does not exist', status_code=404)
