@@ -1,3 +1,4 @@
+'''A module for menu controller'''
 from app.controllers.base_controller import BaseController
 from app.repositories.menu_repo import MenuRepo
 from app.repositories.meal_item_repo import MealItemRepo
@@ -6,6 +7,7 @@ from datetime import datetime
 
 
 class MenuController(BaseController):
+	'''Menu controller class'''
 	def __init__(self, request):
 		BaseController.__init__(self, request)
 		self.menu_repo = MenuRepo()
@@ -156,22 +158,29 @@ class MenuController(BaseController):
 
 		if menu:
 			updates = {}
-			updates['date'] = datetime.strptime(date, '%Y-%m-%d')
-			updates['meal_period'] = meal_period
-			updates['main_meal_id'] = main_meal_id
-			updates['allowed_side'] = allowed_side
-			updates['allowed_protein'] = allowed_protein
-			updates['side_items'] = ','.join(str(item) for item in side_items)
-			updates['protein_items'] = ','.join(str(item) for item in protein_items)
-			updates['vendor_engagement_id'] = vendor_engagement_id
+			if date:
+				updates['date'] = datetime.strptime(date, '%Y-%m-%d')
+			if meal_period:
+				updates['meal_period'] = meal_period
+			if main_meal_id:
+				updates['main_meal_id'] = main_meal_id
+			if allowed_side:
+				updates['allowed_side'] = allowed_side
+			if allowed_protein:
+				updates['allowed_protein'] = allowed_protein
+			if side_items:
+				updates['side_items'] = ','.join(str(item) for item in side_items)
+			if protein_items:
+				updates['protein_items'] = ','.join(str(item) for item in protein_items)
+			if vendor_engagement_id:
+				updates['vendor_engagement_id'] = vendor_engagement_id
 
-			self.menu_repo.update(menu, **updates)
+			updated_menu = self.menu_repo.update(menu, **updates)
 
-			menu = menu.serialize()
-			menu['mainMeal'] = self.meal_repo.get(main_meal_id).serialize()
-			menu['proteinItems'] = self.menu_repo.get_meal_items(protein_items)
-			menu['sideItems'] = self.menu_repo.get_meal_items(side_items)
+			menu = updated_menu.serialize()
+			menu['mainMeal'] = self.meal_repo.get(updated_menu.main_meal_id).serialize()
+			menu['proteinItems'] = self.menu_repo.get_meal_items(updated_menu.protein_items)
+			menu['sideItems'] = self.menu_repo.get_meal_items(updated_menu.side_items)
 			return self.handle_response('OK', payload={'menu': menu}, status_code=200)
 
 		return self.handle_response('This menu_id does not exist', status_code=404)
-
