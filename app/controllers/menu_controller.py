@@ -156,7 +156,6 @@ class MenuController(BaseController):
 				'date', 'mealPeriod', 'mainMealId', 'allowedSide',
 				'allowedProtein', 'sideItems', 'proteinItems', 'vendorEngagementId'
 				)
-
 		menu = self.menu_repo.get(menu_id)
 
 		if menu:

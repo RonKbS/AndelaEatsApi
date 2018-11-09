@@ -181,7 +181,7 @@ class MenuEndpoints(BaseTestCase):
 		'''Test update of a menu'''
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='create_menu', role_id=role.id)
+		permission = PermissionFactory.create(keyword='update_menu', role_id=role.id)
 		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		meal_item_repo = MealItemRepo()
@@ -211,7 +211,7 @@ class MenuEndpoints(BaseTestCase):
 			'proteinItems': [protein_meal_item.id], 'vendorEngagementId': vendor_engagement.id
     	}
 
-		response = self.client().put(self.make_url('/admin/menus/{}/'.format(menu.id)), data=self.encode_to_json_string(data), headers=self.headers())
+		response = self.client().put(self.make_url('/admin/menus/{}'.format(menu.id)), data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		payload = response_json['payload']
 
@@ -220,7 +220,7 @@ class MenuEndpoints(BaseTestCase):
 		self.assertEqual(payload['menu']['allowedSide'], data['allowedSide'])
 
 		'''Test invalid update request'''
-		response = self.client().put(self.make_url('/admin/menus/100/'), data=self.encode_to_json_string(data), headers=self.headers())
+		response = self.client().put(self.make_url('/admin/menus/100'), data=self.encode_to_json_string(data), headers=self.headers())
 		self.assertEqual(response.status_code, 404)
 
 		'''Test invalid main item id request'''
@@ -230,7 +230,7 @@ class MenuEndpoints(BaseTestCase):
 			'allowedProtein': 2, 'sideItems': [side_meal_item.id],
 			'proteinItems': [protein_meal_item.id], 'vendorEngagementId': vendor_engagement.id
 		}
-		response = self.client().put(self.make_url('/admin/menus/{}/'.format(menu.id)), data=self.encode_to_json_string(data), headers=self.headers())
+		response = self.client().put(self.make_url('/admin/menus/{}'.format(menu.id)), data=self.encode_to_json_string(data), headers=self.headers())
 		self.assertEqual(response.status_code, 400)
 
 		'''Test invalid side item id request'''
@@ -240,7 +240,7 @@ class MenuEndpoints(BaseTestCase):
 			'allowedProtein': 2, 'sideItems': [1000],
 			'proteinItems': [protein_meal_item.id], 'vendorEngagementId': vendor_engagement.id
 		}
-		response = self.client().put(self.make_url('/admin/menus/{}/'.format(menu.id)), data=self.encode_to_json_string(data), headers=self.headers())
+		response = self.client().put(self.make_url('/admin/menus/{}'.format(menu.id)), data=self.encode_to_json_string(data), headers=self.headers())
 		self.assertEqual(response.status_code, 400)
 
 		'''Test invalid protein item id request'''
@@ -251,7 +251,7 @@ class MenuEndpoints(BaseTestCase):
 			'proteinItems': [protein_meal_item.id, 1000], 'vendorEngagementId': vendor_engagement.id
 		}
 
-		response = self.client().put(self.make_url('/admin/menus/{}/'.format(menu.id)), data=self.encode_to_json_string(data), headers=self.headers())
+		response = self.client().put(self.make_url('/admin/menus/{}'.format(menu.id)), data=self.encode_to_json_string(data), headers=self.headers())
 		self.assertEqual(response.status_code, 400)
 
 	def test_update_menu_endpoint_with_wrong_values(self):
