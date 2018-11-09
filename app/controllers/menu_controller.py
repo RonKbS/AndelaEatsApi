@@ -4,6 +4,7 @@ from app.repositories.menu_repo import MenuRepo
 from app.repositories.meal_item_repo import MealItemRepo
 from app.utils.enums import MealPeriods
 from datetime import datetime
+import pdb
 
 
 
@@ -156,7 +157,7 @@ class MenuController(BaseController):
 				'date', 'mealPeriod', 'mainMealId', 'allowedSide',
 				'allowedProtein', 'sideItems', 'proteinItems', 'vendorEngagementId'
 				)
-
+		pdb.set_trace()
 		menu = self.menu_repo.get(menu_id)
 
 		if menu:

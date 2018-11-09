@@ -2,6 +2,7 @@
 from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, request, Security, Auth
 from app.controllers.menu_controller import MenuController
 from flasgger import swag_from
+import pdb
 
 menu_blueprint = Blueprint('menu', __name__, url_prefix='{}/admin/menus'.format(BaseBlueprint.base_url_prefix))
 
@@ -19,7 +20,7 @@ menu_controller = MenuController(request)
 	'mainMealId|exists|meal_item|id'
 	])
 @Auth.has_permission('create_menu')
-@swag_from('test_create_menu.yml')
+@swag_from('documentation/create_menu.yml')
 def create_menu():
 	'''Blueprint function for creating a menu'''
 	return menu_controller.create_menu()
@@ -52,13 +53,15 @@ def list_menu_range(meal_period, start_date, end_date):
 	return menu_controller.list_menus_range(meal_period, start_date, end_date)
 
 
-@menu_blueprint.route('/<int:menu_id>/', methods=['PATCH', 'PUT'])
+@menu_blueprint.route('/<int:menu_id>', methods=['PATCH', 'PUT'])
 @Auth.has_permission('create_menu')
 @Security.validator([
 	'sideItems|exists|meal_item|id',
 	'proteinItems|exists|meal_item|id',
 	'mainMealId|exists|meal_item|id'
 	])
+@swag_from('documentation/update_menu.yml')
 def update_menu(menu_id):
 	'''Blueprint function for updating a menu'''
+	pdb.set_trace()
 	return menu_controller.update_menu(menu_id)
