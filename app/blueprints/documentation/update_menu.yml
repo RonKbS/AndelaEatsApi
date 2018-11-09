@@ -1,29 +1,175 @@
-This is using docstrings for specifications.
+Update a selected Menu
 ---
 tags:
   - Admin menu
-produces:
+summary: Updates an existing menu.
+consumes:
   - application/json
-  - application/xml
 parameters:
-  - name: CreateModel
-    in: body
-    type: object
-    required: true
-
+  - in: body
+    name: menu-update
+    description: The menu to to update
+    schema:
+      type: object
+      required:
+        - date
+        - mainMailId
+        - mealPeriod
+        - allowedSide
+        - allowedProtein
+        - sideItems
+        - proteinItems
+        - vendorEngagementId
+      properties:
+        date:
+          type: string
+        mealPeriod:
+          type: string
+        mainMealId:
+          type: string
+        allowedSide:
+          type: integer
+        allowedProtein:
+          type: integer
+        sideItems:
+          type: array
+          items:
+            type: integer
+            enum: [1,2,3]
+        proteinItems:
+          type: array
+          items:
+            type: integer
+            enum: [1,2,3]
+        vendorEngagementId:
+          type: integer
 definitions:
-  CreateModel:
+  MenuPayload:
     type: object
     properties:
-      date:
+      msg:
         type: string
-        example: 2018-11-05
-  Color:
-    type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          menu:
+            type: object
+            properties:
+              allowedProtein:
+                type: integer
+              allowedSide:
+                type: integer
+              date:
+                type: string
+                format: date
+                example: 2018-10-22
+              id:
+                type: integer
+              isDeleted:
+                type: boolean
+              mainMeal:
+                type: object
+                properties:
+                  description:
+                    type: string
+                  id:
+                    type: integer
+                  image:
+                    type: string
+                  isDeleted:
+                    type: boolean
+                  mealType:
+                    type: string
+                  name:
+                    type: string
+                  timestamps:
+                    type: object
+                    properties:
+                      created_at:
+                        type: string
+                        format: date
+                        example: 2018-10-22
+                      updated_at:
+                        type: string
+                        format: date
+                        example: 2018-10-22
+              mainMealId:
+                type: integer
+              mealPeriod:
+                type: string
+              vendorEngagementId:
+                type: integer
+              timestamps:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+                  updated_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+              sideItems:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    description:
+                      type: string
+                    id:
+                      type: integer
+                    image:
+                      type: string
+                    isDeleted:
+                      type: boolean
+                    mealType:
+                      type: string
+                    name:
+                      type: string
+                    timestamps:
+                      type: object
+                      properties:
+                        created_at:
+                          type: string
+                          format: date
+                          example: 2018-10-22
+                        updated_at:
+                          type: string
+                          format: date
+                          example: 2018-10-22
+              proteinItems:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    description:
+                      type: string
+                    id:
+                      type: integer
+                    image:
+                      type: string
+                    isDeleted:
+                      type: boolean
+                    mealType:
+                      type: string
+                    name:
+                      type: string
+                    timestamps:
+                      type: object
+                      properties:
+                        created_at:
+                          type: string
+                          format: date
+                          example: 2018-10-22
+                        updated_at:
+                          type: string
+                          format: date
+                          example: 2018-10-22
+
 responses:
   200:
-    description: A list of colors (may be filtered by palette)
+    description: Ok
     schema:
-      $ref: '#/definitions/CreateModel'
-    examples:
-      rgb: ['red', 'green', 'blue']
+          $ref: '#/definitions/MenuPayload'

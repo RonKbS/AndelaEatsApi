@@ -2,53 +2,173 @@ Create a Menu
 ---
 tags:
   - Admin menu
-produces:
+summary: Creates a new menu.
+consumes:
   - application/json
-  - application/xml
 parameters:
   - in: body
-    name: date
-    description: Date of Action
-    type: date
-    required: true
-  - in: body
-    name: mealPeriod
-    description: Period of the Meal
-    type: string
-    required: true
-  - in: body
-    name: mainMealId
-    description: main Id of the meal from meal item
-    type: integer
-    required: true
-  - in: body
-    name: allowedSide
-    description: Number of allowed Sides
-    type: integer
-    required: true
-  - in: body
-    name: allowedProtein
-    description: Number of allowed Protein
-    type: integer
-    required: true
-  - in: body
-    name: sideItems
-    description: List of integer Ids for side items from meal item
-    type: List
-    required: true
-  - in: body
-    name: proteinItems
-    description: List of Integer Ids for side items from meal item
-    type: List
-    required: true
-  - in: body
-    name: vendorEngagementId
-    description: Id of the Vendor's Engagement
-    type: integer
-    required: true
-
-responses:
-  200:
-    description: OK
+    name: menu
+    description: The menu to create
     schema:
-      type: string
+      type: object
+      required:
+        - date
+        - mainMailId
+        - mealPeriod
+        - allowedSide
+        - allowedProtein
+        - sideItems
+        - proteinItems
+        - vendorEngagementId
+      properties:
+        date:
+          type: string
+        mealPeriod:
+          type: string
+        mainMealId:
+          type: string
+        allowedSide:
+          type: integer
+        allowedProtein:
+          type: integer
+        sideItems:
+          type: array
+          items:
+            type: integer
+            enum: [1,2,3]
+        proteinItems:
+          type: array
+          items:
+            type: integer
+            enum: [1,2,3]
+        vendorEngagementId:
+          type: integer
+definitions:
+  MenuPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          menu:
+            type: object
+            properties:
+              allowedProtein:
+                type: integer
+              allowedSide:
+                type: integer
+              date:
+                type: string
+                format: date
+                example: 2018-10-22
+              id:
+                type: integer
+              isDeleted:
+                type: boolean
+              mainMeal:
+                type: object
+                properties:
+                  description:
+                    type: string
+                  id:
+                    type: integer
+                  image:
+                    type: string
+                  isDeleted:
+                    type: boolean
+                  mealType:
+                    type: string
+                  name:
+                    type: string
+                  timestamps:
+                    type: object
+                    properties:
+                      created_at:
+                        type: string
+                        format: date
+                        example: 2018-10-22
+                      updated_at:
+                        type: string
+                        format: date
+                        example: 2018-10-22
+              mainMealId:
+                type: integer
+              mealPeriod:
+                type: string
+              vendorEngagementId:
+                type: integer
+              timestamps:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+                  updated_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+              sideItems:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    description:
+                      type: string
+                    id:
+                      type: integer
+                    image:
+                      type: string
+                    isDeleted:
+                      type: boolean
+                    mealType:
+                      type: string
+                    name:
+                      type: string
+                    timestamps:
+                      type: object
+                      properties:
+                        created_at:
+                          type: string
+                          format: date
+                          example: 2018-10-22
+                        updated_at:
+                          type: string
+                          format: date
+                          example: 2018-10-22
+              proteinItems:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    description:
+                      type: string
+                    id:
+                      type: integer
+                    image:
+                      type: string
+                    isDeleted:
+                      type: boolean
+                    mealType:
+                      type: string
+                    name:
+                      type: string
+                    timestamps:
+                      type: object
+                      properties:
+                        created_at:
+                          type: string
+                          format: date
+                          example: 2018-10-22
+                        updated_at:
+                          type: string
+                          format: date
+                          example: 2018-10-22
+responses:
+  201:
+    description: Ok
+    schema:
+          $ref: '#/definitions/MenuPayload'
