@@ -1,0 +1,54 @@
+Create a Menu
+---
+tags:
+  - Admin menu
+produces:
+  - application/json
+  - application/xml
+parameters:
+  - in: body
+    name: date
+    description: Date of Action
+    type: date
+    required: true
+  - in: body
+    name: mealPeriod
+    description: Period of the Meal
+    type: string
+    required: true
+  - in: body
+    name: mainMealId
+    description: main Id of the meal from meal item
+    type: integer
+    required: true
+  - in: body
+    name: allowedSide
+    description: Number of allowed Sides
+    type: integer
+    required: true
+  - in: body
+    name: allowedProtein
+    description: Number of allowed Protein
+    type: integer
+    required: true
+  - in: body
+    name: sideItems
+    description: List of integer Ids for side items from meal item
+    type: List
+    required: true
+  - in: body
+    name: proteinItems
+    description: List of Integer Ids for side items from meal item
+    type: List
+    required: true
+  - in: body
+    name: vendorEngagementId
+    description: Id of the Vendor's Engagement
+    type: integer
+    required: true
+
+responses:
+  200:
+    description: OK
+    schema:
+      type: string

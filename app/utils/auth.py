@@ -9,12 +9,12 @@ class Auth:
 	
 	''' Routes The Location Header Should  Not Be Applied Ignore'''
 	location_header_ignore = [
-		'/locations', '/docs', '/apidocs'
+		'/locations', '/docs', '/apidocs', '/flasgger_static', '/apispec_1.json'
 	]
 	
 	''' Routes The Authentication Header Should  Not Be Applied Ignore'''
 	authentication_header_ignore = [
-		'/docs', '/apidocs'
+		'/docs', '/apidocs', '/flasgger_static', '/apispec_1.json'
 	]
 	
 	@staticmethod

@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from app.utils.security import Security
 from app.utils.auth import Auth
-from flasgger import Swagger
+
 
 
 class BaseBlueprint:
@@ -33,4 +33,3 @@ class BaseBlueprint:
 		self.app.register_blueprint(menu_blueprint)
 		self.app.register_blueprint(order_blueprint)
 
-		swg = Swagger(self.app)

@@ -1,11 +1,9 @@
 '''A module of menu blueprint'''
 from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, request, Security, Auth
 from app.controllers.menu_controller import MenuController
+from flasgger import swag_from
 
-
-
-menu_blueprint = Blueprint('menu', __name__, url_prefix='{}/admin/menus'\
-.format(BaseBlueprint.base_url_prefix))
+menu_blueprint = Blueprint('menu', __name__, url_prefix='{}/admin/menus'.format(BaseBlueprint.base_url_prefix))
 
 menu_controller = MenuController(request)
 
@@ -21,7 +19,7 @@ menu_controller = MenuController(request)
 	'mainMealId|exists|meal_item|id'
 	])
 @Auth.has_permission('create_menu')
-
+@swag_from('test_create_menu.yml')
 def create_menu():
 	'''Blueprint function for creating a menu'''
 	return menu_controller.create_menu()
