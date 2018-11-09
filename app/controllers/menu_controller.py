@@ -26,7 +26,6 @@ class MenuController(BaseController):
 				'date', 'mealPeriod', 'mainMealId', 'allowedSide',
 				'allowedProtein', 'sideItems', 'proteinItems', 'vendorEngagementId'
 			)
-		print('YYYYYYYYYYYYYYYYYYYY', protein_items)
 
 		menu = self.menu_repo.new_menu(
 			date, meal_period, main_meal_id, allowed_side,
