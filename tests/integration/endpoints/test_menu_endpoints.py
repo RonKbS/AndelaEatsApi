@@ -5,22 +5,52 @@ from app.utils import db
 from app.models import MealItem, Menu
 from app.repositories import MenuRepo, MealItemRepo
 from app.utils.enums import MealPeriods
+import pdb
 
 
 class MenuEndpoints(BaseTestCase):
-	'''A test class for menu endpoints'''
+	"""A test class for menu endpoints"""
 
 	def setUp(self):
 		self.BaseSetUp()
 
 	def test_create_menu_endpoint_without_permission(self):
+		""" Test for creation of a new menu without permmission """
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='delete_menu', role_id=role.id)
-		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		PermissionFactory.create(keyword='delete_menu', role_id=role.id)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+		menu = MenuFactory.build()
+		main_meal_item = MealItemFactory.build()
+		side_meal_item = MealItemFactory.build()
+		protein_meal_item = MealItemFactory.build()
+		vendor = VendorFactory.build()
+		db.session.add(vendor)
+		db.session.commit()
+		vendor_engagement = VendorEngagementFactory.build(vendor_id=vendor.id)
+		db.session.add(vendor_engagement)
+		db.session.add(main_meal_item)
+		db.session.add(side_meal_item)
+		db.session.add(protein_meal_item)
+		db.session.commit()
+
+		data = {
+			'date': menu.date.strftime('%Y-%m-%d'), 'mealPeriod': menu.meal_period,
+			'mainMealId': main_meal_item.id, 'allowedSide': menu.allowed_side,
+			'allowedProtein': menu.allowed_protein,
+			'sideItems': [side_meal_item.id],
+			'proteinItems': [protein_meal_item.id],
+			'vendorEngagementId': vendor_engagement.id
+		}
+
+		response = self.client().post(self.make_url('/admin/menus/'), \
+									  data=self.encode_to_json_string(data), headers=self.headers())
+
+		self.assert400(response)
 
 	def test_create_menu_endpoint(self):
-		'''Test for creation of new menu'''
+		"""Test for creation of new menu"""
 		menu = MenuFactory.build()
 		main_meal_item = MealItemFactory.build()
 		side_meal_item = MealItemFactory.build()
@@ -37,8 +67,8 @@ class MenuEndpoints(BaseTestCase):
 
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='create_menu', role_id=role.id)
-		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		PermissionFactory.create(keyword='create_menu', role_id=role.id)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 
 		data = {
@@ -101,13 +131,13 @@ class MenuEndpoints(BaseTestCase):
 		self.assertEqual(response.status_code, 400)
 
 	def test_delete_menu_endpoint_with_right_permission(self):
-		'''Test that a user with permission to delete menu can successfully do so'''
+		"""Test that a user with permission to delete menu can successfully do so"""
 		menu = MenuFactory.create()
 
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='delete_menu', role_id=role.id)
-		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		PermissionFactory.create(keyword='delete_menu', role_id=role.id)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		response = self.client().delete(self.make_url(f'/admin/menus/{menu.id}'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -117,72 +147,109 @@ class MenuEndpoints(BaseTestCase):
 		self.assertEqual(payload['status'], "success")
 
 	def test_delete_menu_endpoint_without_right_permission(self):
-		'''Test that a user without permission to delete menu cannot successfully do so'''
+		"""Test that a user without permission to delete menu cannot successfully do so"""
 		menu = MenuFactory.create()
 
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='delete_menu', role_id=100)
-		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		PermissionFactory.create(keyword='delete_menu', role_id=100)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		response = self.client().delete(self.make_url(f'/admin/menus/{menu.id}'), headers=self.headers())
-		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
 		self.assert400(response)
 
 
 	def test_list_menu_endpoint_without_right_permission(self):
-		'''Test that users without the right permission cannot view list of menus'''
+		"""Test that users without the right permission cannot view list of menus"""
 
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='view_menu', role_id=100)
-		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		PermissionFactory.create(keyword='view_menu', role_id=100)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 		current_date = datetime.now().date()
 
 		MenuFactory.create_batch(5)
-		results = Menu.query.all()
+		Menu.query.all()
 
 		response = self.client().get(self.make_url(f'/admin/menus/{MealPeriods.lunch}/{current_date}'), headers=self.headers())
-		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
 		self.assert400(response)
 
 	def test_list_menu_endpoint_with_right_permission(self):
-		'''Test that users with the right permission can view list of menus'''
+		"""Test that users with the right permission can view list of menus"""
 
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='view_menu', role_id=role.id)
-		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		PermissionFactory.create(keyword='view_menu', role_id=role.id)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 		current_date = datetime.now().date()
 
 		MenuFactory.create_batch(5)
 
-
-		response = self.client().get(self.make_url(f'/admin/menus/{MealPeriods.lunch}/{current_date}'), headers=self.headers())
-		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+		response = self.client().get(self.make_url(f'/admin/menus/{MealPeriods.lunch}/{current_date}'),
+					headers=self.headers())
 
 		self.assert200(response)
 
 	def test_list_menu_range_endpoint_without_right_permission(self):
-		pass
+		""" Test that users without the right permission cannot view list of menus with date range """
+		start_date = datetime.now().date()
+		end_date = datetime.now().date() + timedelta(days=7)
+
+		MenuFactory.create_batch(5)
+
+		response = self.client().get(self.make_url(f'/admin/menus/{MealPeriods.lunch}/{start_date}/{end_date}'),
+									 headers=self.headers())
+
+		self.assert400(response)
 
 	def test_list_menu_range_endpoint_with_right_permission(self):
+		""" Test that users with right permission can view list of menu with date range """
 		pass
+		# role = RoleFactory.create(name='admin')
+		# user_id = BaseTestCase.user_id()
+		# PermissionFactory.create(keyword='view_menu', role_id=role.id)
+		# UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		# current_date = datetime.now().date()
+		# start_date = current_date.strftime('%Y-%m-%d')
+		# end_date = (datetime.now().date() + timedelta(days=7)).strftime('%Y-%m-%d')
+		#
+		# MenuFactory.create_batch(5)
+		#
+		# response = self.client()\
+		# 	.get(self.make_url(f'/admin/menus/{MealPeriods.lunch}/{start_date}/{end_date}'), headers=self.headers())
+		#
+		# self.assert200(response)
 
 	def test_list_menu_range_endpoint_with_right_permission_wrong_range(self):
+		""" Test that users with right permission but wrong range cannot view """
 		pass
+		# role = RoleFactory.create(name='admin')
+		# user_id = BaseTestCase.user_id()
+		# PermissionFactory.create(keyword='view_menu', role_id=role.id)
+		# UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		#
+		# start_date = datetime.now().date()
+		# end_date = datetime.now().date()+ timedelta(days=-7)
+		#
+		# MenuFactory.create_batch(5)
+		#
+		# response = self.client().get(self.make_url(f'/admin/menus/{MealPeriods.lunch}/{start_date}/{end_date}'),
+		# 							 headers=self.headers())
+		# response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+		# self.assert404(response)
+		# self.assertEqual(response_json['msg'], 'Start Date [{}] must be less than End Date[{}]'.format(start_date, end_date))
 
 	def test_list_menu_range_endpoint_with_right_permission_wrong_period(self):
 		pass
 
 	def test_update_menu_endpoint(self):
-		'''Test update of a menu'''
+		"""Test update of a menu"""
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='update_menu', role_id=role.id)
-		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		PermissionFactory.create(keyword='update_menu', role_id=role.id)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		meal_item_repo = MealItemRepo()
 
