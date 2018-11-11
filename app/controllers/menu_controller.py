@@ -4,7 +4,7 @@ from app.repositories.menu_repo import MenuRepo
 from app.repositories.meal_item_repo import MealItemRepo
 from app.utils.enums import MealPeriods
 from datetime import datetime
-
+import pdb
 
 
 class MenuController(BaseController):
@@ -85,12 +85,20 @@ class MenuController(BaseController):
 			meal period: breakfast or lunch
 			menu_start_date: start date of search
 			menu_end_date: end date of search
+			first_date = datetime.strptime(menu_start_date, '%Y-%m-%d')
+			second_date = datetime.strptime(menu_end_date, '%Y-%m-%d')
+
+			if first_date >= second_date:
+
 		'''
 		if MealPeriods.has_value(menu_period):
 
-			menus = self.menu_repo.get_range_unpaginated(
-				start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period
-			)
+			first_date = datetime.strptime(menu_start_date, '%Y-%m-%d')
+			second_date = datetime.strptime(menu_end_date, '%Y-%m-%d')
+			pdb.set_trace()
+			if first_date >= second_date:
+				return self.handle_response('Provide valid date range. start_date cannot be greater than end_date', status_code=404)
+			menus = self.menu_repo.get_range_unpaginated(start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period)
 			menu_list = []
 			for menu in menus:
 				serialised_menu = menu.serialize()
@@ -109,7 +117,7 @@ class MenuController(BaseController):
 				}
 			)
 
-		return self.handle_response('Provide valid meal period and date', status_code=404)
+		return self.handle_response('Provide valid meal period and date range', status_code=404)
 
 	def list_menus_range_page(self, menu_period, menu_start_date, menu_end_date, page_id, page_num):
 		'''retrieves a list of menus for a specific date range for a specific meal period with pagination.

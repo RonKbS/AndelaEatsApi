@@ -6,6 +6,17 @@ summary: Creates a new menu.
 consumes:
   - application/json
 parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
   - in: body
     name: menu
     description: The menu to create
