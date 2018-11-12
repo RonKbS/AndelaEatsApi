@@ -4,7 +4,6 @@ from app.repositories.menu_repo import MenuRepo
 from app.repositories.meal_item_repo import MealItemRepo
 from app.utils.enums import MealPeriods
 from datetime import datetime
-import pdb
 
 
 class MenuController(BaseController):
@@ -95,15 +94,15 @@ class MenuController(BaseController):
 
 			first_date = datetime.strptime(menu_start_date, '%Y-%m-%d')
 			second_date = datetime.strptime(menu_end_date, '%Y-%m-%d')
-			pdb.set_trace()
 			if first_date >= second_date:
 				return self.handle_response('Provide valid date range. start_date cannot be greater than end_date', status_code=404)
 			menus = self.menu_repo.get_range_unpaginated(start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period)
 			menu_list = []
 			for menu in menus:
 				serialised_menu = menu.serialize()
-				arr_protein = menu.protein_items.split(",")
-				arr_side = menu.side_items.split(",")
+				arr_protein = [int(prot_id) for prot_id in menu.protein_items if prot_id != ',']
+				arr_side = [int(side_id) for side_id in menu.side_items if side_id != ',']
+
 				serialised_menu['mainMeal'] = self.meal_repo.get(menu.main_meal_id).serialize()
 				serialised_menu['proteinItems'] = self.menu_repo.get_meal_items(arr_protein)
 				serialised_menu['sideItems'] = self.menu_repo.get_meal_items(arr_side)
@@ -186,7 +185,7 @@ class MenuController(BaseController):
 
 			updated_menu = self.menu_repo.update(menu, **updates)
 			prot_items = [int(prot_id) for prot_id in updated_menu.protein_items if prot_id != ',']
-			sid_items = [int(side_id) for side_id in updated_menu.protein_items if side_id != ',']
+			sid_items = [int(side_id) for side_id in updated_menu.side_items if side_id != ',']
 
 			menu = updated_menu.serialize()
 			menu['mainMeal'] = self.meal_repo.get(updated_menu.main_meal_id).serialize()

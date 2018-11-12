@@ -206,21 +206,24 @@ class MenuEndpoints(BaseTestCase):
 
 	def test_list_menu_range_endpoint_with_right_permission(self):
 		""" Test that users with right permission can view list of menu with date range """
-		pass
-		# role = RoleFactory.create(name='admin')
-		# user_id = BaseTestCase.user_id()
-		# PermissionFactory.create(keyword='view_menu', role_id=role.id)
-		# UserRoleFactory.create(user_id=user_id, role_id=role.id)
-		# current_date = datetime.now().date()
-		# start_date = current_date.strftime('%Y-%m-%d')
-		# end_date = (datetime.now().date() + timedelta(days=7)).strftime('%Y-%m-%d')
-		#
-		# MenuFactory.create_batch(5)
-		#
-		# response = self.client()\
-		# 	.get(self.make_url(f'/admin/menus/{MealPeriods.lunch}/{start_date}/{end_date}'), headers=self.headers())
-		#
-		# self.assert200(response)
+		# pass
+		meal_item_repo = MealItemRepo()
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		PermissionFactory.create(keyword='view_menu', role_id=role.id)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		current_date = datetime.now().date()
+		start_date = current_date.strftime('%Y-%m-%d')
+		end_date = (datetime.now().date() + timedelta(days=7)).strftime('%Y-%m-%d')
+
+		side_meal_item = meal_item_repo.new_meal_item(name="side1", description="descr11", image="image11", meal_type="side")
+		protein_meal_item = meal_item_repo.new_meal_item(name="protein1", description="descr11", image="image12", meal_type="protein")
+		MenuFactory.create_batch(5, side_items=side_meal_item.id, protein_items=protein_meal_item.id)
+		
+		response = self.client()\
+			.get(self.make_url(f'/admin/menus/{MealPeriods.lunch}/{start_date}/{end_date}'), headers=self.headers())
+		
+		self.assert200(response)
 
 	def test_list_menu_range_endpoint_with_right_permission_wrong_range(self):
 		""" Test that users with right permission but wrong range cannot view """
