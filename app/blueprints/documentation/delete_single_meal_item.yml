@@ -1,8 +1,8 @@
-Delete a Menu
+Delete a meal Item
 ---
 tags:
-  - Admin menu
-summary: Deletes a menu with menu id
+  - Meal item
+summary: Deletes a meal item  with meal-item id
 consumes:
   - application/json
 parameters:
@@ -17,11 +17,11 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
-  - name: meal_id
+  - name: meal_item_id
     in: path
     type: integer
     required: true
-    description: Id of the menu to be deleted
+    description: Id of the meal item to be deleted
     default: 1
 definitions:
   StatusPayload:

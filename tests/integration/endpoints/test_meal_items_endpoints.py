@@ -40,7 +40,7 @@ class TestMealItemEndpoints(BaseTestCase):
         meal_item = MealItemFactory.create()
         print('/meals/{}/'.format(meal_item.id))
 
-        response = self.client().get(self.make_url('/meal-items/{}/'.format(meal_item.id)), headers=self.headers())
+        response = self.client().get(self.make_url('/meal-items/{}'.format(meal_item.id)), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
         payload = response_json['payload']
 
@@ -55,7 +55,7 @@ class TestMealItemEndpoints(BaseTestCase):
     def test_update_meal_item_endpoint(self):
         meal_item = MealItemFactory.create()
         data = {'mealName': 'Jollof Rice', 'description': 'tomato sautee rice', 'mealType': 'protein', 'image': 'a new image link'}
-        response = self.client().put(self.make_url('/meal-items/{}/'.format(meal_item.id)), data=self.encode_to_json_string(data), headers=self.headers())
+        response = self.client().put(self.make_url('/meal-items/{}'.format(meal_item.id)), data=self.encode_to_json_string(data), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
         payload = response_json['payload']
 
@@ -67,13 +67,13 @@ class TestMealItemEndpoints(BaseTestCase):
 
         '''Test invalid update request'''
         # User arbitrary value of 100 as the meal item ID
-        response = self.client().put(self.make_url('/meal-items/100/'), data=self.encode_to_json_string(data), headers=self.headers())
+        response = self.client().put(self.make_url('/meal-items/100'), data=self.encode_to_json_string(data), headers=self.headers())
         self.assert400(response)
 
     def test_delete_meal_item_endpoint(self):
         meal_item = MealItemFactory.create()
 
-        response = self.client().delete(self.make_url('/meal-items/{}/'.format(meal_item.id)), headers=self.headers())
+        response = self.client().delete(self.make_url('/meal-items/{}'.format(meal_item.id)), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
         payload = response_json['payload']
       

@@ -1,0 +1,84 @@
+Create a menu item
+---
+tags:
+  - Meal item
+summary: Creates a new menu item.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - in: body
+    name: menu-item
+    description: The menu-item to create
+    schema:
+      type: object
+      required:
+        - date
+        - mealName
+        - description
+        - image
+        - mealType
+      properties:
+        date:
+          type: string
+        mealName:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+        mealType:
+          type: string
+definitions:
+  MenuItemPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          mealItem:
+            type: object
+            properties:
+              description:
+                type: string
+              id:
+                type: integer
+              image:
+                type: string
+              id:
+                type: integer
+              isDeleted:
+                type: boolean
+              mealType:
+                type: string
+              name:
+                type: string
+              timestamps:
+                    type: object
+                    properties:
+                      created_at:
+                        type: string
+                        format: date
+                        example: 2018-10-22
+                      updated_at:
+                        type: string
+                        format: date
+                        example: 2018-10-22
+responses:
+  201:
+    description: Ok
+    schema:
+          $ref: '#/definitions/MenuItemPayload'
