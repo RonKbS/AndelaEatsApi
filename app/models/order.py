@@ -1,6 +1,7 @@
 '''module of order model class'''
 from .base_model import BaseModel, db
 from app.utils.enums import Channels
+from app.utils.enums import MealPeriods
 
 
 class Order(BaseModel):
@@ -11,6 +12,7 @@ class Order(BaseModel):
 	date_booked_for = db.Column(db.Date, nullable=False)
 	date_booked = db.Column(db.Date)
 	channel = db.Column(db.Enum(Channels))
+	meal_period = db.Column(db.Enum(MealPeriods))
 	status = db.Column(db.SmallInteger(), default=0)
 	is_deleted = db.Column(db.Boolean, default=False, nullable=False)
 	meal_item_orders = db.relationship('MealItem', secondary='meal_item_orders', lazy=False, backref=db.backref('orders', lazy=True))

@@ -41,6 +41,12 @@ parameters:
     required: true
     description: page number e.g 1
     default: 1
+  - name: page_num
+    in: path
+    type: integer
+    required: true
+    description: no of records per page
+    default: 1
 definitions:
   MenuListPayload:
     type: object

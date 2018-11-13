@@ -1,8 +1,8 @@
-Create an Order
+Get an Order
 ---
 tags:
   - Orders
-summary: Creates a new order.
+summary: Gets an Order by Id.
 consumes:
   - application/json
 parameters:
@@ -17,29 +17,12 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
-  - in: body
-    name: menu
-    description: Creation of an Order
-    schema:
-      type: object
-      required:
-        - dateBookedFor
-        - channel
-        - mealPeriod
-        - mealItems
-      properties:
-        dateBookedFor:
-          type: string
-        channel:
-          type: string
-        mealPeriod:
-          type: string
-        mealItems:
-          type: array
-          items:
-            type: integer
-            enum: [1,2,3]
-
+  - name: order_id
+    in: path
+    type: integer
+    required: true
+    description: The id of the order
+    default: 1
 definitions:
   OrderPayload:
     type: object

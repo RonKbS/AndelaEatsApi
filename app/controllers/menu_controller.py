@@ -148,7 +148,6 @@ class MenuController(BaseController):
 
 		return self.handle_response('Provide valid meal period and date', status_code=404)
 
-
 	def update_menu(self, menu_id):
 		'''
 
