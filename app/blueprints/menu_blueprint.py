@@ -40,7 +40,7 @@ def list_menu(meal_period, date):
 	return menu_controller.list_menus(meal_period, date)
 
 
-@menu_blueprint.route('/<meal_period>/<start_date>/<end_date>/page/<int:page_id>', methods=['GET'])
+@menu_blueprint.route('/<meal_period>/<start_date>/<end_date>/page/<int:page_id>?per_page=<per_page>', methods=['GET'])
 @Auth.has_permission('view_menu')
 @swag_from('documentation/get_menu_period_date_range_page.yml')
 def list_menu_range_page(meal_period, start_date, end_date, page_id):

@@ -1,0 +1,79 @@
+Get an Order
+---
+tags:
+  - Orders
+summary: Gets an Order by Id.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: order_id
+    in: path
+    type: integer
+    required: true
+    description: The id of the order
+    default: 1
+definitions:
+  OrderPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          order:
+            type: object
+            properties:
+              channel:
+                type: string
+              dateBooked:
+                type: string
+                format: date
+                example: 2018-10-22
+              dateBookedFor:
+                type: string
+                format: date
+                example: 2018-10-22
+              id:
+                type: integer
+              isDeleted:
+                type: boolean
+              mealItems:
+                type: array
+                items:
+                  type: string
+                  enum: ['all', 'rgb', 'cmyk']
+              status:
+                type: integer
+                default: 0
+              userId:
+                type: string
+                default: -L5J538y77WvOnzJ1FPG
+              timestamps:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+                  updated_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+responses:
+  201:
+    description: Ok
+    schema:
+          $ref: '#/definitions/OrderPayload'

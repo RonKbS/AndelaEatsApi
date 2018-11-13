@@ -7,6 +7,19 @@ class EnvConfig(object):
     CSRF_ENABLED = True
     SECRET = get_env('SECRET')
     SQLALCHEMY_DATABASE_URI = get_env('DATABASE_URL')
+    SWAGGER = {
+        'title': 'AndelaEATS API',
+        'footer_text': '<b>Copyright Andela Eats</b>',
+        'head_text': '<style>.top_text{color: red;}</style>',
+        'doc_expansion': "list",
+        'ui_params': {
+            'apisSorter': 'alpha',
+            'operationsSorter': 'alpha',
+        },
+        'ui_params_text': '''{
+            "operationsSorter" : (a, b) => a.get("path").localeCompare(b.get("path"))
+            }'''
+    }
 
 
 class DevelopmentEnv(EnvConfig):
@@ -25,6 +38,19 @@ class TestingEnv(EnvConfig):
 class StagingEnv(EnvConfig):
     """Configurations for Staging."""
     DEBUG = True
+    SWAGGER = {
+        'title': 'AndelaEATS API',
+        'footer_text': '<b>Copyright Andela Eats</b>',
+        'head_text': '<style>.top_text{color: red;}</style>',
+        'doc_expansion': "list",
+        'ui_params': {
+            'apisSorter': 'alpha',
+            'operationsSorter': 'alpha',
+        },
+        'ui_params_text': '''{
+                "operationsSorter" : (a, b) => a.get("path").localeCompare(b.get("path"))
+                }'''
+    }
 
 
 class ProductionEnv(EnvConfig):

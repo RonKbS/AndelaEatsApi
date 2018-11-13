@@ -1,8 +1,8 @@
-Delete a Menu
+Delete an Order
 ---
 tags:
-  - Admin menu
-summary: Deletes a menu with menu id
+  - Orders
+summary: Deletes an order with order Id
 consumes:
   - application/json
 parameters:
@@ -17,25 +17,12 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
-  - name: meal_id
+  - name: order_id
     in: path
     type: integer
     required: true
-    description: Id of the menu to be deleted
+    description: Id of the order to be deleted
     default: 1
-definitions:
-  StatusPayload:
-    type: object
-    properties:
-      msg:
-        type: string
-        default: Ok
-      payload:
-        type: object
-        properties:
-          status:
-            type: string
-
 responses:
   201:
     description: Ok
