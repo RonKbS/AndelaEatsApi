@@ -62,6 +62,12 @@ class TestOrderEndpoints(BaseTestCase):
 	def test_check_order_valid_endpoint(self):
 		pass
 
+	def test_check_order_valid_but_cancelled_endpoint(self):
+		pass
+
+	def test_check_order_valid_but_collected_endpoint(self):
+		pass
+
 	def test_check_order_not_valid_endpoint(self):
 		pass
 

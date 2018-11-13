@@ -1,8 +1,8 @@
-Get All Order By Date
+Get All Orders By Date
 ---
 tags:
   - Orders
-summary: Get all orders
+summary: Get all orders by a date
 consumes:
   - application/json
 parameters:

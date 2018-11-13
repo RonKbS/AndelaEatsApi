@@ -58,11 +58,15 @@ def create_order():
 
 
 @order_blueprint.route('/<int:order_id>', methods=['PUT'])
-@Security.validator(['dateBookedFor|required:date', 'channel|string', 'mealItems|required:list_int'])
+@Security.validator([
+	'dateBookedFor|required:date', 'channel|string',
+	'mealPeriod|required:string', 'mealItems|required:list_int'])
+@swag_from('documentation/update_order.yml')
 def update_order(order_id):
 	return order_controller.update_order(order_id)
 
 
 @order_blueprint.route('/<int:order_id>', methods=['DELETE'])
+@swag_from('documentation/delete_single_order.yml')
 def delete_order(order_id):
 	return order_controller.delete_order(order_id)

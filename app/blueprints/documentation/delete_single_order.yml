@@ -1,0 +1,30 @@
+Delete an Order
+---
+tags:
+  - Orders
+summary: Deletes an order with order Id
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: order_id
+    in: path
+    type: integer
+    required: true
+    description: Id of the order to be deleted
+    default: 1
+responses:
+  201:
+    description: Ok
+    schema:
+          $ref: '#/definitions/StatusPayload'
