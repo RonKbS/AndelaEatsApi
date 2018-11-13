@@ -1,0 +1,49 @@
+Update Single Vendor Engagement
+---
+tags:
+  - Vendor Engagement
+summary: Update an existing engagement.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: engagement_id
+    in: path
+    type: integer
+    required: true
+    description: The id of the engagement
+    default: 1
+  - in: body
+    name: menu
+    description: Creation of an Engagement
+    schema:
+      type: object
+      required:
+        - vendorId
+        - startDate
+        - endDate
+        - status
+      properties:
+        vendorId:
+          type: integer
+        startDate:
+          type: string
+        endDate:
+          type: string
+        status:
+          type: integer
+responses:
+  201:
+    description: Ok
+    schema:
+          $ref: '#/definitions/EngagementPayload'

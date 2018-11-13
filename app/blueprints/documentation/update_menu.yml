@@ -17,6 +17,12 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
+  - name: menu_id
+    in: path
+    type: integer
+    required: true
+    description: The id of the menu
+    default: 1
   - in: body
     name: menu-update
     description: The menu to to update

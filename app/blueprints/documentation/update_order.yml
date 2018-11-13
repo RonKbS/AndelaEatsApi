@@ -17,6 +17,12 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
+  - name: order_id
+    in: path
+    type: integer
+    required: true
+    description: The id of the order
+    default: 1
   - in: body
     name: menu
     description: Updating an Order
