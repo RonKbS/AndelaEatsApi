@@ -43,7 +43,7 @@ parameters:
         status:
           type: integer
 responses:
-  201:
+  200:
     description: Ok
     schema:
           $ref: '#/definitions/EngagementPayload'

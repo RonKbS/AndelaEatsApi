@@ -7,6 +7,7 @@ from app.repositories.vendor_engagement_repo import VendorEngagementRepo
 from app.repositories.vendor_rating_repo import VendorRatingRepo
 from app.utils.auth import Auth
 
+
 class VendorController(BaseController):
 	def __init__(self, request):
 		BaseController.__init__(self, request)
@@ -14,8 +15,8 @@ class VendorController(BaseController):
 		self.vendor_engagement_repo = VendorEngagementRepo()
 		self.vendor_rating_repo = VendorRatingRepo()
 
-	def list_vendors(self):
-		vendors = self.vendor_repo.filter_by()
+	def list_vendors(self, page_id, per_page):
+		vendors = self.vendor_repo.filter_by(is_deleted=False, page=page_id, per_page=per_page)
 		vendors_list = [vendor.serialize() for vendor in vendors.items]
 		return self.handle_response('OK', payload={'vendors': vendors_list, 'meta': self.pagination_meta(vendors)})
 

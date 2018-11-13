@@ -1,8 +1,8 @@
-Get an Order
+Get a single Vendor
 ---
 tags:
-  - Orders
-summary: Gets an Order by Id.
+  - Vendors
+summary: Get a single vendor
 consumes:
   - application/json
 parameters:
@@ -17,14 +17,14 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
-  - name: order_id
+  - name: vendor_id
     in: path
     type: integer
     required: true
-    description: The id of the order
+    description: The id of the vendor
     default: 1
 definitions:
-  OrderPayload:
+  VendorPayload:
     type: object
     properties:
       msg:
@@ -33,34 +33,21 @@ definitions:
       payload:
         type: object
         properties:
-          order:
+          vendor:
             type: object
             properties:
-              channel:
+              address:
+                  type: string
+              contactPerson:
                 type: string
-              dateBooked:
+              tel:
                 type: string
-                format: date
-                example: 2018-10-22
-              dateBookedFor:
+              name:
                 type: string
-                format: date
-                example: 2018-10-22
               id:
                 type: integer
               isDeleted:
                 type: boolean
-              mealItems:
-                type: array
-                items:
-                  type: string
-                  enum: ['all', 'rgb', 'cmyk']
-              status:
-                type: integer
-                default: 0
-              userId:
-                type: string
-                default: -L5J538y77WvOnzJ1FPG
               timestamps:
                 type: object
                 properties:
@@ -76,4 +63,4 @@ responses:
   200:
     description: Ok
     schema:
-          $ref: '#/definitions/OrderPayload'
+          $ref: '#/definitions/VendorPayload'

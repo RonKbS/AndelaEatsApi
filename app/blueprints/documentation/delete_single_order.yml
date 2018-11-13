@@ -24,7 +24,7 @@ parameters:
     description: Id of the order to be deleted
     default: 1
 responses:
-  201:
+  200:
     description: Ok
     schema:
           $ref: '#/definitions/StatusPayload'

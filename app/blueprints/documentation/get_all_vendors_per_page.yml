@@ -1,8 +1,8 @@
-Get All Orders
+Get All Vendors
 ---
 tags:
-  - Orders
-summary: Get all orders by pagination
+  - Vendors
+summary: Get all Vendors
 consumes:
   - application/json
 parameters:
@@ -21,10 +21,16 @@ parameters:
     in: path
     type: integer
     required: true
-    description: Page Id of the list of all records
+    description: The id of the page
+    default: 1
+  - name: per_page
+    in: path
+    type: integer
+    required: true
+    description: The number of records per page
     default: 1
 definitions:
-  OrderPagePayload:
+  VendorListPayload:
     type: object
     properties:
       msg:
@@ -33,36 +39,36 @@ definitions:
       payload:
         type: object
         properties:
-          orders:
+          meta:
+            type: object
+            properties:
+              current_page:
+                type: integer
+              next_page:
+                type: integer
+              prev_page:
+                type: integer
+              total_pages:
+                type: integer
+              total_rows:
+                type: integer
+          vendors:
             type: array
             items:
               type: object
               properties:
-                channel:
+                address:
                   type: string
-                dateBooked:
+                contactPerson:
                   type: string
-                  format: date
-                  example: 2018-10-22
-                dateBookedFor:
+                tel:
                   type: string
-                  format: date
-                  example: 2018-10-22
+                name:
+                  type: string
                 id:
                   type: integer
                 isDeleted:
                   type: boolean
-                mealItems:
-                  type: array
-                  items:
-                    type: string
-                    enum: ['all', 'rgb', 'cmyk']
-                status:
-                  type: integer
-                  default: 0
-                userId:
-                  type: string
-                  default: -L5J538y77WvOnzJ1FPG
                 timestamps:
                   type: object
                   properties:
@@ -79,4 +85,4 @@ responses:
   200:
     description: Ok
     schema:
-          $ref: '#/definitions/OrderPagePayload'
+          $ref: '#/definitions/VendorListPayload'

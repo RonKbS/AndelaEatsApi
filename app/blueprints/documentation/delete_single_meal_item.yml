@@ -37,7 +37,7 @@ definitions:
             type: string
 
 responses:
-  201:
+  200:
     description: Ok
     schema:
           $ref: '#/definitions/StatusPayload'

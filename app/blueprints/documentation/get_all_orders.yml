@@ -70,7 +70,7 @@ definitions:
                       example: 2018-10-22
 
 responses:
-  201:
+  200:
     description: Ok
     schema:
           $ref: '#/definitions/OrderListPayload'

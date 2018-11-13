@@ -1,0 +1,46 @@
+Create a Vendor
+---
+tags:
+  - Orders
+summary: Creates a new order.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - in: body
+    name: menu
+    description: Creation of an Order
+    schema:
+      type: object
+      required:
+        - dateBookedFor
+        - channel
+        - mealPeriod
+        - mealItems
+      properties:
+        dateBookedFor:
+          type: string
+        channel:
+          type: string
+        mealPeriod:
+          type: string
+        mealItems:
+          type: array
+          items:
+            type: integer
+            enum: [1,2,3]
+responses:
+  201:
+    description: Ok
+    schema:
+          $ref: '#/definitions/VendorPayload'
