@@ -31,6 +31,7 @@ class VendorController(BaseController):
 	def create_vendor(self):
 		name, tel, address, is_active, contact_person = self.request_params(
 			'name', 'tel', 'address', 'isActive', 'contactPerson')
+
 		vendor = self.vendor_repo.new_vendor(name, address, tel, is_active, contact_person).serialize()
 		return self.handle_response('OK', payload={'vendor': vendor})
 
