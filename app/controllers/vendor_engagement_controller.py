@@ -48,13 +48,13 @@ class VendorEngagementController(BaseController):
 			return self.handle_response('Bad Request', status_code=400)
 
 	def create_vendor_engagement(self):
-		vendor_id, start_date, end_date = self.request_params('vendorId', 'startDate', 'endDate')
+		vendor_id, start_date, end_date, status = self.request_params('vendorId', 'startDate', 'endDate', 'status')
 
 		if self.vendor_repo.get(vendor_id):
 
 			start_date = datetime.strptime(start_date, '%Y-%m-%d')
 			end_date = datetime.strptime(end_date, '%Y-%m-%d')
-			engagement = self.vendor_engagement_repo.new_vendor_engagement(vendor_id, start_date, end_date)
+			engagement = self.vendor_engagement_repo.new_vendor_engagement(vendor_id, start_date, end_date, status)
 			e = engagement.serialize()
 			e['vendor'] = engagement.vendor.serialize()
 

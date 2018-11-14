@@ -1,5 +1,6 @@
 from .base_model import BaseModel, db
 
+
 class Vendor(BaseModel):
 	__tablename__ = 'vendors'
 	
@@ -7,6 +8,7 @@ class Vendor(BaseModel):
 	address = db.Column(db.String(240), nullable=False)
 	tel = db.Column(db.String(20), nullable=False)
 	contact_person = db.Column(db.String(120), nullable=False)
+	is_active = db.Column(db.Boolean, default=True, nullable=True)
 	engagements = db.relationship('VendorEngagement', lazy=True)
 	ratings = db.relationship('VendorRating', lazy=True)
 

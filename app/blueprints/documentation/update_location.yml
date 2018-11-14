@@ -1,0 +1,34 @@
+Update a selected Location
+---
+tags:
+  - Locations
+summary: Updates an existing Location.
+consumes:
+  - application/json
+parameters:
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: location_id
+    in: path
+    type: integer
+    required: true
+    description: The id of the Location
+    default: 1
+  - in: body
+    name: menu
+    description: update of a Location
+    schema:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/LocationPayload'

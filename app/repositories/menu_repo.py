@@ -29,11 +29,7 @@ class MenuRepo(BaseRepo):
 			meal_items.append(item)
 		return meal_items
 
-	def get_range_unpaginated(self, start_date, end_date, meal_period):
+	def get_range_paginated_options(self, start_date, end_date, meal_period):
 		return Menu.query.filter(
-			Menu.date >= start_date, Menu.date <= end_date, Menu.meal_period == meal_period
-		).filter_by(is_deleted=False)
-
-	def get_range_paginated(self, start_date, end_date, meal_period, **kwargs):
-		return Menu.query.filter(Menu.date >= start_date, Menu.date <= end_date, Menu.meal_period == meal_period)\
-			.filter_by(is_deleted=False).paginate(**kwargs, error_out=False)
+			Menu.date >= start_date, Menu.date <= end_date, Menu.meal_period == meal_period, Menu.is_deleted.is_(False)
+		).order_by(Menu.date.asc()).paginate(error_out=False)

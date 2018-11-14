@@ -15,8 +15,8 @@ class VendorController(BaseController):
 		self.vendor_engagement_repo = VendorEngagementRepo()
 		self.vendor_rating_repo = VendorRatingRepo()
 
-	def list_vendors(self, page_id, per_page):
-		vendors = self.vendor_repo.filter_by(is_deleted=False, page=page_id, per_page=per_page)
+	def list_vendors(self):
+		vendors = self.vendor_repo.filter_by()
 		vendors_list = [vendor.serialize() for vendor in vendors.items]
 		return self.handle_response('OK', payload={'vendors': vendors_list, 'meta': self.pagination_meta(vendors)})
 
@@ -29,12 +29,14 @@ class VendorController(BaseController):
 			return self.handle_response('Bad Request - Invalid or Missing vendor_id', status_code=400)
 	
 	def create_vendor(self):
-		name, tel, address, contact_person = self.request_params('name', 'tel', 'address', 'contactPerson')
-		vendor = self.vendor_repo.new_vendor(name, address, tel, contact_person).serialize()
+		name, tel, address, is_active, contact_person = self.request_params(
+			'name', 'tel', 'address', 'isActive', 'contactPerson')
+		vendor = self.vendor_repo.new_vendor(name, address, tel, is_active, contact_person).serialize()
 		return self.handle_response('OK', payload={'vendor': vendor})
 
 	def update_vendor(self, vendor_id):
-		name, tel, address, contact_person = self.request_params('name', 'tel', 'address', 'contactPerson')
+		name, tel, address, is_active, contact_person = self.request_params(
+			'name', 'tel', 'address', 'isActive', 'contactPerson')
 		vendor = self.vendor_repo.get(vendor_id)
 		if vendor:
 			updates = {}
@@ -44,6 +46,8 @@ class VendorController(BaseController):
 				updates['tel'] = tel
 			if address:
 				updates['address'] = address
+			if is_active:
+				updates['is_active'] = is_active
 			if contact_person:
 				updates['contact_person'] = contact_person
 

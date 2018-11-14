@@ -1,0 +1,58 @@
+Create a location
+---
+tags:
+  - Locations
+summary: Creates a new location
+consumes:
+  - application/json
+parameters:
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - in: body
+    name: location
+    description: The location to create
+    schema:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+definitions:
+  LocationPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          location:
+            type: object
+            properties:
+              name:
+                type: string
+              id:
+                type: integer
+              isDeleted:
+                type: boolean
+              timestamps:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+                  updated_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+responses:
+  201:
+    description: Ok
+    schema:
+          $ref: '#/definitions/LocationPayload'

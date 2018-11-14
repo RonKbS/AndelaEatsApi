@@ -1,0 +1,24 @@
+Delete a Location
+---
+tags:
+  - Locations
+summary: Deletes a Location with location id
+consumes:
+  - application/json
+parameters:
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: location_id
+    in: path
+    type: integer
+    required: true
+    description: Id of the location to be deleted
+    default: 1
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/StatusPayload'

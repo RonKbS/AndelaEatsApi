@@ -26,7 +26,7 @@ class TestVendorEndpoints(BaseTestCase):
 		
 		# Create Three Dummy Vendors
 		VendorFactory.create_batch(3)
-		
+		page_id = 1
 		response = self.client().get(self.make_url('/vendors/'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		payload = response_json['payload']

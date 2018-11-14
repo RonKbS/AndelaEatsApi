@@ -23,6 +23,18 @@ parameters:
     required: true
     description: date for query search
     default: 1
+  - name: page
+    in: path
+    type: integer
+    required: optional
+    description: the number of the page
+    default: 1
+  - name: per_page
+    in: path
+    type: integer
+    required: optional
+    description: The number of records per page
+    default: 1
 definitions:
   OrderListPayload:
     type: object
@@ -33,6 +45,19 @@ definitions:
       payload:
         type: object
         properties:
+          meta:
+            type: object
+            properties:
+              current_page:
+                type: integer
+              next_page:
+                type: integer
+              prev_page:
+                type: integer
+              total_pages:
+                type: integer
+              total_rows:
+                type: integer
           orders:
             type: array
             items:

@@ -15,10 +15,11 @@ def list_order():
 	return order_controller.list_orders()
 
 
-@order_blueprint.route('/page/<page_id>/per_page/<per_page>', methods=['GET'])
+@order_blueprint.route('/page/<int:page_id>?per_page=<int:per_page>', methods=['GET'])
 @Auth.has_permission('view_orders')
 @swag_from('documentation/get_all_orders_by_page.yml')
-def list_orders_page(page_id, per_page):
+def list_orders_page(page_id):
+	per_page = int(request.args.get('per_page')) if request.args.get('per_page') != None else 10
 	return order_controller.list_orders_page(page_id, per_page)
 
 

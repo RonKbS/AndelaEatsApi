@@ -2,7 +2,7 @@ Get Menu for Food Period by Range of Date.
 ---
 tags:
   - Admin menu
-summary: Get list of menu for a date range
+summary: Get list of menu fetching paginated && unpaginated menu records between two dates
 consumes:
   - application/json
 parameters:
@@ -35,6 +35,18 @@ parameters:
     required: true
     description: end date of search  e.g 2018-10-22
     default: 2018-10-22
+  - name: page
+    in: path
+    type: integer
+    required: optional
+    description: page number
+    default: 1
+  - name: per_page
+    in: path
+    type: integer
+    required: optional
+    description: number of records per page
+    default: 10
 definitions:
   MenuListPayload:
     type: object

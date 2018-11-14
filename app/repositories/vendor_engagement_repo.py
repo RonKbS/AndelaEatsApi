@@ -13,4 +13,6 @@ class VendorEngagementRepo(BaseRepo):
 		return vendor_engagement
 
 	def get_engagement_by_date(self):
-		return VendorEngagement.query.filter(VendorEngagement.start_date >= datetime.now().date()).paginate(error_out=False)
+		return VendorEngagement.query.filter(
+			VendorEngagement.start_date >= datetime.now().date(),
+			VendorEngagement.is_deleted.is_(False)).paginate(error_out=False)
