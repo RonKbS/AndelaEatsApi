@@ -17,6 +17,18 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
+    - name: page
+    in: path
+    type: integer
+    required: optional
+    description: the number of the page
+    default: 1
+  - name: per_page
+    in: path
+    type: integer
+    required: optional
+    description: The number of records per page
+    default: 1
 responses:
   200:
     description: A list of all vendors

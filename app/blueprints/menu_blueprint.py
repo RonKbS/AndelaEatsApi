@@ -40,20 +40,12 @@ def list_menu(meal_period, date):
 	return menu_controller.list_menus(meal_period, date)
 
 
-@menu_blueprint.route('/<meal_period>/<start_date>/<end_date>/page/<int:page_id>?per_page=<per_page>', methods=['GET'])
-@Auth.has_permission('view_menu')
-@swag_from('documentation/get_menu_period_date_range_page.yml')
-def list_menu_range_page(meal_period, start_date, end_date, page_id):
-	'''Blueprint function for fetching paginated menu records between two dates'''
-	meals_per_page = int(request.args.get('per_page')) if request.args.get('per_page') != None else 10
-	return menu_controller.list_menus_range_page(meal_period, start_date, end_date, page_id, meals_per_page)
-
 
 @menu_blueprint.route('/<meal_period>/<start_date>/<end_date>', methods=['GET'])
 @Auth.has_permission('view_menu')
 @swag_from('documentation/get_menu_period_date_range.yml')
 def list_menu_range(meal_period, start_date, end_date):
-	'''Blueprint function for fetching unpaginated menu records between two dates'''
+	'''Blueprint function for fetching paginated && unpaginated menu records between two dates'''
 	return menu_controller.list_menus_range(meal_period, start_date, end_date)
 
 

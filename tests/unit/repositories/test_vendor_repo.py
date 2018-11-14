@@ -12,7 +12,7 @@ class TestVendorRepo(BaseTestCase):
 		
 	def test_new_vendor_method_returns_new_vendor_object(self):
 		vendor = VendorFactory.build()
-		new_vendor = self.repo.new_vendor(vendor.name, vendor.address, vendor.tel, vendor.contact_person)
+		new_vendor = self.repo.new_vendor(vendor.name, vendor.address, vendor.tel, vendor.is_active, vendor.contact_person)
 		
 		self.assertIsInstance(new_vendor, Vendor)
 		self.assertEqual(vendor.name, new_vendor.name)

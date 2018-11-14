@@ -7,6 +7,7 @@ from app.repositories.vendor_engagement_repo import VendorEngagementRepo
 from app.repositories.vendor_rating_repo import VendorRatingRepo
 from app.utils.auth import Auth
 
+
 class VendorController(BaseController):
 	def __init__(self, request):
 		BaseController.__init__(self, request)
@@ -28,12 +29,15 @@ class VendorController(BaseController):
 			return self.handle_response('Bad Request - Invalid or Missing vendor_id', status_code=400)
 	
 	def create_vendor(self):
-		name, tel, address, contact_person = self.request_params('name', 'tel', 'address', 'contactPerson')
-		vendor = self.vendor_repo.new_vendor(name, address, tel, contact_person).serialize()
+		name, tel, address, is_active, contact_person = self.request_params(
+			'name', 'tel', 'address', 'isActive', 'contactPerson')
+
+		vendor = self.vendor_repo.new_vendor(name, address, tel, is_active, contact_person).serialize()
 		return self.handle_response('OK', payload={'vendor': vendor})
 
 	def update_vendor(self, vendor_id):
-		name, tel, address, contact_person = self.request_params('name', 'tel', 'address', 'contactPerson')
+		name, tel, address, is_active, contact_person = self.request_params(
+			'name', 'tel', 'address', 'isActive', 'contactPerson')
 		vendor = self.vendor_repo.get(vendor_id)
 		if vendor:
 			updates = {}
@@ -43,6 +47,8 @@ class VendorController(BaseController):
 				updates['tel'] = tel
 			if address:
 				updates['address'] = address
+			if is_active:
+				updates['is_active'] = is_active
 			if contact_person:
 				updates['contact_person'] = contact_person
 

@@ -29,6 +29,18 @@ parameters:
     required: true
     description: Date of the meal e.g 2018-10-22
     default: 2018-10-22
+  - name: page
+    in: path
+    type: integer
+    required: optional
+    description: the number of the page
+    default: 1
+  - name: per_page
+    in: path
+    type: integer
+    required: optional
+    description: The number of records per page
+    default: 1
 definitions:
   MenuListPayload:
     type: object

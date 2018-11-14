@@ -1,27 +1,21 @@
-Delete an Order
+Delete a Location
 ---
 tags:
-  - Orders
-summary: Deletes an order with order Id
+  - Locations
+summary: Deletes a Location with location id
 consumes:
   - application/json
 parameters:
-  - name: X-Location
-    in: header
-    type: integer
-    required: true
-    description: The location of user
-    default: 1
   - name: Authorization
     in: header
     type: string
     required: true
     description: Bearer Token Value
-  - name: order_id
+  - name: location_id
     in: path
     type: integer
     required: true
-    description: Id of the order to be deleted
+    description: Id of the location to be deleted
     default: 1
 responses:
   200:

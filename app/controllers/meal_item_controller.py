@@ -15,7 +15,7 @@ class MealItemController(BaseController):
         return self.handle_response('OK', payload={'mealItems': meals_list})
 
     def list_meals_page(self, page_id, meals_per_page):
-        meals = self.meal_repo.filter_by(is_deleted=False, page=page_id, per_page=meals_per_page)
+        meals = self.meal_repo.filter_by(page=page_id, per_page=meals_per_page)
         meals_list = [meal.serialize() for meal in meals.items]
         return self.handle_response('OK', payload={'mealItems': meals_list, 'meta': self.pagination_meta(meals)})
     

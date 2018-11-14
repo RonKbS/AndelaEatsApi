@@ -1,8 +1,8 @@
-Update Single Vendor Engagement
+Update a selected Vendor
 ---
 tags:
-  - Vendor Engagement
-summary: Update an existing engagement.
+  - Vendors
+summary: Updates an existing Vendor.
 consumes:
   - application/json
 parameters:
@@ -17,33 +17,36 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
-  - name: engagement_id
+  - name: vendor_id
     in: path
     type: integer
     required: true
-    description: The id of the engagement
+    description: The id of the Vendor
     default: 1
   - in: body
     name: menu
-    description: Creation of an Engagement
+    description: Update of a Vendor
     schema:
       type: object
       required:
-        - vendorId
-        - startDate
-        - endDate
-        - status
+        - name
+        - tel
+        - address
+        - isActive
+        - contactPerson
       properties:
-        vendorId:
-          type: integer
-        startDate:
+        name:
           type: string
-        endDate:
+        tel:
           type: string
-        status:
-          type: integer
+        address:
+          type: string
+        contactPerson:
+          type: string
+        isActive:
+          type: boolean
 responses:
   200:
     description: Ok
     schema:
-          $ref: '#/definitions/EngagementPayload'
+          $ref: '#/definitions/VendorPayload'

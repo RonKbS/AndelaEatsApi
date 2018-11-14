@@ -92,13 +92,14 @@ class MenuController(BaseController):
 		'''
 		if MealPeriods.has_value(menu_period):
 
-			first_date = datetime.strptime(menu_start_date, '%Y-%m-%d')
-			second_date = datetime.strptime(menu_end_date, '%Y-%m-%d')
-			if first_date >= second_date:
+			menu_start_date = datetime.strptime(menu_start_date, '%Y-%m-%d')
+			menu_end_date = datetime.strptime(menu_end_date, '%Y-%m-%d')
+
+			if menu_start_date >= menu_end_date:
 				return self.handle_response('Provide valid date range. start_date cannot be greater than end_date', status_code=404)
-			menus = self.menu_repo.get_range_unpaginated(start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period)
+			menus = self.menu_repo.get_range_paginated_options(start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period)
 			menu_list = []
-			for menu in menus:
+			for menu in menus.items:
 				serialised_menu = menu.serialize()
 				arr_protein = [int(prot_id) for prot_id in menu.protein_items if prot_id != ',']
 				arr_side = [int(side_id) for side_id in menu.side_items if side_id != ',']
@@ -112,41 +113,11 @@ class MenuController(BaseController):
 				'OK',
 				payload={
 					'startDateOfSearch': menu_start_date, 'endDateOfSearch': menu_end_date,
-					'mealPeriod': menu_period, 'menuList': menu_list
+					'mealPeriod': menu_period, 'meta': self.pagination_meta(menus), 'menuList': menu_list
 				}
 			)
 
 		return self.handle_response('Provide valid meal period and date range', status_code=404)
-
-	def list_menus_range_page(self, menu_period, menu_start_date, menu_end_date, page_id, page_num):
-		'''retrieves a list of menus for a specific date range for a specific meal period with pagination.
-			date fornat: "YYYY-MM-DD"
-			'''
-		if MealPeriods.has_value(menu_period):
-
-			menus = self.menu_repo.get_range_paginated(
-				start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period,
-				page_id=page_id, page_num=page_num
-			)
-			menu_list = []
-			for menu in menus:
-				serialised_menu = menu.serialize()
-				arr_protein = menu.protein_items.split(",")
-				arr_side = menu.side_items.split(",")
-				serialised_menu['mainMeal'] = self.meal_repo.get(menu.main_meal_id).serialize()
-				serialised_menu['proteinItems'] = self.menu_repo.get_meal_items(arr_protein)
-				serialised_menu['sideItems'] = self.menu_repo.get_meal_items(arr_side)
-				menu_list.append(serialised_menu)
-
-			return self.handle_response(
-				'OK',
-				payload={
-					'startDateOfSearch': menu_start_date, 'endDateOfSearch': menu_end_date,
-					'mealPeriod': menu_period, 'menuList': menu_list
-				}
-			)
-
-		return self.handle_response('Provide valid meal period and date', status_code=404)
 
 	def update_menu(self, menu_id):
 		'''

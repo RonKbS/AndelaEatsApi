@@ -72,6 +72,5 @@ class BaseRepo:
 	
 	def filter(self, *args):
 		"""Query and filter the data of the model."""
-		return self._model.query.filter(*args)
+		return self._model.query.filter(*args).paginate(error_out=False)
 
-	

@@ -1,0 +1,46 @@
+Create a Vendor
+---
+tags:
+  - Vendors
+summary: Creates a new order.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - in: body
+    name: menu
+    description: Creation of a Vendor
+    schema:
+      type: object
+      required:
+        - name
+        - tel
+        - address
+        - isActive
+        - contactPerson
+      properties:
+        name:
+          type: string
+        tel:
+          type: string
+        address:
+          type: string
+        contactPerson:
+          type: string
+        isActive:
+          type: boolean
+responses:
+  201:
+    description: Ok
+    schema:
+          $ref: '#/definitions/VendorPayload'

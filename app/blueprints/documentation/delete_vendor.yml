@@ -1,8 +1,8 @@
-Delete a meal Item
+Delete a Vendor
 ---
 tags:
-  - Meal item
-summary: Deletes a meal item  with meal-item id
+  - Vendors
+summary: Deletes a Vendor with vendor id
 consumes:
   - application/json
 parameters:
@@ -10,32 +10,19 @@ parameters:
     in: header
     type: integer
     required: true
-    description: The location of user
+    description: The id of the vendor
     default: 1
   - name: Authorization
     in: header
     type: string
     required: true
     description: Bearer Token Value
-  - name: meal_item_id
+  - name: vendor_id
     in: path
     type: integer
     required: true
-    description: Id of the meal item to be deleted
+    description: Id of the vendor to be deleted
     default: 1
-definitions:
-  StatusPayload:
-    type: object
-    properties:
-      msg:
-        type: string
-        default: Ok
-      payload:
-        type: object
-        properties:
-          status:
-            type: string
-
 responses:
   200:
     description: Ok
