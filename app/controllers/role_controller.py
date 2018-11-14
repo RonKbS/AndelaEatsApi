@@ -3,7 +3,6 @@ from app.repositories.role_repo import RoleRepo
 from app.repositories.user_role_repo import UserRoleRepo
 from app.repositories.permission_repo import PermissionRepo
 
-
 class RoleController(BaseController):
 	def __init__(self, request):
 		BaseController.__init__(self, request)

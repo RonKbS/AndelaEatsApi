@@ -97,7 +97,7 @@ def create_role_permission():
 	return role_controller.create_role_permission()
 
 
-@role_blueprint.route('/<int:role_id>/permissions/<int:permission_id>', methods=['PUT', 'PATCH'])
+@role_blueprint.route('/permissions/<int:permission_id>', methods=['PUT', 'PATCH'])
 @Security.validator(['role_id|required:int', 'name|required', 'keyword|required'])
 @Auth.has_permission('create_permissions')
 @swag_from('documentation/update_permissions.yml')
