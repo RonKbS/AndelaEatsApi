@@ -1,0 +1,40 @@
+Update a Role
+---
+tags:
+  - Roles
+summary: Update an existing role.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: role_id
+    in: path
+    type: integer
+    required: true
+    description: The id of the role
+    default: 1
+  - in: body
+    name: menu
+    description: Updating a role
+    schema:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/RolePayload'

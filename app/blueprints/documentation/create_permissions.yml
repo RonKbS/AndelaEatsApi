@@ -1,0 +1,74 @@
+Create a Permission By Role Id
+---
+tags:
+  - Permissions
+summary: Creates a new Permission.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - in: body
+    name: permission
+    description: The permission to create
+    schema:
+      type: object
+      required:
+        - role_id
+        - name
+        - keyword
+      properties:
+        role_id:
+          type: integer
+        name:
+          type: string
+        keyword:
+          type: string
+definitions:
+  PermissionPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          permissions:
+            type: object
+            properties:
+              keyword:
+                type: string
+              role_id:
+                type: integer
+              name:
+                type: string
+              id:
+                type: integer
+              isDeleted:
+                type: boolean
+              timestamps:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+                  updated_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+responses:
+  201:
+    description: Ok
+    schema:
+          $ref: '#/definitions/PermissionPayload'

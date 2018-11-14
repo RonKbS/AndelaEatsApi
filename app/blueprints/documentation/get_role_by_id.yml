@@ -1,0 +1,62 @@
+Get a Role
+---
+tags:
+  - Roles
+summary: Gets a Role by Id.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: role_id
+    in: path
+    type: integer
+    required: true
+    description: The id of the role
+    default: 1
+definitions:
+  RolePayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          role:
+            type: object
+            properties:
+              help:
+                type: string
+              name:
+                type: string
+              id:
+                type: integer
+              isDeleted:
+                type: boolean
+              timestamps:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+                  updated_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/RolePayload'

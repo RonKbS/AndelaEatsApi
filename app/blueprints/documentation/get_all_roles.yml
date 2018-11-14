@@ -1,8 +1,8 @@
-Get All Order
+Get All Roles
 ---
 tags:
-  - Orders
-summary: Get all orders
+  - Roles
+summary: Get all roles
 consumes:
   - application/json
 parameters:
@@ -30,7 +30,7 @@ parameters:
     description: The number of records per page
     default: 1
 definitions:
-  OrderListPayload:
+  RoleListPayload:
     type: object
     properties:
       meta:
@@ -52,36 +52,19 @@ definitions:
       payload:
         type: object
         properties:
-          orders:
+          roles:
             type: array
             items:
               type: object
               properties:
-                channel:
+                help:
                   type: string
-                dateBooked:
+                name:
                   type: string
-                  format: date
-                  example: 2018-10-22
-                dateBookedFor:
-                  type: string
-                  format: date
-                  example: 2018-10-22
                 id:
                   type: integer
                 isDeleted:
                   type: boolean
-                mealItems:
-                  type: array
-                  items:
-                    type: string
-                    enum: ['all', 'rgb', 'cmyk']
-                status:
-                  type: integer
-                  default: 0
-                userId:
-                  type: string
-                  default: -L5J538y77WvOnzJ1FPG
                 timestamps:
                   type: object
                   properties:
@@ -98,4 +81,4 @@ responses:
   200:
     description: Ok
     schema:
-          $ref: '#/definitions/OrderListPayload'
+          $ref: '#/definitions/RoleListPayload'
