@@ -15,6 +15,12 @@ def list_engagements():
 	return vendor_engagement_controller.list_vendor_engagements()
 
 
+@engagement_blueprint.route('/vendor/<int:vendor_id>', methods=['GET'])
+@swag_from('documentation/get_all_vendor_engagements_by_vendor_id.yml')
+def list_engagements_by_vendor(vendor_id):
+	return vendor_engagement_controller.list_vendor_engagements_by_vendor(vendor_id)
+
+
 @engagement_blueprint.route('/upcoming', methods=['GET'])
 @swag_from('documentation/get_all_upcoming_vendor_engagement.yml')
 def upcoming_engagements():

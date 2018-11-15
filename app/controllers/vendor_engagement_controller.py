@@ -12,7 +12,28 @@ class VendorEngagementController(BaseController):
 		self.vendor_repo = VendorRepo()
 
 	def list_vendor_engagements(self):
-		engagements = self.vendor_engagement_repo.fetch_all()
+		engagements = self.vendor_engagement_repo.filter_by(is_deleted=False)
+
+		engagements_list = []
+		for e in engagements.items:
+			engagement = e.serialize()
+			engagement['vendor'] = e.vendor.serialize()
+			engagements_list.append(engagement)
+
+		return self.handle_response(
+			'OK', payload={'engagements': engagements_list, 'meta': self.pagination_meta(engagements)}
+		)
+
+	def list_vendor_engagements_by_vendor(self, vendor_id):
+
+		vendor = self.vendor_repo.get(vendor_id)
+		if vendor.is_deleted is True:
+			return self.handle_response('Invalid Vendor', status_code=400)
+
+		if vendor.is_active is False:
+			return self.handle_response('Vendor is disabled', status_code=400)
+
+		engagements = self.vendor_engagement_repo.filter_by(vendor_id=vendor_id)
 
 		engagements_list = []
 		for e in engagements.items:

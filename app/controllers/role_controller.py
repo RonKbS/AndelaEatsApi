@@ -13,7 +13,7 @@ class RoleController(BaseController):
 	''' ROLES '''
 
 	def list_roles(self):
-		roles = self.role_repo.fetch_all()
+		roles = self.role_repo.filter_by(is_deleted=False)
 		role_list = [role.serialize() for role in roles.items]
 		return self.handle_response('OK', payload={'roles': role_list, 'meta': self.pagination_meta(roles)})
 
