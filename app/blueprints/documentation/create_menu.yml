@@ -37,7 +37,7 @@ parameters:
         mealPeriod:
           type: string
         mainMealId:
-          type: string
+          type: integer
         allowedSide:
           type: integer
         allowedProtein:
