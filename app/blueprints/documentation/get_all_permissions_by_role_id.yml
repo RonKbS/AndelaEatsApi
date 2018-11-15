@@ -1,8 +1,8 @@
-Get All Upcoming Vendor Engagements .
+Get All Permissions By Role Id
 ---
 tags:
-  - Vendor Engagement
-summary: Get all upcoming vendor engagements stored from current date going forward
+  - Permissions
+summary: Get All Permissions By Role Id
 consumes:
   - application/json
 parameters:
@@ -17,6 +17,12 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
+  - name: role_id
+    in: path
+    type: integer
+    required: true
+    description: the role id
+    default: 1
   - name: page
     in: path
     type: integer
@@ -31,6 +37,6 @@ parameters:
     default: 1
 responses:
   200:
-    description: A list of all vendors
+    description: Ok
     schema:
-      $ref: '#/definitions/EngagementListPayload'
+          $ref: '#/definitions/PermissionListPayload'

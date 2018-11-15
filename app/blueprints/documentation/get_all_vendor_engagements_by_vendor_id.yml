@@ -1,8 +1,8 @@
-Get All Roles
+Get All Vendor Engagements by Vendor Id
 ---
 tags:
-  - Roles
-summary: Get all roles
+  - Vendor Engagement
+summary: Get all vendor engagements stored since inceptions by a vendor
 consumes:
   - application/json
 parameters:
@@ -17,6 +17,12 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
+  - name: vendor_id
+    in: path
+    type: integer
+    required: true
+    description: id of the vendor
+    default: 1
   - name: page
     in: path
     type: integer
@@ -30,7 +36,7 @@ parameters:
     description: The number of records per page
     default: 1
 definitions:
-  RoleListPayload:
+  EngagementListPayload:
     type: object
     properties:
       meta:
@@ -52,19 +58,27 @@ definitions:
       payload:
         type: object
         properties:
-          roles:
+          engagements:
             type: array
             items:
               type: object
               properties:
-                help:
+                endDate:
                   type: string
-                name:
+                  default: 2018-11-02
+                startDate:
                   type: string
+                  default: 2018-11-02
                 id:
+                  type: integer
+                vendorId:
+                  type: integer
+                status:
                   type: integer
                 isDeleted:
                   type: boolean
+                terminationReason:
+                  type: string
                 timestamps:
                   type: object
                   properties:
@@ -76,9 +90,34 @@ definitions:
                       type: string
                       format: date
                       example: 2018-10-22
-
+                vendor:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    contactPerson:
+                      type: string
+                    id:
+                      type: integer
+                    isDeleted:
+                      type: boolean
+                    name:
+                      type: string
+                    tel:
+                      type: string
+                    timestamps:
+                      type: object
+                      properties:
+                        created_at:
+                          type: string
+                          format: date
+                          example: 2018-10-22
+                        updated_at:
+                          type: string
+                          format: date
+                          example: 2018-10-22
 responses:
   200:
-    description: Ok
+    description: A list of all vendors
     schema:
-          $ref: '#/definitions/RoleListPayload'
+      $ref: '#/definitions/EngagementListPayload'

@@ -11,8 +11,9 @@ class RoleController(BaseController):
 		self.permission_repo = PermissionRepo()
 
 	''' ROLES '''
+
 	def list_roles(self):
-		roles = self.role_repo.fetch_all()
+		roles = self.role_repo.filter_by(is_deleted=False)
 		role_list = [role.serialize() for role in roles.items]
 		return self.handle_response('OK', payload={'roles': role_list, 'meta': self.pagination_meta(roles)})
 
@@ -57,6 +58,7 @@ class RoleController(BaseController):
 		return self.handle_response('Invalid or incorrect role_id provided', status_code=404)
 
 	''' USER ROLES '''
+
 	def get_user_roles(self, user_id):
 		user_roles = self.user_role_repo.get_unpaginated(user_id=user_id)
 		if user_roles:
@@ -75,7 +77,6 @@ class RoleController(BaseController):
 			return self.handle_response('This role does not exist', status_code=400)
 		return self.handle_response('This user_role combination already exists', status_code=400)
 
-
 	def delete_user_role(self, user_role_id):
 		user_role = self.user_role_repo.get(user_role_id)
 		if user_role:
@@ -85,27 +86,28 @@ class RoleController(BaseController):
 			return self.handle_response('user_role deleted', payload={"status": "success"})
 		return self.handle_response(
 			'Invalid or incorrect user_role_id provided', status_code=404
-			)
-
+		)
 
 	''' PERMISSIONS '''
+
 	def get_role_permissions(self, role_id):
-		permissions = self.permission_repo.get_unpaginated(**{'role_id':role_id})
+		permissions = self.permission_repo.get_unpaginated(**{'role_id': role_id})
 		perm_list = [permission.serialize() for permission in permissions]
-		return self.handle_response('OK',
-			payload={ 'role_id':role_id, 'role_permissions': perm_list}
-			)
+		return self.handle_response('OK', payload={'role_id': role_id, 'role_permissions': perm_list})
+
+	def get_single_permission(self, role_id, permission_id):
+		permission = self.permission_repo.filter_by(role_id=role_id, permission_id=permission_id)
+		return self.handle_response('OK', payload={'permission': permission.serialize()})
+
 	def get_all_permissions(self):
 		permissions = self.permission_repo.get_unpaginated()
 		perm_list = [permission.serialize() for permission in permissions]
-		return self.handle_response('OK',
-			payload={'permissions': perm_list}
-			)
+		return self.handle_response('OK', payload={'permissions': perm_list})
 
 	def create_role_permission(self):
 		role_id, name, keyword = self.request_params(
 			'role_id', 'name', 'keyword'
-			)
+		)
 		permission = self.permission_repo.get_unpaginated(
 			name=name, is_deleted=False)
 		if not permission:
@@ -113,16 +115,16 @@ class RoleController(BaseController):
 			if role:
 				permission = self.permission_repo.new_permission(
 					role_id=role_id, name=name, keyword=keyword
-					)
+				)
 				return self.handle_response('OK', payload={
 					'permission': permission.serialize()
-					})
+				})
 			return self.handle_response(
 				'This role does not exist', status_code=400
-				)
+			)
 		return self.handle_response(
 			'This permission already exists', status_code=400
-			)
+		)
 
 	def update_permission(self, permission_id):
 		role_id, name, keyword = self.request_params('role_id', 'name', 'keyword')
@@ -143,7 +145,6 @@ class RoleController(BaseController):
 			return self.handle_response('OK', payload={'permission': permission.serialize()})
 		return self.handle_response('Invalid or incorrect permission id provided', status_code=400)
 
-
 	def delete_role_permission(self, permission_id):
 		permission = self.permission_repo.get(permission_id)
 		if permission:
@@ -153,4 +154,4 @@ class RoleController(BaseController):
 			return self.handle_response('permission deleted', payload={"status": "success"})
 		return self.handle_response(
 			'Invalid or incorrect permission id provided', status_code=404
-			)
+		)

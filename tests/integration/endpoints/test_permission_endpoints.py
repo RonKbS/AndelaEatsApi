@@ -3,6 +3,7 @@ from tests.base_test_case import BaseTestCase
 from app.repositories import PermissionRepo
 from factories import PermissionFactory, RoleFactory, UserRoleFactory
 
+
 class TestPermissionEndpoints(BaseTestCase):
 
 	def setUp(self):
@@ -81,7 +82,7 @@ class TestPermissionEndpoints(BaseTestCase):
 		user_id = BaseTestCase.user_id()
 		PermissionFactory.create(keyword='create_permissions', role_id=role1.id)
 		UserRoleFactory.create(user_id=user_id, role_id=100)
-		data = {'name': 'New name1'}
+		data = {'name': 'New name1', 'role_id': role1.id, 'keyword': 'New eky'}
 		response = self.client().put(self.make_url('/roles/permissions/{}'.format(permission.id)), data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
@@ -96,7 +97,7 @@ class TestPermissionEndpoints(BaseTestCase):
 		user_id = BaseTestCase.user_id()
 		PermissionFactory.create(keyword='create_permissions', role_id=role1.id)
 		UserRoleFactory.create(user_id=user_id, role_id=role1.id)
-		data = {'name': 'New name1'}
+		data = {'name': 'New name1', 'role_id': role1.id, 'keyword': 'New eky'}
 		response = self.client().put(self.make_url('/roles/permissions/{}'.format(permission.id)), data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		payload = response_json['payload']
@@ -113,8 +114,9 @@ class TestPermissionEndpoints(BaseTestCase):
 		user_id = BaseTestCase.user_id()
 		PermissionFactory.create(keyword='create_permissions', role_id=role1.id)
 		UserRoleFactory.create(user_id=user_id, role_id=role1.id)
-		data = {'name': 'New name1'}
-		response = self.client().put(self.make_url('/roles/permissions/1000'), data=self.encode_to_json_string(data), headers=self.headers())
+		data = {'name': 'New name1', 'role_id': role1.id, 'keyword': 'New eky'}
+
+		response = self.client().put(self.make_url(f'/roles/permissions/1000'), data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		self.assert400(response)
 		self.assertEqual(response_json['msg'], 'Invalid or incorrect permission id provided')

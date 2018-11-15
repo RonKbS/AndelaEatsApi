@@ -1,0 +1,30 @@
+Delete single permission
+---
+tags:
+  - Permissions
+summary: Deletes a Permission with vendor id
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The id of the Permission
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: vendor_id
+    in: path
+    type: integer
+    required: true
+    description: Id of the Permission to be deleted
+    default: 1
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/StatusPayload'

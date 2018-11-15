@@ -24,19 +24,19 @@ class OrderController(BaseController):
 			order['mealItems'] = [item.name for item in meal_items]
 		return self.handle_response('OK', payload={'orders': orders_list})
 
-	def list_orders_page(self, page_id, per_page):
-		"""
-		List all orders in the application per page
-		:param page_id:
-		:param per_page:
-		:return:
-		"""
-		orders = self.order_repo.filter_and_order(is_deleted=False, page=page_id, per_page=per_page)
-		orders_list = [order.serialize() for order in orders]
-		for order in orders_list:
-			meal_items = self.order_repo.get(order['id']).meal_item_orders
-			order['mealItems'] = [item.name for item in meal_items]
-		return self.handle_response('OK', payload={'orders': orders_list})
+	# def list_orders_page(self, page_id, per_page):
+	# 	"""
+	# 	List all orders in the application per page
+	# 	:param page_id:
+	# 	:param per_page:
+	# 	:return:
+	# 	"""
+	# 	orders = self.order_repo.filter_and_order(is_deleted=False, page=page_id, per_page=per_page)
+	# 	orders_list = [order.serialize() for order in orders]
+	# 	for order in orders_list:
+	# 		meal_items = self.order_repo.get(order['id']).meal_item_orders
+	# 		order['mealItems'] = [item.name for item in meal_items]
+	# 	return self.handle_response('OK', payload={'orders': orders_list})
 
 	def list_orders_date(self, start_date):
 		"""

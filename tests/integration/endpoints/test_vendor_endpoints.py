@@ -132,3 +132,6 @@ class TestVendorEndpoints(BaseTestCase):
 
 		self.assert400(response)
 		self.assertEqual(response_json['msg'], 'Vendor cannot be deleted because it has a child object')
+
+	def test_delete_vendor_deletes_vendor_engagement(self):
+		pass

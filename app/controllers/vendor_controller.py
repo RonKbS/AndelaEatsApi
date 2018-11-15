@@ -16,7 +16,7 @@ class VendorController(BaseController):
 		self.vendor_rating_repo = VendorRatingRepo()
 
 	def list_vendors(self):
-		vendors = self.vendor_repo.filter_by()
+		vendors = self.vendor_repo.filter_by(is_deleted=False)
 		vendors_list = [vendor.serialize() for vendor in vendors.items]
 		return self.handle_response('OK', payload={'vendors': vendors_list, 'meta': self.pagination_meta(vendors)})
 
@@ -69,5 +69,12 @@ class VendorController(BaseController):
 			updates['is_deleted'] = True
 
 			self.vendor_repo.update(vendor, **updates)
+
+			engagements = self.vendor_engagement_repo.filter_by(vendor_id=vendor_id)
+			for e in engagements.items:
+				updates_engagement = {}
+				updates_engagement['is_deleted'] = True
+
+				self.vendor_engagement_repo.update(e, **updates_engagement)
 			return self.handle_response('Vendor deleted', payload={"status": "success"})
 		return self.handle_response('Invalid or incorrect vendor_id provided', status_code=400)
