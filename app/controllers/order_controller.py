@@ -84,6 +84,7 @@ class OrderController(BaseController):
 
 		if orders \
 			and any(order.user_id == user_id and order.meal_period == meal_period
+			and order.is_deleted.is_(False)
 			and order.date_booked_for == datetime.strptime(
 			date_booked_for, '%Y-%m-%d').date() for order in orders):
 			return self.handle_response('you have already booked for this date.', status_code=400)
