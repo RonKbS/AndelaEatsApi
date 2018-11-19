@@ -32,6 +32,8 @@ class TestingEnv(EnvConfig):
     # SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/andelaeats_test'
     # SQLALCHEMY_POOL_TIMEOUT = 1000
     SQLALCHEMY_DATABASE_URI = 'sqlite:///andelaeats.db'
+    # SQLALCHEMY_DATABASE_URI = get_env('DATABASE_TEST_URL')
+
     DEBUG = True
 
 

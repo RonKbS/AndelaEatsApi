@@ -12,7 +12,7 @@ class Order(BaseModel):
 	date_booked = db.Column(db.Date)
 	channel = db.Column(db.Enum(Channels))
 	meal_period = db.Column(db.Enum(MealPeriods))
-	order_status = db.Column(db.Enum(OrderStatus), default=0)
+	order_status = db.Column(db.Enum(OrderStatus))
 	meal_item_orders = db.relationship('MealItem', secondary='meal_item_orders', lazy=False, backref=db.backref('orders', lazy=True))
 
 # many to many relationship between meal item and order

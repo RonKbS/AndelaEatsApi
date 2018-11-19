@@ -4,7 +4,6 @@ from app.repositories.menu_repo import MenuRepo
 from app.repositories.meal_item_repo import MealItemRepo
 from app.utils.enums import MealPeriods
 from datetime import datetime
-import pdb
 
 class MenuController(BaseController):
 	'''Menu controller class'''
@@ -108,7 +107,6 @@ class MenuController(BaseController):
 				serialised_menu['proteinItems'] = self.menu_repo.get_meal_items(arr_protein)
 				serialised_menu['sideItems'] = self.menu_repo.get_meal_items(arr_side)
 				menu_list.append(serialised_menu)
-				#pdb.set_trace()
 
 			return self.handle_response(
 				'OK',
