@@ -4,7 +4,6 @@ from app.repositories import OrderRepo
 from app.repositories.meal_item_repo import MealItemRepo
 from datetime import datetime, timedelta
 from app.utils.auth import Auth
-import pdb
 
 class OrderController(BaseController):
 	def __init__(self, request):
@@ -114,7 +113,7 @@ class OrderController(BaseController):
 			meal_object_items.append(meal_item)
 
 		order = self.order_repo.get(order_id)
-		pdb.set_trace()
+
 		if order:
 			if order.is_deleted:
 				return self.handle_response('Order has already been deleted', status_code=400)
