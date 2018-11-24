@@ -63,6 +63,21 @@ class OrderController(BaseController):
 			order['mealItems'] = [{'name': item.name, 'image': item.image} for item in meal_items]
 		return self.handle_response('OK', payload={'orders': orders_list})
 
+	def get_order_by_user_id_date_range(self, user_id, start_date, end_date):
+		"""
+
+		:param user_id:
+		:param start_date:
+		:param end_date:
+		:return:
+		"""
+		orders = self.order_repo.get_range_paginated_options(user_id=user_id, start_date=start_date, end_date=end_date)
+		orders_list = [order.serialize() for order in orders.items]
+		for order in orders_list:
+			meal_items = self.order_repo.get(order['id']).meal_item_orders
+			order['mealItems'] = [{'name': item.name, 'image': item.image} for item in meal_items]
+		return self.handle_response('OK', payload={'orders': orders_list})
+
 	def create_order(self):
 		"""
 		creates an order

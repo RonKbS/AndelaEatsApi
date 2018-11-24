@@ -34,6 +34,12 @@ def get_order_by_user_id(user_id):
 	return order_controller.get_order_by_user_id(user_id)
 
 
+@order_blueprint.route('/user/<string:user_id>/<start_date>/<end_date>', methods=['GET'])
+@swag_from('documentation/get_order_by_user_id_date_range.yml')
+def get_order_by_user_id_date_range(user_id, start_date, end_date):
+	return order_controller.get_order_by_user_id_date_range(user_id, start_date, end_date)
+
+
 @order_blueprint.route('/check', methods=['POST'])
 @Security.validator(['user_id|required:string', 'order_type|required:string', 'order_date|required:string'])
 def check_order():
