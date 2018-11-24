@@ -160,9 +160,7 @@ class OrderController(BaseController):
 	def check_order(self):
 		"""
 		Checks if a user has an order for a particular date and period
-		:param user_id:
-		:param order_type:
-		:param order_date:
+
 		:return:
 		"""
 		user_id, order_type, order_date = self.request_params('user_id', 'order_type', 'order_date')
