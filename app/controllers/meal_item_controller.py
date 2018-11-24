@@ -22,10 +22,12 @@ class MealItemController(BaseController):
     def get_meal(self, meal_id):
         meal = self.meal_repo.get(meal_id)
         if meal:
+            if meal.is_deleted:
+                return self.handle_response('Bad Request. This meal item is deleted', status_code=400)
             meal = meal.serialize()
             return self.handle_response('OK', payload={'mealItem': meal})
         else:
-            return self.handle_response('Bad Request', status_code=400)
+            return self.handle_response('Bad Request. This meal id does not exist', status_code=400)
     
     def create_meal(self):
         """
@@ -33,6 +35,8 @@ class MealItemController(BaseController):
         """
         
         name, description, image_url, meal_type = self.request_params('mealName', 'description', 'image', 'mealType')
+        if self.meal_repo.get_unpaginated(name=name):
+            return self.handle_response('Meal item with this name already exists', status_code=400)
         if MealTypes.has_value(meal_type):
             new_meal_item = self.meal_repo.new_meal_item(name, description, image_url, meal_type).serialize()
         
@@ -45,6 +49,10 @@ class MealItemController(BaseController):
 
         meal = self.meal_repo.get(meal_id)
         if meal:
+            if meal.is_deleted:
+                return self.handle_response('Bad Request. This meal item is deleted', status_code=400)
+            if self.meal_repo.get_unpaginated(name=name):
+                return self.handle_response('Meal item with this name already exists', status_code=400)
             updates = {}
             if name:
                 updates['name'] = name
@@ -65,8 +73,10 @@ class MealItemController(BaseController):
         meal = self.meal_repo.get(meal_id)
         updates = {}
         if meal:
+            if meal.is_deleted:
+                return self.handle_response('Bad Request. This meal item is deleted', status_code=400)
             updates['is_deleted'] = True
-                
+
             self.meal_repo.update(meal, **updates)
             return self.handle_response('OK', payload={"status": "success"})
         return self.handle_response('Invalid or incorrect meal_id provided', status_code=400)

@@ -15,14 +15,6 @@ def list_order():
 	return order_controller.list_orders()
 
 
-# @order_blueprint.route('/page/<int:page_id>?per_page=<int:per_page>', methods=['GET'])
-# @Auth.has_permission('view_orders')
-# @swag_from('documentation/get_all_orders_by_page.yml')
-# def list_orders_page(page_id):
-# 	per_page = int(request.args.get('per_page')) if request.args.get('per_page') != None else 10
-# 	return order_controller.list_orders_page(page_id, per_page)
-
-
 @order_blueprint.route('/<start_date>', methods=['GET'])
 @Auth.has_permission('view_orders')
 @swag_from('documentation/get_orders_by_date.yml')
@@ -36,16 +28,22 @@ def get_order(order_id):
 	return order_controller.get_order(order_id)
 
 
+@order_blueprint.route('/user/<string:user_id>', methods=['GET'])
+@swag_from('documentation/get_order_by_user_id.yml')
+def get_order_by_user_id(user_id):
+	return order_controller.get_order_by_user_id(user_id)
+
+
 @order_blueprint.route('/check', methods=['POST'])
-@Security.validator(['userId|required:string', 'mealPeriod|required:string'])
-def check_order(user_id):
-	return order_controller.check_order(user_id)
+@Security.validator(['user_id|required:string', 'order_type|required:string', 'order_date|required:string'])
+def check_order():
+	return order_controller.check_order()
 
 
 @order_blueprint.route('/collect', methods=['POST'])
-@Security.validator(['userId|required:string', 'mealPeriod|required:string'])
-def collect_order(user_id):
-	return order_controller.collect_order(user_id)
+@Security.validator(['user_id|required:string', 'order_type|required:string', 'order_date|required:string'])
+def collect_order():
+	return order_controller.collect_order()
 
 
 @order_blueprint.route('/', methods=['POST'])

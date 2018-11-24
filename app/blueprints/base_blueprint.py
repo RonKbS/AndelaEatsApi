@@ -20,6 +20,7 @@ class BaseBlueprint:
 		from app.blueprints.location_blueprint import location_blueprint
 		from app.blueprints.role_blueprint import role_blueprint
 		from app.blueprints.menu_blueprint import menu_blueprint
+		from app.blueprints.menu_blueprint import user_menu_blueprint
 		from app.blueprints.order_blueprint import order_blueprint
 		from app.blueprints.vendor_rating_blueprint import rating_blueprint
 		from app.blueprints.vendor_engagement_blueprint import engagement_blueprint
@@ -31,5 +32,6 @@ class BaseBlueprint:
 		self.app.register_blueprint(location_blueprint)
 		self.app.register_blueprint(role_blueprint)
 		self.app.register_blueprint(menu_blueprint)
+		self.app.register_blueprint(user_menu_blueprint)
 		self.app.register_blueprint(order_blueprint)
 

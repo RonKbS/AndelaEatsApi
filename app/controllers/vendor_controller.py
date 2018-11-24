@@ -16,7 +16,17 @@ class VendorController(BaseController):
 		self.vendor_rating_repo = VendorRatingRepo()
 
 	def list_vendors(self):
-		vendors = self.vendor_repo.filter_by(is_deleted=False)
+		vendors = self.vendor_repo.filter_by(is_deleted=False, is_active=True)
+		vendors_list = [vendor.serialize() for vendor in vendors.items]
+		return self.handle_response('OK', payload={'vendors': vendors_list, 'meta': self.pagination_meta(vendors)})
+
+	def list_deleted_vendors(self):
+		vendors = self.vendor_repo.filter_by(is_deleted=True)
+		vendors_list = [vendor.serialize() for vendor in vendors.items]
+		return self.handle_response('OK', payload={'vendors': vendors_list, 'meta': self.pagination_meta(vendors)})
+
+	def list_suspended_vendors(self):
+		vendors = self.vendor_repo.filter_by(is_deleted=False, is_active=False)
 		vendors_list = [vendor.serialize() for vendor in vendors.items]
 		return self.handle_response('OK', payload={'vendors': vendors_list, 'meta': self.pagination_meta(vendors)})
 
@@ -55,6 +65,24 @@ class VendorController(BaseController):
 			self.vendor_repo.update(vendor, **updates)
 			return self.handle_response('OK', payload={'vendor': vendor.serialize()})
 
+		return self.handle_response('Invalid or incorrect vendor_id provided', status_code=400)
+
+	def suspend_vendor(self, vendor_id):
+		vendor = self.vendor_repo.get(vendor_id)
+		if vendor:
+			updates = {}
+			updates['is_active'] = 0
+			self.vendor_repo.update(vendor, **updates)
+			return self.handle_response('OK', payload={'vendor': vendor.serialize()})
+		return self.handle_response('Invalid or incorrect vendor_id provided', status_code=400)
+	
+	def un_suspend_vendor(self, vendor_id):
+		vendor = self.vendor_repo.get(vendor_id)
+		if vendor:
+			updates = {}
+			updates['is_active'] = 0
+			self.vendor_repo.update(vendor, **updates)
+			return self.handle_response('OK', payload={'vendor': vendor.serialize()})
 		return self.handle_response('Invalid or incorrect vendor_id provided', status_code=400)
 
 	def delete_vendor(self, vendor_id):

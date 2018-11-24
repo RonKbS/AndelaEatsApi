@@ -1,8 +1,8 @@
-Get an Order
+Get Suspended Vendors
 ---
 tags:
-  - Orders
-summary: Gets an Order by Id.
+  - Vendors
+summary: Get all Suspended Vendors
 consumes:
   - application/json
 parameters:
@@ -17,14 +17,20 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
-  - name: order_id
+  - name: page
     in: path
     type: integer
-    required: true
-    description: The id of the order
-
+    required: optional
+    description: the number of the page
+    default: 1
+  - name: per_page
+    in: path
+    type: integer
+    required: optional
+    description: The number of records per page
+    default: 1
 responses:
   200:
     description: Ok
     schema:
-          $ref: '#/definitions/Order1Payload'
+          $ref: '#/definitions/VendorListPayload'

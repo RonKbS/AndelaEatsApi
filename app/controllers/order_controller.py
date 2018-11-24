@@ -3,6 +3,7 @@ from app.controllers.base_controller import BaseController
 from app.repositories import OrderRepo
 from app.repositories.meal_item_repo import MealItemRepo
 from datetime import datetime, timedelta
+from app.utils.enums import OrderStatus
 from app.utils.auth import Auth
 
 class OrderController(BaseController):
@@ -16,26 +17,12 @@ class OrderController(BaseController):
 		List all orders in the application: should rarely be should
 		:return:
 		"""
-		orders = self.order_repo.get_unpaginated(is_deleted=False)
-		orders_list = [order.serialize() for order in orders]
+		orders = self.order_repo.filter_by(is_deleted=False)
+		orders_list = [order.serialize() for order in orders.items]
 		for order in orders_list:
 			meal_items = self.order_repo.get(order['id']).meal_item_orders
-			order['mealItems'] = [item.name for item in meal_items]
-		return self.handle_response('OK', payload={'orders': orders_list})
-
-	# def list_orders_page(self, page_id, per_page):
-	# 	"""
-	# 	List all orders in the application per page
-	# 	:param page_id:
-	# 	:param per_page:
-	# 	:return:
-	# 	"""
-	# 	orders = self.order_repo.filter_and_order(is_deleted=False, page=page_id, per_page=per_page)
-	# 	orders_list = [order.serialize() for order in orders]
-	# 	for order in orders_list:
-	# 		meal_items = self.order_repo.get(order['id']).meal_item_orders
-	# 		order['mealItems'] = [item.name for item in meal_items]
-	# 	return self.handle_response('OK', payload={'orders': orders_list})
+			order['mealItems'] = [{'name': item.name, 'image': item.image} for item in meal_items]
+		return self.handle_response('OK', payload={'orders': orders_list, 'meta': self.pagination_meta(orders)})
 
 	def list_orders_date(self, start_date):
 		"""
@@ -43,11 +30,11 @@ class OrderController(BaseController):
 		:param start_date:
 		:return:
 		"""
-		orders = self.order_repo.get_unpaginated(is_deleted=False, dateBookedFor=start_date)
+		orders = self.order_repo.get_unpaginated(is_deleted=False, date_booked_for=start_date)
 		orders_list = [order.serialize() for order in orders]
 		for order in orders_list:
 			meal_items = self.order_repo.get(order['id']).meal_item_orders
-			order['mealItems'] = [item.name for item in meal_items]
+			order['mealItems'] = [{'name': item.name, 'image': item.image} for item in meal_items]
 		return self.handle_response('OK', payload={'orders': orders_list})
 
 	def get_order(self, order_id):
@@ -59,9 +46,22 @@ class OrderController(BaseController):
 		order = self.order_repo.get(order_id)
 		if order:
 			order_serialized = order.serialize()
-			order_serialized['mealItems'] = [item.name for item in order.meal_item_orders]
+			order_serialized['mealItems'] = [{'name': item.name, 'image': item.image} for item in order.meal_item_orders]
 			return self.handle_response('OK', payload={'order': order_serialized})
 		return self.handle_response('Order not found', status_code=400)
+
+	def get_order_by_user_id(self, user_id):
+		"""
+		Gets all orders for a user by the user id
+		:param user_id:
+		:return: list of orders in json model
+		"""
+		orders = self.order_repo.filter_by(user_id=user_id, is_deleted=False)
+		orders_list = [order.serialize() for order in orders.items]
+		for order in orders_list:
+			meal_items = self.order_repo.get(order['id']).meal_item_orders
+			order['mealItems'] = [{'name': item.name, 'image': item.image} for item in meal_items]
+		return self.handle_response('OK', payload={'orders': orders_list})
 
 	def create_order(self):
 		"""
@@ -81,9 +81,10 @@ class OrderController(BaseController):
 		if order_date_midnight - current_time < timedelta('hours' == 7):
 			return self.handle_response('It is too late to book meal for the selected date ', status_code=400)
 
+
 		if orders \
 			and any(order.user_id == user_id and order.meal_period == meal_period
-			and order.is_deleted.is_(False)
+			and order.is_deleted is False
 			and order.date_booked_for == datetime.strptime(
 			date_booked_for, '%Y-%m-%d').date() for order in orders):
 			return self.handle_response('you have already booked for this date.', status_code=400)
@@ -96,7 +97,7 @@ class OrderController(BaseController):
 
 		new_order = self.order_repo.create_order(
 			user_id, date_booked_for, meal_object_items, channel, meal_period).serialize()
-		new_order['mealItems'] = [item.name for item in meal_object_items]
+		new_order['mealItems'] = [{'name': item.name, 'image': item.image} for item in meal_object_items]
 		return self.handle_response('OK', payload={'order': new_order})
 
 	def update_order(self, order_id):
@@ -113,7 +114,6 @@ class OrderController(BaseController):
 			meal_object_items.append(meal_item)
 
 		order = self.order_repo.get(order_id)
-
 		if order:
 			if order.is_deleted:
 				return self.handle_response('Order has already been deleted', status_code=400)
@@ -131,34 +131,46 @@ class OrderController(BaseController):
 				updates['meal_item_orders'] = meal_object_items
 
 			updated_order = self.order_repo.update(order, **updates).serialize()
-			updated_order['mealItems'] = [item.name for item in order.meal_item_orders]
+			updated_order['mealItems'] = [{'name': item.name, 'image': item.image} for item in order.meal_item_orders]
 			return self.handle_response('OK', payload={'order': updated_order})
 
 		return self.handle_response('Invalid or incorrect order_id provided', status_code=400)
 
-	def collect_order(self, order_type, user_id):
+	def collect_order(self):
 		"""
 		Collects order and mark as collected for a user Id
-		:param order_type:
 		:param user_id:
+		:param order_type:
+		:param order_date:
 		:return:
 		"""
+		user_id, order_type, order_date = self.request_params('user_id', 'order_type', 'order_date')
 
-		order = self.order_repo.filter_by(user_id=user_id)
+		order = self.order_repo.find_first(user_id=user_id, meal_period=order_type, date_booked_for=order_date)
+		if not order:
+			return self.handle_response('Invalid or incorrect details provided', status_code=400)
 
-		if order:
-			return self.handle_response('OK', payload={'order': order})
-		return self.handle_response('Invalid or incorrect details provided', status_code=400)
+		if order.order_status == OrderStatus.collected:
+			return self.handle_response('Order already collected', status_code=409)
 
-	def check_order(self, user_id, order_date, meal_period):
+		order.order_status = OrderStatus.collected
+		order.save()
+		return self.handle_response('OK', payload={'order': order.serialize()})
+
+	def check_order(self):
 		"""
 		Checks if a user has an order for a particular date and period
 		:param user_id:
+		:param order_type:
 		:param order_date:
-		:param meal_period:
 		:return:
 		"""
-		pass
+		user_id, order_type, order_date = self.request_params('user_id', 'order_type', 'order_date')
+
+		order = self.order_repo.find_first(user_id=user_id, meal_period=order_type, date_booked_for=order_date)
+		if not order:
+			return self.handle_response('Invalid or incorrect details provided', status_code=400)
+		return self.handle_response('OK', payload={'order': order.serialize()})
 
 	def delete_order(self, order_id):
 

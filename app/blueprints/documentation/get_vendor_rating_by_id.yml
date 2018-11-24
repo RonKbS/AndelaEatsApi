@@ -1,0 +1,64 @@
+Get a Vendor Rating
+---
+tags:
+  - Vendor Ratings
+summary: Gets a Vendor rating by Id.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: rating_id
+    in: path
+    type: integer
+    required: true
+    description: The id of the rating
+    default: 1
+definitions:
+  VendorRatingPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          rating:
+            type: object
+            properties:
+              channel:
+                type: string
+              comment:
+                type: string
+              id:
+                type: integer
+              isDeleted:
+                type: boolean
+              rating:
+                type: number
+              timestamps:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    format: date
+                    example: 2018-11-21
+                  updated_at:
+                    type: string
+                    format: date
+                    example: 2018-11-21
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/VendorRatingPayload'

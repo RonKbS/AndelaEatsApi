@@ -4,6 +4,7 @@ from app.controllers.menu_controller import MenuController
 from flasgger import swag_from
 
 menu_blueprint = Blueprint('menu', __name__, url_prefix='{}/admin/menus'.format(BaseBlueprint.base_url_prefix))
+user_menu_blueprint = Blueprint('user_menu', __name__, url_prefix='{}/menus'.format(BaseBlueprint.base_url_prefix))
 
 menu_controller = MenuController(request)
 
@@ -24,6 +25,7 @@ def create_menu():
 	'''Blueprint function for creating a menu'''
 	return menu_controller.create_menu()
 
+
 @menu_blueprint.route('/<int:menu_id>', methods=['DELETE'])
 @Auth.has_permission('delete_menu')
 @swag_from('documentation/delete_menu.yml')
@@ -40,12 +42,19 @@ def list_menu(meal_period, date):
 	return menu_controller.list_menus(meal_period, date)
 
 
-
 @menu_blueprint.route('/<meal_period>/<start_date>/<end_date>', methods=['GET'])
 @Auth.has_permission('view_menu')
 @swag_from('documentation/get_menu_period_date_range.yml')
+def list_menu_range_admin(meal_period, start_date, end_date):
+	"""Blueprint function for fetching paginated && unpaginated menu records between two dates for admin"""
+	return menu_controller.list_menus_range_admin(meal_period, start_date, end_date)
+
+
+@user_menu_blueprint.route('/<meal_period>/<start_date>/<end_date>', methods=['GET'])
+@Auth.has_permission('view_menu')
+@swag_from('documentation/get_menu_period_date_range.yml')
 def list_menu_range(meal_period, start_date, end_date):
-	'''Blueprint function for fetching paginated && unpaginated menu records between two dates'''
+	"""Blueprint function for fetching paginated && unpaginated menu records between two dates for user"""
 	return menu_controller.list_menus_range(meal_period, start_date, end_date)
 
 

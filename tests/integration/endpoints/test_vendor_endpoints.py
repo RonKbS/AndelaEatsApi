@@ -135,3 +135,15 @@ class TestVendorEndpoints(BaseTestCase):
 
 	def test_delete_vendor_deletes_vendor_engagement(self):
 		pass
+
+	def test_suspend_vendor(self):
+		pass
+
+	def test_un_suspend_vendor(self):
+		pass
+
+	def test_list_suspended_vendors(self):
+		pass
+
+	def test_list_deleted_vendors(self):
+		pass

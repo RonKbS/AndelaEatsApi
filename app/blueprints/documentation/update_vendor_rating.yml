@@ -1,0 +1,78 @@
+Update a Vendor rating
+---
+tags:
+  - Vendor Ratings
+summary: Update an existing vendor rating.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: rating_id
+    in: path
+    type: integer
+    required: true
+    description: The id of the vendor rating
+    default: 1
+  - in: body
+    name: menu
+    description: Updating a vendor rating
+    schema:
+      type: object
+      required:
+        - comment
+      properties:
+        comment:
+          type: string
+definitions:
+  VendorRatingPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          rating:
+            type: object
+            properties:
+              channel:
+                type: string
+              comment:
+                type: string
+              id:
+                type: integer
+              isDeleted:
+                type: boolean
+              rating:
+                type: number
+              timestamps:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    format: date
+                    example: 2018-11-21
+                  updated_at:
+                    type: string
+                    format: date
+                    example: 2018-11-21
+          userId:
+            type: string
+          vendorId:
+            type: integer
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/VendorRatingUpdatePayload'

@@ -1,8 +1,8 @@
-Get an Order
+Get all Order by User Id
 ---
 tags:
   - Orders
-summary: Gets an Order by Id.
+summary: Gets all Order by User Id.
 consumes:
   - application/json
 parameters:
@@ -17,14 +17,14 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
-  - name: order_id
+  - name: user_id
     in: path
     type: integer
     required: true
-    description: The id of the order
-
+    description: The id of the user
+    default: 1
 responses:
   200:
     description: Ok
     schema:
-          $ref: '#/definitions/Order1Payload'
+          $ref: '#/definitions/OrderList1Payload'

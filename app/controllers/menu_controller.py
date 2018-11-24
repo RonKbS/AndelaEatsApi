@@ -4,6 +4,7 @@ from app.repositories.menu_repo import MenuRepo
 from app.repositories.meal_item_repo import MealItemRepo
 from app.utils.enums import MealPeriods
 from datetime import datetime
+from collections import defaultdict
 
 class MenuController(BaseController):
 	'''Menu controller class'''
@@ -37,7 +38,6 @@ class MenuController(BaseController):
 
 	def delete_menu(self, menu_id):
 		'''
-
 		:param menu_id: id of the menu
 		:return: json object
 		'''
@@ -61,7 +61,7 @@ class MenuController(BaseController):
 		'''
 		if MealPeriods.has_value(menu_period):
 			menus = self.menu_repo.get_unpaginated(date=menu_date, meal_period=menu_period, is_deleted=False)
-			menu_list = []
+			menu_list = defaultdict(list)
 			for menu in menus:
 				serialised_menu = menu.serialize()
 				arr_protein = menu.protein_items.split(",")
@@ -69,34 +69,32 @@ class MenuController(BaseController):
 				serialised_menu['mainMeal'] = self.meal_repo.get(menu.main_meal_id).serialize()
 				serialised_menu['proteinItems'] = self.menu_repo.get_meal_items(arr_protein)
 				serialised_menu['sideItems'] = self.menu_repo.get_meal_items(arr_side)
-				menu_list.append(serialised_menu)
+				menu_list[serialised_menu['date'].strftime('%Y-%m-%d')].append(serialised_menu)
 
+			grouped = [{'date': date, 'menus': menus} for date, menus in menu_list.items()]
 			return self.handle_response(
-				'OK', payload={'dateOfMeal': menu_date, 'mealPeriod': menu_period, 'menuList': menu_list}
+				'OK', payload={'dateOfMeal': menu_date, 'mealPeriod': menu_period, 'menuList': grouped}
 			)
 
 		return self.handle_response('Provide valid meal period and date', status_code=404)
 
-	def list_menus_range(self, menu_period, menu_start_date, menu_end_date):
-		'''retrieves a list of menus for a specific date range for a specific meal period.
+	def list_menus_range_admin(self, menu_period, menu_start_date, menu_end_date):
+		"""retrieves a list of menus for a specific date range for a specific meal period.
 			date fornat: "YYYY-MM-DD"
 			meal period: breakfast or lunch
 			menu_start_date: start date of search
 			menu_end_date: end date of search
-			first_date = datetime.strptime(menu_start_date, '%Y-%m-%d')
-			second_date = datetime.strptime(menu_end_date, '%Y-%m-%d')
-
-			if first_date >= second_date:
-
-		'''
+		"""
 		if MealPeriods.has_value(menu_period):
 
 			menu_start_date = datetime.strptime(menu_start_date, '%Y-%m-%d')
 			menu_end_date = datetime.strptime(menu_end_date, '%Y-%m-%d')
 
 			if menu_start_date >= menu_end_date:
-				return self.handle_response('Provide valid date range. start_date cannot be greater than end_date', status_code=404)
-			menus = self.menu_repo.get_range_paginated_options(start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period)
+				return self.handle_response('Provide valid date range. start_date cannot be greater than end_date',
+											status_code=400)
+			menus = self.menu_repo.get_range_paginated_options(start_date=menu_start_date, end_date=menu_end_date,
+															   meal_period=menu_period)
 			menu_list = []
 			for menu in menus.items:
 				serialised_menu = menu.serialize()
@@ -116,11 +114,49 @@ class MenuController(BaseController):
 				}
 			)
 
-		return self.handle_response('Provide valid meal period and date range', status_code=404)
+		return self.handle_response('Provide valid meal period and date range', status_code=400)
+
+	def list_menus_range(self, menu_period, menu_start_date, menu_end_date):
+		"""retrieves a list of menus for a specific date range for a specific meal period.
+			date fornat: "YYYY-MM-DD"
+			meal period: breakfast or lunch
+			menu_start_date: start date of search
+			menu_end_date: end date of search
+		"""
+
+		if MealPeriods.has_value(menu_period):
+
+			menu_start_date = datetime.strptime(menu_start_date, '%Y-%m-%d')
+			menu_end_date = datetime.strptime(menu_end_date, '%Y-%m-%d')
+
+			if menu_start_date >= menu_end_date:
+				return self.handle_response('Provide valid date range. start_date cannot be greater than end_date', status_code=400)
+			menus = self.menu_repo.get_range_paginated_options(start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period)
+			menu_list = defaultdict(list)
+			for menu in menus.items:
+				serialised_menu = menu.serialize()
+				arr_protein = [int(prot_id) for prot_id in menu.protein_items.split(',')]
+				arr_side = [int(side_id) for side_id in menu.side_items.split(',')]
+
+				serialised_menu['mainMeal'] = self.meal_repo.get(menu.main_meal_id).serialize()
+				serialised_menu['proteinItems'] = self.menu_repo.get_meal_items(arr_protein)
+				serialised_menu['sideItems'] = self.menu_repo.get_meal_items(arr_side)
+				menu_list[serialised_menu['date'].strftime('%Y-%m-%d')].append(serialised_menu)
+
+			grouped = [{'date': date, 'menus': menus} for date, menus in menu_list.items()]
+
+			return self.handle_response(
+				'OK',
+				payload={
+					'startDateOfSearch': menu_start_date, 'endDateOfSearch': menu_end_date,
+					'mealPeriod': menu_period, 'meta': self.pagination_meta(menus), 'menuList': grouped
+				}
+			)
+
+		return self.handle_response('Provide valid meal period and date range', status_code=400)
 
 	def update_menu(self, menu_id):
 		'''
-
 		:param menu_id: id of menu record
 		:params other params sent via request_param
 		:return:
@@ -134,6 +170,9 @@ class MenuController(BaseController):
 		menu = self.menu_repo.get(menu_id)
 
 		if menu:
+			if menu.is_deleted:
+				return self.handle_response('This menu is already deleted', status_code=400)
+
 			updates = {}
 			if date:
 				updates['date'] = datetime.strptime(date, '%Y-%m-%d')
@@ -153,8 +192,8 @@ class MenuController(BaseController):
 				updates['vendor_engagement_id'] = vendor_engagement_id
 
 			updated_menu = self.menu_repo.update(menu, **updates)
-			prot_items = [int(prot_id) for prot_id in updated_menu.protein_items if prot_id != ',']
-			sid_items = [int(side_id) for side_id in updated_menu.side_items if side_id != ',']
+			prot_items = [int(prot_id) for prot_id in updated_menu.protein_items.split(',')]
+			sid_items = [int(side_id) for side_id in updated_menu.side_items.split(',')]
 
 			menu = updated_menu.serialize()
 			menu['mainMeal'] = self.meal_repo.get(updated_menu.main_meal_id).serialize()
@@ -163,3 +202,5 @@ class MenuController(BaseController):
 			return self.handle_response('OK', payload={'menu': menu}, status_code=200)
 
 		return self.handle_response('This menu_id does not exist', status_code=404)
+
+

@@ -1,8 +1,8 @@
-Get All Order
+Get All Vendor Ratings
 ---
 tags:
-  - Orders
-summary: Get all orders
+  - Vendor Ratings
+summary: Get all vendor ratings
 consumes:
   - application/json
 parameters:
@@ -17,6 +17,12 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
+  - name: vendor_id
+    in: path
+    type: integer
+    required: true
+    description: the id of the vendor
+    default: 1
   - name: page
     in: path
     type: integer
@@ -28,9 +34,9 @@ parameters:
     type: integer
     required: optional
     description: The number of records per page
-    default: 1
+    default: 10
 definitions:
-  OrderList1Payload:
+  VendorRatingListPayload:
     type: object
     properties:
       meta:
@@ -52,54 +58,34 @@ definitions:
       payload:
         type: object
         properties:
-          orders:
+          ratings:
             type: array
             items:
               type: object
               properties:
                 channel:
                   type: string
-                dateBooked:
+                comment:
                   type: string
-                  format: date
-                  example: 2018-10-22
-                dateBookedFor:
-                  type: string
-                  format: date
-                  example: 2018-10-22
                 id:
                   type: integer
                 isDeleted:
                   type: boolean
-                mealItems:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      image:
-                        type: string
-                      name:
-                        type: string
-                status:
-                  type: integer
-                  default: 0
-                userId:
-                  type: string
-                  default: -L5J538y77WvOnzJ1FPG
+                rating:
+                  type: number
                 timestamps:
                   type: object
                   properties:
                     created_at:
                       type: string
                       format: date
-                      example: 2018-10-22
+                      example: 2018-11-21
                     updated_at:
                       type: string
                       format: date
-                      example: 2018-10-22
-
+                      example: 2018-11-21
 responses:
   200:
     description: Ok
     schema:
-          $ref: '#/definitions/OrderList1Payload'
+          $ref: '#/definitions/VendorRatingListPayload'
