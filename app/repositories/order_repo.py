@@ -29,3 +29,9 @@ class OrderRepo(BaseRepo):
 
         order.save()
         return order
+
+    def get_range_paginated_options(self, user_id, start_date, end_date):
+        return Order.query.filter(
+            Order.date_booked_for >= start_date, Order.date_booked_for <= end_date,
+            Order.user_id == user_id, Order.is_deleted.is_(False)
+        ).order_by(Order.date_booked_for.desc()).paginate(error_out=False)

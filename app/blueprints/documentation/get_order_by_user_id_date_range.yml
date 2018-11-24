@@ -1,0 +1,42 @@
+Get all Order by User Id and date range filter
+---
+tags:
+  - Orders
+summary: Gets all Order by User Id and start/end date filter
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: user_id
+    in: path
+    type: integer
+    required: true
+    description: The id of the user
+    default: 1
+  - name: start_date
+    in: path
+    type: integer
+    required: true
+    description: The start date to search for
+    default: 1
+  - name: end_date
+    in: path
+    type: integer
+    required: true
+    description: The end date to search for
+    default: 1
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/OrderList1Payload'
