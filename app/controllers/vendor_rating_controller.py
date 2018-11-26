@@ -1,6 +1,5 @@
 '''A controller module for vendor ratings
 '''
-import pdb
 
 from app.controllers.base_controller import BaseController
 from app.repositories import VendorRatingRepo, VendorRepo, VendorEngagementRepo, OrderRepo, MenuRepo
