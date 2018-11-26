@@ -22,6 +22,13 @@ def list_orders_date(start_date):
 	return order_controller.list_orders_date(start_date)
 
 
+@order_blueprint.route('/<start_date>/<end_date>', methods=['GET'])
+@Auth.has_permission('view_orders')
+@swag_from('documentation/get_orders_by_date_range.yml')
+def list_orders_date_range(start_date, end_date):
+	return order_controller.list_orders_date_range(start_date, end_date)
+
+
 @order_blueprint.route('/<int:order_id>', methods=['GET'])
 @swag_from('documentation/get_order_by_id.yml')
 def get_order(order_id):
@@ -41,20 +48,20 @@ def get_order_by_user_id_date_range(user_id, start_date, end_date):
 
 
 @order_blueprint.route('/check', methods=['POST'])
-@Security.validator(['user_id|required:string', 'order_type|required:string', 'order_date|required:string'])
+@Security.validator(['userId|required:string', 'orderType|required:string', 'orderDate|required:string'])
 def check_order():
 	return order_controller.check_order()
 
 
 @order_blueprint.route('/collect', methods=['POST'])
-@Security.validator(['user_id|required:string', 'order_type|required:string', 'order_date|required:string'])
+@Security.validator(['userId|required:string', 'orderType|required:string', 'orderDate|required:string'])
 def collect_order():
 	return order_controller.collect_order()
 
 
 @order_blueprint.route('/', methods=['POST'])
 @Security.validator([
-	'dateBookedFor|required:string', 'channel|required:string',
+	'dateBookedFor|required:string', 'channel|required:string', 'menuId|required:int',
 	'mealPeriod|required:string', 'mealItems|required:list_int'
 ])
 @swag_from('documentation/create_order.yml')

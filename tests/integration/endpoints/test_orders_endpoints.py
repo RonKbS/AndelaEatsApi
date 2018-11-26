@@ -1,5 +1,5 @@
 from tests.base_test_case import BaseTestCase
-from factories import OrderFactory, MealItemFactory, RoleFactory, PermissionFactory, UserRoleFactory
+from factories import OrderFactory, MealItemFactory, RoleFactory, PermissionFactory, UserRoleFactory, MenuFactory
 from app.utils.enums import MealTypes
 from json import loads
 from datetime import date, timedelta
@@ -15,7 +15,8 @@ class TestOrderEndpoints(BaseTestCase):
 
 	def test_create_order_with_invalid_details_endpoint(self):
 		items = [item.id for item in MealItemFactory.create_batch(4)]
-		data = {'dateBookedFor': '2001-02-22', 'channel': 'web', 'mealPeriod': 'lunch'}
+		menu = MenuFactory.create()
+		data = {'dateBookedFor': '2001-02-22', 'channel': 'web', 'mealPeriod': 'lunch', 'menuId': menu.id}
 
 		# If we don't add meal items
 		response = self.client().post(self.make_url('/orders/'), data=self.encode_to_json_string(data), headers=self.headers())
@@ -32,6 +33,7 @@ class TestOrderEndpoints(BaseTestCase):
 
 	def test_create_order_with_valid_details_endpoint(self):
 		order = OrderFactory.create()
+		menu = MenuFactory.create()
 		meal_item1 = MealItemFactory.create()
 		meal_item2 = MealItemFactory.create()
 		meal_item3 = MealItemFactory.create()
@@ -40,7 +42,7 @@ class TestOrderEndpoints(BaseTestCase):
 
 		meal_items = [meal_item1.id, meal_item2.id, meal_item3.id]
 		data = {'userId': order.user_id, 'dateBookedFor': order.date_booked_for.strftime('%Y-%m-%d'),
-				'dateBooked': order.date_booked.strftime('%Y-%m-%d'), 'channel': order.channel,
+				'dateBooked': order.date_booked.strftime('%Y-%m-%d'), 'channel': order.channel, 'menuId': menu.id,
 				'mealPeriod': order.meal_period, 'mealItems': meal_items}
 
 		response = self.client().post(
@@ -112,7 +114,7 @@ class TestOrderEndpoints(BaseTestCase):
 		PermissionFactory.create(keyword='view_orders', role_id=role.id)
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
-		data={'user_id': user_id, 'order_type': order.meal_period, 'order_date': order.date_booked_for.strftime('%Y-%m-%d')}
+		data={'userId': user_id, 'orderType': order.meal_period, 'orderDate': order.date_booked_for.strftime('%Y-%m-%d')}
 		response = self.client().post(self.make_url('/orders/check'), data=self.encode_to_json_string(data) , headers=self.headers())
 		self.assert200(response)
 
@@ -125,7 +127,7 @@ class TestOrderEndpoints(BaseTestCase):
 		PermissionFactory.create(keyword='view_orders', role_id=role.id)
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
-		data={'user_id': user_id, 'order_type': order.meal_period, 'order_date': order.date_booked_for.strftime('%Y-%m-%d')}
+		data = {'userId': user_id, 'orderType': order.meal_period, 'orderDate': order.date_booked_for.strftime('%Y-%m-%d')}
 		response = self.client().post(self.make_url('/orders/check'), data=self.encode_to_json_string(data) , headers=self.headers())
 		self.assert200(response)
 		self.assertEqual(loads(response.data, encoding='utf-8')['payload']['order']['orderStatus'], 'cancelled')
@@ -139,7 +141,7 @@ class TestOrderEndpoints(BaseTestCase):
 		PermissionFactory.create(keyword='view_orders', role_id=role.id)
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
-		data={'user_id': user_id, 'order_type': order.meal_period, 'order_date': order.date_booked_for.strftime('%Y-%m-%d')}
+		data = {'userId': user_id, 'orderType': order.meal_period, 'orderDate': order.date_booked_for.strftime('%Y-%m-%d')}
 		response = self.client().post(self.make_url('/orders/check'), data=self.encode_to_json_string(data) , headers=self.headers())
 		self.assert200(response)
 		self.assertEqual(loads(response.data, encoding='utf-8')['payload']['order']['orderStatus'], 'collected')
@@ -164,7 +166,7 @@ class TestOrderEndpoints(BaseTestCase):
 		PermissionFactory.create(keyword='view_orders', role_id=role.id)
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
-		data={'user_id': user_id, 'order_type': order.meal_period, 'order_date': order.date_booked_for.strftime('%Y-%m-%d')}
+		data = {'userId': user_id, 'orderType': order.meal_period, 'orderDate': order.date_booked_for.strftime('%Y-%m-%d')}
 		response = self.client().post(self.make_url('/orders/collect'), data=self.encode_to_json_string(data) , headers=self.headers())
 		self.assert200(response)
 
@@ -176,7 +178,7 @@ class TestOrderEndpoints(BaseTestCase):
 		PermissionFactory.create(keyword='view_orders', role_id=role.id)
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
-		data={'user_id': user_id, 'order_type': order.meal_period, 'order_date': order.date_booked_for.strftime('%Y-%m-%d')}
+		data = {'userId': user_id, 'orderType': order.meal_period, 'orderDate': order.date_booked_for.strftime('%Y-%m-%d')}
 		response = self.client().post(self.make_url('/orders/collect'), data=self.encode_to_json_string(data) , headers=self.headers())
 		self.assert200(response)
 
@@ -191,7 +193,7 @@ class TestOrderEndpoints(BaseTestCase):
 		PermissionFactory.create(keyword='view_orders', role_id=role.id)
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
-		data={'user_id': user_id, 'order_type': 'blahblah', 'order_date': order.date_booked_for.strftime('%Y-%m-%d')}
+		data={'userId': user_id, 'orderType': 'blahblah', 'orderDate': order.date_booked_for.strftime('%Y-%m-%d')}
 		response = self.client().post(self.make_url('/orders/collect'), data=self.encode_to_json_string(data) , headers=self.headers())
 		self.assert400(response)
 
@@ -258,10 +260,11 @@ class TestOrderEndpoints(BaseTestCase):
 	def test_delete_order_endpoint_with_right_permission(self):
 		user_id = BaseTestCase.user_id()
 		meal = MealItemFactory.create()
+		menu = MenuFactory.create()
 		order_data = {
 			'user_id': user_id,
 			'date_booked_for': '2018-10-20',
-			'channel': 'web', 'meal_period': 'lunch',
+			'channel': 'web', 'meal_period': 'lunch', 'menu_id': menu.id,
 			'meal_items': [meal]
 		}
 		order_repo = OrderRepo()
@@ -278,10 +281,11 @@ class TestOrderEndpoints(BaseTestCase):
 	def test_delete_order_not_yours(self):
 		user_id = BaseTestCase.user_id()
 		meal = MealItemFactory.create()
+		menu = MenuFactory.create()
 		order_data = {
 			'user_id': '-UTG654RfggtdI',
 			'date_booked_for': '2018-10-20',
-			'channel': 'web', 'meal_period': 'lunch',
+			'channel': 'web', 'meal_period': 'lunch', 'menu_id': menu.id,
 			'meal_items': [meal]
 		}
 		order_repo = OrderRepo()
@@ -303,10 +307,11 @@ class TestOrderEndpoints(BaseTestCase):
 	def test_already_deleted_order(self):
 		user_id = BaseTestCase.user_id()
 		meal = MealItemFactory.create()
+		menu = MenuFactory.create()
 		order_data = {
 			'user_id': user_id,
 			'date_booked_for': '2018-10-20',
-			'channel': 'web', 'meal_period': 'lunch',
+			'channel': 'web', 'meal_period': 'lunch', 'menu_id': menu.id,
 			'meal_items': [meal]
 		}
 		order_repo = OrderRepo()
