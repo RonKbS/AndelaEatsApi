@@ -27,6 +27,7 @@ parameters:
         - channel
         - mealPeriod
         - mealItems
+        - menuId
       properties:
         dateBookedFor:
           type: string
@@ -34,6 +35,8 @@ parameters:
           type: string
         mealPeriod:
           type: string
+        menuId:
+          type: int
         mealItems:
           type: array
           items:
