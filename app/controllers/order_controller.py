@@ -161,7 +161,7 @@ class OrderController(BaseController):
 		"""
 		user_id, order_type, order_date = self.request_params('user_id', 'order_type', 'order_date')
 
-		order = self.order_repo.find_first(user_id=user_id, meal_period=order_type, date_booked_for=order_date)
+		order = self.order_repo.find_first(user_id=user_id, meal_period=order_type, date_booked_for=order_date, is_deleted=False)
 		if not order:
 			return self.handle_response('Invalid or incorrect details provided', status_code=400)
 
@@ -179,8 +179,8 @@ class OrderController(BaseController):
 		:return:
 		"""
 		user_id, order_type, order_date = self.request_params('user_id', 'order_type', 'order_date')
-
-		order = self.order_repo.find_first(user_id=user_id, meal_period=order_type, date_booked_for=order_date)
+		# get user_id from another method and reform to db's user id
+		order = self.order_repo.find_first(user_id=user_id, meal_period=order_type, date_booked_for=order_date, is_deleted=False)
 		if not order:
 			return self.handle_response('Invalid or incorrect details provided', status_code=400)
 		return self.handle_response('OK', payload={'order': order.serialize()})

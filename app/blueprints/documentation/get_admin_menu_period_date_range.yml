@@ -1,7 +1,7 @@
 Get Menu for Food Period by Range of Date.
 ---
 tags:
-  - User menu
+  - Admin menu
 summary: Get list of menu fetching paginated && unpaginated menu records between two dates
 consumes:
   - application/json

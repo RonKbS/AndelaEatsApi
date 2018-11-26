@@ -1,7 +1,7 @@
 '''A controller module for vendor ratings
 '''
 from app.controllers.base_controller import BaseController
-from app.repositories import VendorRatingRepo, VendorRepo
+from app.repositories import VendorRatingRepo, VendorRepo, VendorEngagementRepo, OrderRepo
 from app.utils.auth import Auth
 
 class VendorRatingController(BaseController):
@@ -9,6 +9,8 @@ class VendorRatingController(BaseController):
 		BaseController.__init__(self, request)
 		self.vendor_rating_repo = VendorRatingRepo()
 		self.vendor_repo = VendorRepo()
+		self.vendor_engagement_repo = VendorEngagementRepo()
+		self.order_repo = OrderRepo()
 
 	def list_ratings(self, vendor_id):
 		'''retrieves a list of ratings for a specific vendor'''
@@ -44,6 +46,22 @@ class VendorRatingController(BaseController):
 			return self.handle_response('Rating created', payload={'rating': rtng}, status_code=201)
 
 		return self.handle_response('Invalid vendor_id provided', status_code=400)
+
+	def create_order_rating(self):
+		'''Adds a order rating during a specific engagement '''
+		pass
+		# (order_id, comment, rating, channel) = self.request_params('order_id', 'comment', 'rating', 'channel')
+		# user_id = Auth.user('id')
+		# order = self.order_repo.get(order_id)
+		#
+		# if self.vendor_repo.get(vendor_id):
+		#
+		# 	rating = self.vendor_rating_repo.new_vendor_rating(vendor_id, user_id, rating, channel, comment)
+		# 	rtng = rating.serialize()
+		#
+		# 	return self.handle_response('Rating created', payload={'rating': rtng}, status_code=201)
+		#
+		# return self.handle_response('Invalid vendor_id provided', status_code=400)
 
 	def update_vendor_rating(self, rating_id):
 		'''edits an existing rating'''

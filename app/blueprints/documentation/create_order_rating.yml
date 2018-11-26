@@ -1,0 +1,85 @@
+Create a Order Rating
+---
+tags:
+  - Vendor Ratings
+summary: Creates a new order rating.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - in: body
+    name: menu
+    description: Creation of an order Rating
+    schema:
+      type: object
+      required:
+        - order_id
+        - comment
+        - rating
+        - channel
+      properties:
+        vendor_id:
+          type: integer
+          required: true
+        comment:
+          type: string
+          required: optional
+        rating:
+          type: number
+          required: true
+        channel:
+          type: string
+          required: true
+definitions:
+  VendorRatingPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          rating:
+            type: object
+            properties:
+              channel:
+                type: string
+              comment:
+                type: string
+              id:
+                type: integer
+              isDeleted:
+                type: boolean
+              rating:
+                type: number
+              timestamps:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    format: date
+                    example: 2018-11-21
+                  updated_at:
+                    type: string
+                    format: date
+                    example: 2018-11-21
+              userId:
+                type: string
+              vendorId:
+                type: integer
+responses:
+  201:
+    description: Ok
+    schema:
+          $ref: '#/definitions/VendorRatingPayload'

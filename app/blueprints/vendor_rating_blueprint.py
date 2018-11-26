@@ -28,6 +28,14 @@ def get_vendor_rating(rating_id):
 def create_vendor_rating():
 	return vendor_rating_controller.create_vendor_rating()
 
+
+@rating_blueprint.route('/order/', methods=['POST'])
+@Security.validator(['order_id|required:int', 'rating|required:int'])
+@swag_from('documentation/create_order_rating.yml')
+def create_order_rating():
+	return vendor_rating_controller.create_order_rating()
+
+
 @rating_blueprint.route('/<int:rating_id>', methods=['PUT', 'PATCH'])
 @Security.validator(['rating|int'])
 @swag_from('documentation/update_vendor_rating.yml')
