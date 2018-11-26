@@ -38,3 +38,13 @@ class OrderStatus(str, enum.Enum):
     @classmethod
     def has_value(cls, value):
         return any(value == item.value for item in cls)
+
+
+class RatingType(str, enum.Enum):
+    meal = "meal"
+    order = "order"
+    engagement = "engagement"
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)

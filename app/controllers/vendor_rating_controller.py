@@ -1,15 +1,18 @@
 '''A controller module for vendor ratings
 '''
+
 from app.controllers.base_controller import BaseController
-from app.repositories import VendorRatingRepo, VendorRepo, VendorEngagementRepo, OrderRepo
+from app.repositories import VendorRatingRepo, VendorRepo, VendorEngagementRepo, OrderRepo, MenuRepo
 from app.utils.auth import Auth
+from app.utils.enums import RatingType
+
 
 class VendorRatingController(BaseController):
 	def __init__(self, request):
 		BaseController.__init__(self, request)
 		self.vendor_rating_repo = VendorRatingRepo()
 		self.vendor_repo = VendorRepo()
-		self.vendor_engagement_repo = VendorEngagementRepo()
+		self.menu_repo = MenuRepo()
 		self.order_repo = OrderRepo()
 
 	def list_ratings(self, vendor_id):
@@ -35,12 +38,13 @@ class VendorRatingController(BaseController):
 
 	def create_vendor_rating(self):
 		'''Adds a vendor rating during a specific engagement'''
-		(vendor_id, comment, rating, channel) = self.request_params('vendor_id', 'comment', 'rating', 'channel')
+		(vendor_id, comment, rating, channel, engagement_id) = self.request_params('vendorId', 'comment', 'rating', 'channel', 'engagementId')
 		user_id = Auth.user('id')
 
 		if self.vendor_repo.get(vendor_id):
 
-			rating = self.vendor_rating_repo.new_vendor_rating(vendor_id, user_id, rating, channel, comment)
+			rating = self.vendor_rating_repo.new_rating(vendor_id, user_id, rating, RatingType.engagement,
+						0, engagement_id, channel, comment)
 			rtng = rating.serialize()
 
 			return self.handle_response('Rating created', payload={'rating': rtng}, status_code=201)
@@ -49,19 +53,25 @@ class VendorRatingController(BaseController):
 
 	def create_order_rating(self):
 		'''Adds a order rating during a specific engagement '''
-		pass
-		# (order_id, comment, rating, channel) = self.request_params('order_id', 'comment', 'rating', 'channel')
-		# user_id = Auth.user('id')
-		# order = self.order_repo.get(order_id)
-		#
-		# if self.vendor_repo.get(vendor_id):
-		#
-		# 	rating = self.vendor_rating_repo.new_vendor_rating(vendor_id, user_id, rating, channel, comment)
-		# 	rtng = rating.serialize()
-		#
-		# 	return self.handle_response('Rating created', payload={'rating': rtng}, status_code=201)
-		#
-		# return self.handle_response('Invalid vendor_id provided', status_code=400)
+
+		(order_id, comment, rating, channel) = self.request_params('orderId', 'comment', 'rating', 'channel')
+		user_id = Auth.user('id')
+		order = self.order_repo.get(order_id)
+		if order:
+			menu = self.menu_repo.get(order.menu_id)
+			if menu:
+				vendor_id = menu.vendor_engagement.vendor_id
+				engagement_id = menu.vendor_engagement.id
+				rating = self.vendor_rating_repo.new_rating(
+					vendor_id, user_id, rating, RatingType.order, order_id, engagement_id, channel, comment)
+				rating_obj = rating.serialize()
+				if rating:
+					updates = {}
+					updates['has_rated'] = True
+					updated_order = self.order_repo.update(order, **updates).serialize()
+				return self.handle_response('Rating created', payload={'rating': rating_obj}, status_code=201)
+
+		return self.handle_response('Invalid vendor_id provided', status_code=400)
 
 	def update_vendor_rating(self, rating_id):
 		'''edits an existing rating'''

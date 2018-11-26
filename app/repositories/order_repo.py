@@ -22,9 +22,10 @@ class OrderRepo(BaseRepo):
 		order.save()
 		return order
 
-	def update_order(self, user_id, date_booked_for, date_booked, meal_items, channel='web', meal_period='lunch'):
+	def update_order(self, user_id, date_booked_for, date_booked, meal_items, channel='web', meal_period='lunch', has_rated=False):
 		order = Order(user_id=user_id, date_booked_for=datetime.strptime(date_booked_for, '%Y-%m-%d'),
-					  date_booked=datetime.strptime(date_booked, '%Y-%m-%d'), channel=channel, meal_period=meal_period)
+					  date_booked=datetime.strptime(date_booked, '%Y-%m-%d'),
+					  channel=channel, meal_period=meal_period, has_rated=has_rated)
 
 		for meal_item in meal_items:
 			order.meal_item_orders.append(meal_item)
