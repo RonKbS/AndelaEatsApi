@@ -1,7 +1,8 @@
 '''Module of integration tests for vendor rating endpoints'''
 import factory
 from tests.base_test_case import BaseTestCase
-from factories import VendorFactory, VendorRatingFactory, UserRoleFactory, RoleFactory, PermissionFactory
+from factories import VendorFactory, VendorRatingFactory, UserRoleFactory, RoleFactory, PermissionFactory, \
+	VendorEngagementFactory
 from app.models import VendorRating
 
 class TestVendorRatingEndpoints(BaseTestCase):
@@ -13,7 +14,8 @@ class TestVendorRatingEndpoints(BaseTestCase):
 	def test_create_vendor_rating_endpoint(self):
 		rating = VendorRatingFactory.build()
 		vendor_id = VendorFactory.create().id
-		data = {'vendor_id': vendor_id, 'user_id': rating.user_id, 'rating': rating.rating, 'comment': rating.comment, 'channel': rating.channel}
+		engagement_id = VendorEngagementFactory.create().id
+		data = {'vendorId': vendor_id, 'engagementId': engagement_id, 'user_id': rating.user_id, 'rating': rating.rating, 'comment': rating.comment, 'channel': rating.channel}
 		response = self.client().post(self.make_url('/ratings/'), data=self.encode_to_json_string(data), headers=self.headers())
 
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
