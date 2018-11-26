@@ -1,4 +1,3 @@
-
 from sqlalchemy import and_
 from app.controllers.base_controller import BaseController
 from app.repositories import OrderRepo
@@ -43,10 +42,13 @@ class OrderController(BaseController):
 		"""
 		List all orders for a particular date
 		:param start_date:
+		:param end_date:
 		:return:
 		"""
-		orders = self.order_repo.get_range_paginated_options_all(is_deleted=False, start_date=start_date, end_date=end_date)
-		orders_list = [order.serialize() for order in orders]
+		orders = self.order_repo.get_range_paginated_options_all(start_date=start_date, end_date=end_date)
+
+		orders_list = [order.serialize() for order in orders.items]
+
 		for order in orders_list:
 			meal_items = self.order_repo.get(order['id']).meal_item_orders
 			order['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
