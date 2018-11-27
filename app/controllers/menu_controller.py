@@ -26,6 +26,8 @@ class MenuController(BaseController):
 				'allowedProtein', 'sideItems', 'proteinItems', 'vendorEngagementId'
 			)
 
+		if self.menu_repo.get_unpaginated(date=date, main_meal_id=main_meal_id):
+			return self.handle_response('You can\'t create multiple menus with same main item on the same day', status_code=400)
 		menu = self.menu_repo.new_menu(
 			date, meal_period, main_meal_id, allowed_side,
 			allowed_protein, side_items, protein_items, vendor_engagement_id
