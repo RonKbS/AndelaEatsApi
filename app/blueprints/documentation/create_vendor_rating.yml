@@ -28,7 +28,7 @@ parameters:
         - rating
         - channel
       properties:
-        vendor_id:
+        vendorId:
           type: integer
           required: true
         engagementId:
