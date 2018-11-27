@@ -23,12 +23,15 @@ parameters:
     schema:
       type: object
       required:
-        - vendor_id
-        - comment
+        - vendorId
+        - engagementId
         - rating
         - channel
       properties:
         vendor_id:
+          type: integer
+          required: true
+        engagementId:
           type: integer
           required: true
         comment:
