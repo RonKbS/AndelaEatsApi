@@ -15,5 +15,5 @@ class OrderFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     id = factory.sequence(lambda n: n)
     channel = Channels.web
-    date_booked_for = date.today() + timedelta(days=2)
+    date_booked_for = date.today() + timedelta(days=1)
     date_booked = date.today()

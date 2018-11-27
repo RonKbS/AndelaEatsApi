@@ -92,7 +92,7 @@ class TestOrderEndpoints(BaseTestCase):
 
 	def test_list_order_by_date_endpoint(self):
 		OrderFactory.create_batch(3)
-		book_date = (date.today() + timedelta(days=2)).strftime('%Y-%m-%d')
+		book_date = (date.today() + timedelta(days=1)).strftime('%Y-%m-%d')
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
 		PermissionFactory.create(keyword='view_orders', role_id=role.id)
