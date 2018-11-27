@@ -6,12 +6,12 @@ bot_blueprint = Blueprint('bot', __name__, url_prefix=url_prefix)
 bot_controller = BotController(request)
 
 
-@bot_blueprint.route('/', methods=['GET'])
+@bot_blueprint.route('/', methods=['GET', 'POST'])
 def bot():
 	return bot_controller.bot()
 
 
-@bot_blueprint.route('/interactions/', methods=['GET'])
+@bot_blueprint.route('/interactions/', methods=['GET', 'POST'])
 # @swag_from('documentation/get_all_meal_items.yml')
 def interactions():
 	return bot_controller.interactions()
