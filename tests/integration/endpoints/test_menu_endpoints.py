@@ -179,6 +179,41 @@ class MenuEndpoints(BaseTestCase):
 		self.assertEqual(response.status_code, 400)
 		self.assertEqual(response_json['msg'], 'Bad Request - proteinItems contains invalid id(s) for meal_item table ')
 
+	def test_create_menu_endpoint_with_existing_main_meal_item(self):
+		"""Multiple menus with same same main meal id should not exist on the same day"""
+
+		main_meal_item = MealItemFactory.create()
+		side_meal_item = MealItemFactory.create()
+		protein_meal_item = MealItemFactory.create()
+
+		menu = MenuFactory.build()
+		vendor = VendorFactory.build()
+		vendor_engagement = VendorEngagementFactory.build(vendor_id=vendor.id)
+		data = {
+			'date': menu.date.strftime('%Y-%m-%d'), 'mealPeriod': menu.meal_period,
+			'mainMealId': main_meal_item.id, 'allowedSide': menu.allowed_side,
+			'allowedProtein': menu.allowed_protein,
+			'sideItems': [side_meal_item.id],
+			'proteinItems': [protein_meal_item.id],
+			'vendorEngagementId': vendor_engagement.id
+		}
+
+		existing_menu = MenuRepo().new_menu(menu.date.strftime('%Y-%m-%d'), menu.meal_period, main_meal_item.id, menu.allowed_side,
+			menu.allowed_protein, [side_meal_item.id], [protein_meal_item.id], vendor_engagement.id)
+
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		PermissionFactory.create(keyword='create_menu', role_id=role.id)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+		response = self.client().post(self.make_url('/admin/menus/'), \
+									  data=self.encode_to_json_string(data), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assertEqual(response.status_code, 400)
+		self.assertEqual(response_json['msg'], 'You can\'t create multiple menus with same main item on the same day')
+
+
 	def test_delete_menu_endpoint_with_right_permission(self):
 		"""Test that a user with permission to delete menu can successfully do so"""
 		menu = MenuFactory.create()
@@ -242,13 +277,19 @@ class MenuEndpoints(BaseTestCase):
 	def test_list_menu_endpoint_with_right_permission(self):
 		"""Test that users with the right permission can view list of menus"""
 
+		meal_item_repo = MealItemRepo()
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
 		PermissionFactory.create(keyword='view_menu', role_id=role.id)
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
-		current_date = datetime.now().date()
+		the_date = datetime.now().date()
+		current_date = the_date.strftime('%Y-%m-%d')
 
-		MenuFactory.create_batch(5)
+		side_meal_item = meal_item_repo.new_meal_item(name="side1", description="descr11", image="image11",
+													  meal_type="side")
+		protein_meal_item = meal_item_repo.new_meal_item(name="protein1", description="descr11", image="image12",
+														 meal_type="protein")
+		MenuFactory.create_batch(5, side_items=side_meal_item.id, protein_items=protein_meal_item.id, date=the_date)
 
 		response = self.client().get(self.make_url(f'/admin/menus/{MealPeriods.lunch}/{current_date}'),
 									 headers=self.headers())
