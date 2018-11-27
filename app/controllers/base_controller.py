@@ -19,6 +19,18 @@ class BaseController:
 		
 		return _json
 	
+	def post_params(self, *keys):
+		values = list()
+		for key in keys:
+			values.append(self.request.data.get(key))
+		return values
+	
+	def get_params(self, *keys):
+		values = list()
+		for key in keys:
+			values.append(self.request.args.get(key))
+		return values
+	
 	def get_json(self):
 		return self.request.get_json()
 	
