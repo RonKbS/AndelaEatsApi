@@ -18,7 +18,9 @@ class OrderController(BaseController):
 		List all orders in the application: should rarely be should
 		:return:
 		"""
-		orders = self.order_repo.filter_by(is_deleted=False)
+		current_date = datetime.now()
+		current_date += timedelta(days=1)
+		orders = self.order_repo.filter_by(is_deleted=False, date_booked_for=current_date.strftime('%Y-%m-%d'))
 		orders_list = [order.serialize() for order in orders.items]
 		for order in orders_list:
 			meal_items = self.order_repo.get(order['id']).meal_item_orders
