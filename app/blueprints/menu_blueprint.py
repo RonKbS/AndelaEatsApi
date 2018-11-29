@@ -51,7 +51,6 @@ def list_menu_range_admin(meal_period, start_date, end_date):
 
 
 @user_menu_blueprint.route('/<meal_period>/<start_date>/<end_date>', methods=['GET'])
-@Auth.has_permission('view_menu')
 @swag_from('documentation/get_menu_period_date_range.yml')
 def list_menu_range(meal_period, start_date, end_date):
 	"""Blueprint function for fetching paginated && unpaginated menu records between two dates for user"""
