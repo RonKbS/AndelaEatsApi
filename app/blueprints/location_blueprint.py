@@ -21,14 +21,14 @@ def get_location(location_id):
 
 
 @location_blueprint.route('/', methods=['POST'])
-@Security.validator(['name|required'])
+@Security.validator(['name|required', 'zone|required'])
 @swag_from('documentation/create_location.yml')
 def create_location():
 	return location_controller.create_location()
 
 
 @location_blueprint.route('/<int:location_id>', methods=['PUT', 'PATCH'])
-@Security.validator(['name|required'])
+@Security.validator(['name|required', 'zone|required'])
 @swag_from('documentation/update_location.yml')
 def update_location(location_id):
 	return location_controller.update_location(location_id)

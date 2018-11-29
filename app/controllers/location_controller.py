@@ -1,6 +1,7 @@
 from app.controllers.base_controller import BaseController
 from app.repositories.location_repo import LocationRepo
 
+
 class LocationController(BaseController):
 	def __init__(self, request):
 		BaseController.__init__(self, request)
@@ -18,9 +19,9 @@ class LocationController(BaseController):
 		return self.handle_response('Invalid or Missing location_id')
 	
 	def create_location(self):
-		name, = self.request_params('name')
-		location = self.location_repo.new_location(name=name)
-		return self.handle_response('OK', payload={'location':location.serialize()})
+		name, zone = self.request_params('name', 'zone')
+		location = self.location_repo.new_location(name=name, zone=zone)
+		return self.handle_response('OK', payload={'location': location.serialize()})
 	
 	def update_location(self, location_id):
 		pass
