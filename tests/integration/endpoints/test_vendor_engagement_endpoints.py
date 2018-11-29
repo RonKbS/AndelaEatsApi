@@ -1,8 +1,9 @@
 from datetime import date, datetime
 from app.repositories.menu_repo import MenuRepo
+from app.repositories import VendorEngagementRepo
 from tests.base_test_case import BaseTestCase
 from factories import VendorFactory, RoleFactory, UserRoleFactory, PermissionFactory, VendorEngagementFactory, \
-	MenuFactory
+	MenuFactory, LocationFactory
 
 
 class TestVendorEngagementEndpoints(BaseTestCase):
@@ -18,7 +19,7 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 		end_date = str(engagement.end_date)
 
 		data = {'vendorId': vendor.id, 'startDate': start_date, 'endDate': end_date, 'status': 1,
-				'terminationReason': engagement.termination_reason}
+				'terminationReason': engagement.termination_reason, 'location_id': engagement.location_id}
 		response = self.client().post(self.make_url('/engagements/'), data=self.encode_to_json_string(data),
 									  headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -42,8 +43,9 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 		self.assertTrue(payload['engagement']['endDate'].find(end_date.split('-')[2]) > -1)
 
 	def test_list_vendor_engagement_endpoint(self):
-		VendorEngagementFactory.create_batch(4)
-
+		location = LocationFactory(id=self.headers()['X-Location'])
+		engagements = VendorEngagementFactory.create_batch(4, location_id=location.id)
+		
 		response = self.client().get(self.make_url('/engagements/'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		payload = response_json['payload']
@@ -99,8 +101,6 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 		response = self.client().put(self.make_url('/engagements/{}'.format(engagement.id)),
 									 data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
-
-		# print(response_json)
 
 		# assert False
 		payload = response_json['payload']
