@@ -46,7 +46,6 @@ def delete_role(role_id):
 
 ''' USER ROLES '''
 
-
 @role_blueprint.route('/user/<user_id>', methods=['GET'])
 @Auth.has_permission('view_user_roles')
 def get_user_role(user_id):
@@ -54,7 +53,7 @@ def get_user_role(user_id):
 
 
 @role_blueprint.route('/user', methods=['POST'])
-@Security.validator(['role_id|required:int', 'user_id|required'])
+@Security.validator(['roleId|required:int', 'userId|required'])
 @Auth.has_permission('create_user_roles')
 def create_user_role():
 	return role_controller.create_user_role()

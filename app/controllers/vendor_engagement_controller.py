@@ -3,6 +3,7 @@
 from datetime import datetime
 from app.controllers.base_controller import BaseController
 from app.repositories.vendor_repo import VendorRepo
+from app.utils.auth import Auth
 from app.repositories.vendor_engagement_repo import VendorEngagementRepo
 
 class VendorEngagementController(BaseController):
@@ -12,7 +13,9 @@ class VendorEngagementController(BaseController):
 		self.vendor_repo = VendorRepo()
 
 	def list_vendor_engagements(self):
-		engagements = self.vendor_engagement_repo.filter_by(is_deleted=False)
+		location = Auth.get_location()
+
+		engagements = self.vendor_engagement_repo.filter_by(is_deleted=False, location_id=location)
 
 		engagements_list = []
 		for e in engagements.items:
@@ -46,13 +49,15 @@ class VendorEngagementController(BaseController):
 		)
 
 	def upcoming_vendor_engagements(self):
+		location = Auth.get_location()
 		engagements = self.vendor_engagement_repo.get_engagement_by_date()
 
 		engagements_list = []
 		for e in engagements.items:
-			engagement = e.serialize()
-			engagement['vendor'] = e.vendor.serialize()
-			engagements_list.append(engagement)
+			if e.location_id == location:
+				engagement = e.serialize()
+				engagement['vendor'] = e.vendor.serialize()
+				engagements_list.append(engagement)
 
 		return self.handle_response(
 			'OK', payload={'engagements': engagements_list, 'meta': self.pagination_meta(engagements)}
@@ -70,12 +75,11 @@ class VendorEngagementController(BaseController):
 
 	def create_vendor_engagement(self):
 		vendor_id, start_date, end_date, status = self.request_params('vendorId', 'startDate', 'endDate', 'status')
-
-		if self.vendor_repo.get(vendor_id):
-
+		vendor = self.vendor_repo.get(vendor_id)
+		if vendor:
 			start_date = datetime.strptime(start_date, '%Y-%m-%d')
 			end_date = datetime.strptime(end_date, '%Y-%m-%d')
-			engagement = self.vendor_engagement_repo.new_vendor_engagement(vendor_id, start_date, end_date, status)
+			engagement = self.vendor_engagement_repo.new_vendor_engagement(vendor_id, start_date, vendor.location_id, end_date, status)
 			e = engagement.serialize()
 			e['vendor'] = engagement.vendor.serialize()
 
