@@ -46,7 +46,6 @@ def delete_role(role_id):
 
 ''' USER ROLES '''
 
-
 @role_blueprint.route('/user/<user_id>', methods=['GET'])
 @Auth.has_permission('view_user_roles')
 def get_user_role(user_id):

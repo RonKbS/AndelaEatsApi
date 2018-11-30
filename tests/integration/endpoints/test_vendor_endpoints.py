@@ -1,7 +1,9 @@
 import datetime
 from tests.base_test_case import BaseTestCase
 from app.repositories.vendor_engagement_repo import VendorEngagementRepo
-from factories import VendorFactory, PermissionFactory, RoleFactory, UserRoleFactory
+from app.utils.auth import Auth
+from app import db
+from factories import VendorFactory, PermissionFactory, RoleFactory, UserRoleFactory, LocationFactory
 
 class TestVendorEndpoints(BaseTestCase):
 
@@ -23,14 +25,15 @@ class TestVendorEndpoints(BaseTestCase):
 		self.assertEqual(payload['vendor']['address'], vendor.address)
 		
 	def test_list_vendors_endpoint(self):
-		
+		location = LocationFactory(id=self.headers()['X-Location'])
 		# Create Three Dummy Vendors
-		VendorFactory.create_batch(3)
+		vendors = VendorFactory.create_batch(3, location_id=location.id)
+
 		page_id = 1
 		response = self.client().get(self.make_url('/vendors/'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		payload = response_json['payload']
-
+		
 		self.assert200(response)
 		self.assertEqual(len(payload['vendors']), 3)
 		self.assertJSONKeysPresent(payload['vendors'][0], 'name', 'tel', 'id', 'address', 'contactPerson','timestamps')
@@ -120,7 +123,7 @@ class TestVendorEndpoints(BaseTestCase):
 		current_date = datetime.datetime.now().date()
 		vendor = VendorFactory.create()
 		vendor_engagement_repo = VendorEngagementRepo()
-		vendor_engagement = vendor_engagement_repo.new_vendor_engagement(vendor_id=vendor.id, start_date=current_date)
+		vendor_engagement = vendor_engagement_repo.new_vendor_engagement(vendor_id=vendor.id, start_date=current_date, location_id=self.headers()['X-Location'])
 
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
@@ -137,13 +140,46 @@ class TestVendorEndpoints(BaseTestCase):
 		pass
 
 	def test_suspend_vendor(self):
-		pass
+		vendor = VendorFactory.create()
+
+		response = self.client().put(self.make_url(f'/vendors/suspend/{vendor.id}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+		payload = response_json['payload']
+
+		self.assert200(response)
+		self.assertEqual(payload['vendor']['isActive'], False)
 
 	def test_un_suspend_vendor(self):
-		pass
+		vendor = VendorFactory.create(is_active=False)
+
+		response = self.client().put(self.make_url(f'/vendors/un_suspend/{vendor.id}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+		payload = response_json['payload']
+
+		self.assert200(response)
+		self.assertEqual(payload['vendor']['isActive'], True)
 
 	def test_list_suspended_vendors(self):
-		pass
+
+		vendors = VendorFactory.create_batch(3, is_active=True)
+		vendors = VendorFactory.create_batch(4, is_active=False)
+
+		response = self.client().get(self.make_url('/vendors/suspended/'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+		payload = response_json['payload']
+		
+		self.assert200(response)
+		self.assertEqual(len(payload['vendors']), 4)
+		self.assertEqual(payload['vendors'][0]['isActive'], False)		
 
 	def test_list_deleted_vendors(self):
-		pass
+		vendors = VendorFactory.create_batch(4, is_deleted=True)
+		vendors = VendorFactory.create_batch(3, is_deleted=False)
+
+		response = self.client().get(self.make_url('/vendors/deleted/'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+		payload = response_json['payload']
+		
+		self.assert200(response)
+		self.assertEqual(len(payload['vendors']), 4)
+		self.assertEqual(payload['vendors'][0]['isDeleted'], True)

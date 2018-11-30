@@ -2,6 +2,7 @@ from app.controllers.base_controller import BaseController
 from app.repositories.role_repo import RoleRepo
 from app.repositories.user_role_repo import UserRoleRepo
 from app.repositories.permission_repo import PermissionRepo
+from app.utils.auth import Auth
 
 class RoleController(BaseController):
 	def __init__(self, request):
@@ -67,12 +68,13 @@ class RoleController(BaseController):
 		return self.handle_response('There are no roles for this user', status_code=404)
 
 	def create_user_role(self):
+		location = Auth.get_location()
 		role_id, user_id = self.request_params('roleId', 'userId')
-		role1 = self.user_role_repo.get_unpaginated(role_id=role_id, user_id=user_id, is_deleted=False)
-		if not role1:
+		user_role = self.user_role_repo.get_unpaginated(role_id=role_id, user_id=user_id, is_deleted=False)
+		if not user_role:
 			role = self.role_repo.get(role_id)
 			if role:
-				user_role = self.user_role_repo.new_user_role(role_id=role_id, user_id=user_id)
+				user_role = self.user_role_repo.new_user_role(role_id=role_id, user_id=user_id, location_id=location)
 				return self.handle_response('OK', payload={'user_role': user_role.serialize()})
 			return self.handle_response('This role does not exist', status_code=400)
 		return self.handle_response('This user_role combination already exists', status_code=400)

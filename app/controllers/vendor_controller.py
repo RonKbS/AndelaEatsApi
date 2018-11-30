@@ -16,17 +16,20 @@ class VendorController(BaseController):
 		self.vendor_rating_repo = VendorRatingRepo()
 
 	def list_vendors(self):
-		vendors = self.vendor_repo.filter_by(is_deleted=False, is_active=True)
+		location = Auth.get_location()
+		vendors = self.vendor_repo.filter_by(is_deleted=False, is_active=True, location_id=location)
 		vendors_list = [vendor.serialize() for vendor in vendors.items]
 		return self.handle_response('OK', payload={'vendors': vendors_list, 'meta': self.pagination_meta(vendors)})
 
 	def list_deleted_vendors(self):
-		vendors = self.vendor_repo.filter_by(is_deleted=True)
+		location = Auth.get_location()
+		vendors = self.vendor_repo.filter_by(is_deleted=True, location_id=location)
 		vendors_list = [vendor.serialize() for vendor in vendors.items]
 		return self.handle_response('OK', payload={'vendors': vendors_list, 'meta': self.pagination_meta(vendors)})
 
 	def list_suspended_vendors(self):
-		vendors = self.vendor_repo.filter_by(is_deleted=False, is_active=False)
+		location = Auth.get_location()
+		vendors = self.vendor_repo.filter_by(is_deleted=False, is_active=False, location_id=location)
 		vendors_list = [vendor.serialize() for vendor in vendors.items]
 		return self.handle_response('OK', payload={'vendors': vendors_list, 'meta': self.pagination_meta(vendors)})
 
@@ -39,10 +42,11 @@ class VendorController(BaseController):
 			return self.handle_response('Bad Request - Invalid or Missing vendor_id', status_code=400)
 	
 	def create_vendor(self):
+		location = Auth.get_location()
 		name, tel, address, is_active, contact_person = self.request_params(
 			'name', 'tel', 'address', 'isActive', 'contactPerson')
 
-		vendor = self.vendor_repo.new_vendor(name, address, tel, is_active, contact_person).serialize()
+		vendor = self.vendor_repo.new_vendor(name, address, tel, is_active, contact_person, location).serialize()
 		return self.handle_response('OK', payload={'vendor': vendor})
 
 	def update_vendor(self, vendor_id):
@@ -80,7 +84,7 @@ class VendorController(BaseController):
 		vendor = self.vendor_repo.get(vendor_id)
 		if vendor:
 			updates = {}
-			updates['is_active'] = 0
+			updates['is_active'] = 1
 			self.vendor_repo.update(vendor, **updates)
 			return self.handle_response('OK', payload={'vendor': vendor.serialize()})
 		return self.handle_response('Invalid or incorrect vendor_id provided', status_code=400)
@@ -91,7 +95,7 @@ class VendorController(BaseController):
 			if vendor.is_deleted:
 				return self.handle_response('Vendor has already been deleted', status_code=400)
 
-			if any( not dependent.is_deleted for dependent in(vendor.engagements or vendor.ratings)):
+			if any(not dependent.is_deleted for dependent in(vendor.engagements or vendor.ratings)):
 				return self.handle_response('Vendor cannot be deleted because it has a child object', status_code=400)
 			updates = {}
 			updates['is_deleted'] = True
