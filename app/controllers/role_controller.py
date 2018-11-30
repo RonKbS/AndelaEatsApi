@@ -67,7 +67,7 @@ class RoleController(BaseController):
 		return self.handle_response('There are no roles for this user', status_code=404)
 
 	def create_user_role(self):
-		role_id, user_id = self.request_params('role_id', 'user_id')
+		role_id, user_id = self.request_params('roleId', 'userId')
 		role1 = self.user_role_repo.get_unpaginated(role_id=role_id, user_id=user_id, is_deleted=False)
 		if not role1:
 			role = self.role_repo.get(role_id)
