@@ -1,4 +1,5 @@
 '''A module for menu controller'''
+from app import Auth
 from app.controllers.base_controller import BaseController
 from app.repositories.menu_repo import MenuRepo
 from app.repositories.meal_item_repo import MealItemRepo
@@ -19,6 +20,7 @@ class MenuController(BaseController):
 		params are gotten from request object
 		:return: json object with status of menu created with menu
 		'''
+		location_id = Auth.get_location()
 		date, meal_period, main_meal_id, allowed_side,\
 			allowed_protein, side_items, protein_items,\
 			vendor_engagement_id = self.request_params(
@@ -26,11 +28,11 @@ class MenuController(BaseController):
 				'allowedProtein', 'sideItems', 'proteinItems', 'vendorEngagementId'
 			)
 
-		if self.menu_repo.get_unpaginated(date=date, main_meal_id=main_meal_id):
+		if self.menu_repo.get_unpaginated(date=date, main_meal_id=main_meal_id, location_id=location_id):
 			return self.handle_response('You can\'t create multiple menus with same main item on the same day', status_code=400)
 		menu = self.menu_repo.new_menu(
 			date, meal_period, main_meal_id, allowed_side,
-			allowed_protein, side_items, protein_items, vendor_engagement_id
+			allowed_protein, side_items, protein_items, vendor_engagement_id, location_id
 		).serialize()
 
 		menu['mainMeal'] = self.meal_repo.get(main_meal_id).serialize()
@@ -61,8 +63,11 @@ class MenuController(BaseController):
 			meal period: breakfast or lunch
 			menu_date:  date of request
 		'''
+		location_id = Auth.get_location()
 		if MealPeriods.has_value(menu_period):
-			menus = self.menu_repo.get_unpaginated(date=menu_date, meal_period=menu_period, is_deleted=False)
+			menus = self.menu_repo.get_unpaginated(
+				date=menu_date, meal_period=menu_period, is_deleted=False, location_id=location_id
+			)
 			menu_list = defaultdict(list)
 			for menu in menus:
 				serialised_menu = menu.serialize()
@@ -87,6 +92,7 @@ class MenuController(BaseController):
 			menu_start_date: start date of search
 			menu_end_date: end date of search
 		"""
+		location_id = Auth.get_location()
 		if MealPeriods.has_value(menu_period):
 
 			menu_start_date = datetime.strptime(menu_start_date, '%Y-%m-%d')
@@ -95,11 +101,12 @@ class MenuController(BaseController):
 			if menu_start_date >= menu_end_date:
 				return self.handle_response('Provide valid date range. start_date cannot be greater than end_date',
 											status_code=400)
-			menus = self.menu_repo.get_range_paginated_options(start_date=menu_start_date, end_date=menu_end_date,
-															   meal_period=menu_period)
+			menus = self.menu_repo.get_range_paginated_options(
+				start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period, location_id=location_id
+			)
 			menu_list = []
 			for menu in menus.items:
-				serialised_menu = menu.serialize()
+				serialised_menu = menu.serialize(),
 				arr_protein = [int(prot_id) for prot_id in menu.protein_items.split(',')]
 				arr_side = [int(side_id) for side_id in menu.side_items.split(',')]
 
@@ -125,7 +132,7 @@ class MenuController(BaseController):
 			menu_start_date: start date of search
 			menu_end_date: end date of search
 		"""
-
+		location_id = Auth.get_location()
 		if MealPeriods.has_value(menu_period):
 
 			menu_start_date = datetime.strptime(menu_start_date, '%Y-%m-%d')
@@ -133,7 +140,9 @@ class MenuController(BaseController):
 
 			if menu_start_date >= menu_end_date:
 				return self.handle_response('Provide valid date range. start_date cannot be greater than end_date', status_code=400)
-			menus = self.menu_repo.get_range_paginated_options(start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period)
+			menus = self.menu_repo.get_range_paginated_options(
+				start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period, location_id=location_id
+			)
 			menu_list = defaultdict(list)
 			for menu in menus.items:
 				serialised_menu = menu.serialize()

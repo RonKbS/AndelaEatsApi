@@ -179,7 +179,7 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 		menu_repo = MenuRepo()
 		menu = menu_repo.new_menu(date='2018-10-15', meal_period='lunch', main_meal_id=1, allowed_side=1,
 								  allowed_protein=1,
-								  side_items=[2], protein_items=[3], vendor_engagement_id=engagement.id)
+								  side_items=[2], protein_items=[3], vendor_engagement_id=engagement.id, location_id=1)
 
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()

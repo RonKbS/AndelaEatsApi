@@ -265,7 +265,7 @@ class TestOrderEndpoints(BaseTestCase):
 			'user_id': user_id,
 			'date_booked_for': '2018-10-20',
 			'channel': 'web', 'meal_period': 'lunch', 'menu_id': menu.id,
-			'meal_items': [meal]
+			'meal_items': [meal], 'location_id': 1
 		}
 		order_repo = OrderRepo()
 		order = order_repo.create_order(**order_data)
@@ -286,7 +286,7 @@ class TestOrderEndpoints(BaseTestCase):
 			'user_id': '-UTG654RfggtdI',
 			'date_booked_for': '2018-10-20',
 			'channel': 'web', 'meal_period': 'lunch', 'menu_id': menu.id,
-			'meal_items': [meal]
+			'meal_items': [meal], 'location_id': 1
 		}
 		order_repo = OrderRepo()
 		order = order_repo.create_order(**order_data)
@@ -312,7 +312,7 @@ class TestOrderEndpoints(BaseTestCase):
 			'user_id': user_id,
 			'date_booked_for': '2018-10-20',
 			'channel': 'web', 'meal_period': 'lunch', 'menu_id': menu.id,
-			'meal_items': [meal]
+			'meal_items': [meal], 'location_id': 1
 		}
 		order_repo = OrderRepo()
 		order = order_repo.create_order(**order_data)

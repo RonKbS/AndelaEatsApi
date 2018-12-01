@@ -1,3 +1,4 @@
+from app import Auth
 from app.controllers.base_controller import BaseController
 from app.repositories.meal_item_repo import MealItemRepo
 from app.utils.enums import MealTypes
@@ -10,12 +11,14 @@ class MealItemController(BaseController):
         self.meal_repo = MealItemRepo()
     
     def list_meals(self):
-        meals = self.meal_repo.get_unpaginated(is_deleted=False)
+        location_id = Auth.get_location()
+        meals = self.meal_repo.get_unpaginated(is_deleted=False, location_id=location_id)
         meals_list = [meal.serialize() for meal in meals]
         return self.handle_response('OK', payload={'mealItems': meals_list})
 
     def list_meals_page(self, page_id, meals_per_page):
-        meals = self.meal_repo.filter_by(page=page_id, per_page=meals_per_page)
+        location_id = Auth.get_location()
+        meals = self.meal_repo.filter_by(page=page_id, per_page=meals_per_page, location_id=location_id)
         meals_list = [meal.serialize() for meal in meals.items]
         return self.handle_response('OK', payload={'mealItems': meals_list, 'meta': self.pagination_meta(meals)})
     
@@ -33,12 +36,12 @@ class MealItemController(BaseController):
         """
         Creates a new meal item
         """
-        
+        location_id = Auth.get_location()
         name, description, image_url, meal_type = self.request_params('mealName', 'description', 'image', 'mealType')
-        if self.meal_repo.get_unpaginated(name=name):
+        if self.meal_repo.get_unpaginated(name=name, location_id=location_id):
             return self.handle_response('Meal item with this name already exists', status_code=400)
         if MealTypes.has_value(meal_type):
-            new_meal_item = self.meal_repo.new_meal_item(name, description, image_url, meal_type).serialize()
+            new_meal_item = self.meal_repo.new_meal_item(name, description, image_url, meal_type, location_id).serialize()
         
             return self.handle_response('OK', payload={'mealItem': new_meal_item})
         return self.handle_response('Invalid meal type. Must be main, protein or side', status_code=400)
