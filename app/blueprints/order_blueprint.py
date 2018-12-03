@@ -49,12 +49,14 @@ def get_order_by_user_id_date_range(user_id, start_date, end_date):
 
 @order_blueprint.route('/check', methods=['POST'])
 @Security.validator(['userId|required:string', 'orderType|required:string', 'orderDate|required:string'])
+@swag_from('documentation/check_order.yml')
 def check_order():
 	return order_controller.check_order()
 
 
 @order_blueprint.route('/collect', methods=['POST'])
 @Security.validator(['userId|required:string', 'orderType|required:string', 'orderDate|required:string'])
+@swag_from('documentation/collect_order.yml')
 def collect_order():
 	return order_controller.collect_order()
 
