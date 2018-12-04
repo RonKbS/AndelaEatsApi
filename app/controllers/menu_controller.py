@@ -106,7 +106,7 @@ class MenuController(BaseController):
 			)
 			menu_list = []
 			for menu in menus.items:
-				serialised_menu = menu.serialize(),
+				serialised_menu = menu.serialize()
 				arr_protein = [int(prot_id) for prot_id in menu.protein_items.split(',')]
 				arr_side = [int(side_id) for side_id in menu.side_items.split(',')]
 
