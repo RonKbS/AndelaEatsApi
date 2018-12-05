@@ -5,6 +5,7 @@ from app.utils import to_camel_case
 from sqlalchemy.inspection import inspect
 from app.repositories.base_repo import BaseRepo
 
+
 class BaseModel(db.Model):
 	__abstract__ = True
 	

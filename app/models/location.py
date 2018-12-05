@@ -1,5 +1,6 @@
 from .base_model import BaseModel, db
 
+
 class Location(BaseModel):
 	__tablename__ = 'locations'
 	

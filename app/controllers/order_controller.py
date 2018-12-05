@@ -1,10 +1,11 @@
 from sqlalchemy import and_
 from app.controllers.base_controller import BaseController
-from app.repositories import OrderRepo
+from app.repositories import OrderRepo, LocationRepo
 from app.repositories.meal_item_repo import MealItemRepo
 from datetime import datetime, timedelta
 from app.utils.enums import OrderStatus
 from app.utils.auth import Auth
+from app.utils import current_time_by_zone
 
 
 class OrderController(BaseController):
@@ -103,32 +104,23 @@ class OrderController(BaseController):
 		:return: order object
 		"""
 		user_id = Auth.user('id')
+		location_id = Auth.get_location()
 		date_booked_for, channel, meal_period, meal_items, menu_id = self.request_params(
 			'dateBookedFor', 'channel', 'mealPeriod', 'mealItems', 'menuId'
 		)
-		orders = self.order_repo.get_unpaginated(is_deleted=False)
+		
+		if self.order_repo.user_has_order(user_id, date_booked_for, meal_period):
+			return self.handle_response('You have already booked for this meal period.', status_code=400)
+		
+		location = LocationRepo().get(location_id)
+		if int(current_time_by_zone(location.zone).strftime('%H')) > 15:
+			return self.handle_response('It is too late to book a meal for the selected date ', status_code=400)
 
-		order_date_midnight = datetime.strptime(date_booked_for, '%Y-%m-%d').replace(hour=00).replace(
-			minute=00).replace(second=00)
-		current_time = datetime.now()
-		if order_date_midnight - current_time < timedelta('hours' == 7):
-			return self.handle_response('It is too late to book meal for the selected date ', status_code=400)
-
-
-		if orders \
-			and any(order.user_id == user_id and order.meal_period == meal_period
-			and order.is_deleted is False
-			and order.date_booked_for == datetime.strptime(
-			date_booked_for, '%Y-%m-%d').date() for order in orders):
-			return self.handle_response('you have already booked for this date.', status_code=400)
-
-		meal_object_items = []
-
-		for meal_item_id in meal_items:
-			meal_item = self.meal_item_repo.get(meal_item_id)
-			meal_object_items.append(meal_item)
+		meal_object_items = self.meal_item_repo.get_meal_items_by_ids(meal_items)
+		
 		new_order = self.order_repo.create_order(
 			user_id, date_booked_for, meal_object_items, menu_id, channel, meal_period).serialize()
+		
 		new_order['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_object_items]
 		return self.handle_response('OK', payload={'order': new_order})
 
