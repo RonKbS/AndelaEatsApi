@@ -11,10 +11,10 @@ class OrderRepo(BaseRepo):
 		BaseRepo.__init__(self, Order)
 		self.meal_item_repo = MealItemRepo()
 
-	def create_order(self, user_id, date_booked_for, meal_items, menu_id, channel='web', meal_period='lunch'):
+	def create_order(self, user_id, date_booked_for, meal_items, location_id, menu_id, channel='web', meal_period='lunch'):
 		order = Order(user_id=user_id, date_booked_for=datetime.strptime(date_booked_for, '%Y-%m-%d'),
 					  date_booked=datetime.now(), channel=channel, order_status=OrderStatus.booked,
-					  meal_period=meal_period, menu_id=menu_id)
+					  meal_period=meal_period, menu_id=menu_id, location_id=location_id)
 
 		for meal_item in meal_items:
 			order.meal_item_orders.append(meal_item)
@@ -39,10 +39,10 @@ class OrderRepo(BaseRepo):
 			Order.user_id == user_id, Order.is_deleted.is_(False)
 		).order_by(Order.date_booked_for.desc()).paginate(error_out=False)
 
-	def get_range_paginated_options_all(self, start_date, end_date):
+	def get_range_paginated_options_all(self, start_date, end_date, location_id):
 		return Order.query.filter(
 			Order.date_booked_for >= start_date, Order.date_booked_for <= end_date,
-			Order.is_deleted.is_(False)
+			Order.is_deleted.is_(False), Order.location_id == location_id
 		).order_by(Order.date_booked_for.desc()).paginate(error_out=False)
 	
 	def user_has_order(self, user_id, date_booked, meal_period):

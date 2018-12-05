@@ -11,7 +11,7 @@ class TestVendorEngagementRepo(BaseTestCase):
 		
 	def test_new_vendor_engagement_method_returns_new_vendor_engagement_object(self):
 		engagement = VendorEngagementFactory.build()
-		new_engagement = self.repo.new_vendor_engagement(engagement.vendor.id, engagement.start_date, engagement.end_date, 1)
+		new_engagement = self.repo.new_vendor_engagement(engagement.vendor.id, engagement.start_date, engagement.location_id, engagement.end_date, 1,1)
 
 		self.assertIsInstance(new_engagement, VendorEngagement)
 		self.assertEqual(engagement.vendor_id, new_engagement.vendor_id)

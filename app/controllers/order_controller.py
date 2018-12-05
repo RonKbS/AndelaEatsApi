@@ -19,9 +19,12 @@ class OrderController(BaseController):
 		List all orders in the application: should rarely be should
 		:return:
 		"""
+		location_id = Auth.get_location()
 		current_date = datetime.now()
 		current_date += timedelta(days=1)
-		orders = self.order_repo.filter_by(is_deleted=False, date_booked_for=current_date.strftime('%Y-%m-%d'))
+		orders = self.order_repo.filter_by(
+			is_deleted=False, date_booked_for=current_date.strftime('%Y-%m-%d'), location_id=location_id
+		)
 		orders_list = [order.serialize() for order in orders.items]
 		for order in orders_list:
 			meal_items = self.order_repo.get(order['id']).meal_item_orders
@@ -34,7 +37,8 @@ class OrderController(BaseController):
 		:param start_date:
 		:return:
 		"""
-		orders = self.order_repo.get_unpaginated(is_deleted=False, date_booked_for=start_date)
+		location_id = Auth.get_location()
+		orders = self.order_repo.get_unpaginated(is_deleted=False, date_booked_for=start_date, location_id=location_id)
 		orders_list = [order.serialize() for order in orders]
 		for order in orders_list:
 			meal_items = self.order_repo.get(order['id']).meal_item_orders
@@ -48,7 +52,10 @@ class OrderController(BaseController):
 		:param end_date:
 		:return:
 		"""
-		orders = self.order_repo.get_range_paginated_options_all(start_date=start_date, end_date=end_date)
+		location_id = Auth.get_location()
+		orders = self.order_repo.get_range_paginated_options_all(
+			start_date=start_date, end_date=end_date, location_id=location_id
+		)
 
 		orders_list = [order.serialize() for order in orders.items]
 
@@ -108,7 +115,6 @@ class OrderController(BaseController):
 		date_booked_for, channel, meal_period, meal_items, menu_id = self.request_params(
 			'dateBookedFor', 'channel', 'mealPeriod', 'mealItems', 'menuId'
 		)
-		
 		if self.order_repo.user_has_order(user_id, date_booked_for, meal_period):
 			return self.handle_response('You have already booked for this meal period.', status_code=400)
 		
