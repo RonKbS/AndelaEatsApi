@@ -44,3 +44,9 @@ class OrderRepo(BaseRepo):
 			Order.date_booked_for >= start_date, Order.date_booked_for <= end_date,
 			Order.is_deleted.is_(False), Order.location_id == location_id
 		).order_by(Order.date_booked_for.desc()).paginate(error_out=False)
+	
+	def user_has_order(self, user_id, date_booked, meal_period):
+		date_booked = datetime.strptime(date_booked, '%Y-%m-%d').date()
+		if self._model.query.filter_by(**{'user_id': user_id, 'date_booked_for': date_booked, 'meal_period': meal_period}).count() > 0:
+			return True
+		return False
