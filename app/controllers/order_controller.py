@@ -2,10 +2,10 @@ from sqlalchemy import and_
 from app.controllers.base_controller import BaseController
 from app.repositories import OrderRepo, LocationRepo
 from app.repositories.meal_item_repo import MealItemRepo
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from app.utils.enums import OrderStatus
 from app.utils.auth import Auth
-from app.utils import current_time_by_zone
+from app.utils import current_time_by_zone, check_date_current_vs_date_for
 
 
 class OrderController(BaseController):
@@ -119,13 +119,20 @@ class OrderController(BaseController):
 			return self.handle_response('You have already booked for this meal period.', status_code=400)
 		
 		location = LocationRepo().get(location_id)
+		current_time = current_time_by_zone(location.zone)
+
+		if datetime.strptime(date_booked_for, "%Y-%m-%d") < datetime.now():
+			return self.handle_response('You are not allowed to book for a date in the past', status_code=400)
+
+
 		if int(current_time_by_zone(location.zone).strftime('%H')) > 15:
-			return self.handle_response('It is too late to book a meal for the selected date ', status_code=400)
+			if check_date_current_vs_date_for(current_time, datetime.strptime(date_booked_for, "%Y-%m-%d")):
+				return self.handle_response('It is too late to book a meal for the selected date ', status_code=400)
 
 		meal_object_items = self.meal_item_repo.get_meal_items_by_ids(meal_items)
 		
 		new_order = self.order_repo.create_order(
-			user_id, date_booked_for, meal_object_items, menu_id, channel, meal_period).serialize()
+			user_id, date_booked_for, meal_object_items, location_id, menu_id, channel, meal_period).serialize()
 		
 		new_order['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_object_items]
 		return self.handle_response('OK', payload={'order': new_order})
