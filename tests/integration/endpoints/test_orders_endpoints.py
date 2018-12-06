@@ -29,11 +29,10 @@ class TestOrderEndpoints(BaseTestCase):
 		response1 = self.client().post(self.make_url('/orders/'), data=self.encode_to_json_string(data), headers=self.headers())
 		self.assert400(response1)
 		
-		data.update({'dateBookedFor': (date.today() + timedelta(days=1)).strftime('%Y-%m-%d')})
+		data.update({'dateBookedFor': (date.today() + timedelta(days=2)).strftime('%Y-%m-%d')})
 		
 		response2 = self.client().post(self.make_url('/orders/'), data=self.encode_to_json_string(data), headers=self.headers())
-		
-		self.assert200(response2)
+		self.assertEqual(response2.status_code, 201)
 
 	def test_create_order_with_valid_details_endpoint(self):
 		LocationFactory.create(id=1, zone='+1')
@@ -46,7 +45,7 @@ class TestOrderEndpoints(BaseTestCase):
 		meal_item2.meal_type = MealTypes.main
 
 		meal_items = [meal_item1.id, meal_item2.id, meal_item3.id]
-		data = {'userId': order.user_id, 'dateBookedFor': order.date_booked_for.strftime('%Y-%m-%d'),
+		data = {'userId': order.user_id, 'dateBookedFor': (date.today() + timedelta(days=2)).strftime('%Y-%m-%d'),
 				'dateBooked': order.date_booked.strftime('%Y-%m-%d'), 'channel': 'web', 'menuId': menu.id,
 				'mealPeriod': order.meal_period, 'mealItems': meal_items}
 
@@ -54,8 +53,9 @@ class TestOrderEndpoints(BaseTestCase):
 			self.make_url('/orders/'), data=self.encode_to_json_string(data), headers=self.headers())
 
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+		
 		payload = response_json['payload']
-		self.assert200(response)
+		self.assertEqual(response.status_code, 201)
 		self.assertJSONKeyPresent(response_json, 'payload')
 		self.assertEqual(payload['order']['userId'], BaseTestCase.user_id())
 		self.assertEqual(payload['order']['channel'], 'web')
