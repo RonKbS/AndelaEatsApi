@@ -29,3 +29,9 @@ def current_time_by_zone(zone):
 		current_date = datetime.utcnow() - timedelta(hours=int(zone[1:]))
 	
 	return current_date
+
+def check_date_current_vs_date_for(current_date, date_booked_for):
+
+	if int((date_booked_for - current_date).days) >= 1:
+		return False
+	return True
