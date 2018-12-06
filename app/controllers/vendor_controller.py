@@ -47,7 +47,7 @@ class VendorController(BaseController):
 			'name', 'tel', 'address', 'isActive', 'contactPerson')
 
 		vendor = self.vendor_repo.new_vendor(name, address, tel, is_active, contact_person, location).serialize()
-		return self.handle_response('OK', payload={'vendor': vendor})
+		return self.handle_response('OK', payload={'vendor': vendor}, status_code=201)
 
 	def update_vendor(self, vendor_id):
 		name, tel, address, is_active, contact_person = self.request_params(

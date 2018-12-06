@@ -135,7 +135,7 @@ class OrderController(BaseController):
 			user_id, date_booked_for, meal_object_items, location_id, menu_id, channel, meal_period).serialize()
 		
 		new_order['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_object_items]
-		return self.handle_response('OK', payload={'order': new_order})
+		return self.handle_response('OK', payload={'order': new_order}, status_code=201)
 
 	def update_order(self, order_id):
 		"""

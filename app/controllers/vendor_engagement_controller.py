@@ -83,7 +83,7 @@ class VendorEngagementController(BaseController):
 			e = engagement.serialize()
 			e['vendor'] = engagement.vendor.serialize()
 
-			return self.handle_response('OK', payload={'engagement': e})
+			return self.handle_response('OK', payload={'engagement': e}, status_code=201)
 
 		return self.handle_response('Invalid vendor_id provided', status_code=400)
 

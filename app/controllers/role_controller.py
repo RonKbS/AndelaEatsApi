@@ -29,7 +29,7 @@ class RoleController(BaseController):
 		role1 = self.role_repo.find_first(name=name)
 		if not role1:
 			role = self.role_repo.new_role(name=name, help_=help_)
-			return self.handle_response('OK', payload={'role': role.serialize()})
+			return self.handle_response('OK', payload={'role': role.serialize()}, status_code=201)
 		return self.handle_response('Role with this name already exists', status_code=400)
 
 	def update_role(self, role_id):
@@ -75,7 +75,7 @@ class RoleController(BaseController):
 			role = self.role_repo.get(role_id)
 			if role:
 				user_role = self.user_role_repo.new_user_role(role_id=role_id, user_id=user_id, location_id=location)
-				return self.handle_response('OK', payload={'user_role': user_role.serialize()})
+				return self.handle_response('OK', payload={'user_role': user_role.serialize()}, status_code=201)
 			return self.handle_response('This role does not exist', status_code=400)
 		return self.handle_response('This user_role combination already exists', status_code=400)
 
@@ -120,7 +120,7 @@ class RoleController(BaseController):
 				)
 				return self.handle_response('OK', payload={
 					'permission': permission.serialize()
-				})
+				}, status_code=201)
 			return self.handle_response(
 				'This role does not exist', status_code=400
 			)
