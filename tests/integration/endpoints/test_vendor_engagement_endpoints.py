@@ -25,7 +25,7 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		payload = response_json['payload']
 
-		self.assert200(response)
+		self.assertEqual(response.status_code, 201)
 		self.assertJSONKeysPresent(payload, 'engagement')
 		self.assertJSONKeysPresent(payload['engagement'], 'endDate', 'startDate', 'vendor', 'terminationReason',
 								   'timestamps')

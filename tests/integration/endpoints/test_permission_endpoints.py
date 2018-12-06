@@ -37,7 +37,7 @@ class TestPermissionEndpoints(BaseTestCase):
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		payload = response_json['payload']
 		
-		self.assert200(response)
+		self.assertEqual(response.status_code, 201)
 		self.assertJSONKeyPresent(response_json, 'payload')
 		self.assertEqual(payload['permission']['name'], permission.name)
 		self.assertEqual(payload['permission']['keyword'], permission.keyword)

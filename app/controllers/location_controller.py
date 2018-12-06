@@ -21,7 +21,7 @@ class LocationController(BaseController):
 	def create_location(self):
 		name, zone = self.request_params('name', 'zone')
 		location = self.location_repo.new_location(name=name, zone=zone)
-		return self.handle_response('OK', payload={'location': location.serialize()})
+		return self.handle_response('OK', payload={'location': location.serialize()}, status_code=201)
 	
 	def update_location(self, location_id):
 		pass

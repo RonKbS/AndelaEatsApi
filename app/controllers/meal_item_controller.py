@@ -43,7 +43,7 @@ class MealItemController(BaseController):
         if MealTypes.has_value(meal_type):
             new_meal_item = self.meal_repo.new_meal_item(name, description, image_url, meal_type, location_id).serialize()
         
-            return self.handle_response('OK', payload={'mealItem': new_meal_item})
+            return self.handle_response('OK', payload={'mealItem': new_meal_item}, status_code=201)
         return self.handle_response('Invalid meal type. Must be main, protein or side', status_code=400)
         
 

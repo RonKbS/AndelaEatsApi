@@ -47,6 +47,6 @@ class OrderRepo(BaseRepo):
 	
 	def user_has_order(self, user_id, date_booked, meal_period):
 		date_booked = datetime.strptime(date_booked, '%Y-%m-%d').date()
-		if self._model.query.filter_by(**{'user_id': user_id, 'date_booked_for': date_booked, 'meal_period': meal_period}).count() > 0:
+		if self._model.query.filter_by(**{'is_deleted': False, 'user_id': user_id, 'date_booked_for': date_booked, 'meal_period': meal_period}).count() > 0:
 			return True
 		return False

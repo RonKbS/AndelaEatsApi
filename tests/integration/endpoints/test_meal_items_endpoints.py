@@ -37,7 +37,7 @@ class TestMealItemEndpoints(BaseTestCase):
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		payload = response_json['payload']
 
-		self.assert200(response)
+		self.assertEqual(response.status_code, 201)
 		self.assertJSONKeyPresent(response_json, 'payload')
 		self.assertEqual(payload['mealItem']['name'], meal_item.name)
 		self.assertEqual(payload['mealItem']['description'], meal_item.description)
