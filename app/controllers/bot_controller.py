@@ -91,8 +91,8 @@ class BotController(BaseController):
 				if r.status_code == 200:
 					user_id = r.json()['values'][0]['id']
 					order = OrderRepo().create_order(
-						user_id=user_id, date_booked_for=date_booked_for, meal_items=meal_items, menu_id=menu_id,
-						channel=channel, meal_period=meal_period, location_id=location_id)
+						user_id=user_id, date_booked_for=date_booked_for, meal_items=meal_items, location_id=location_id, menu_id=menu_id,
+						channel=channel, meal_period=meal_period)
 	
 					if order:
 						slack_data = {'text': 'Booking Confirmed!'}
