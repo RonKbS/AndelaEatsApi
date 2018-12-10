@@ -10,6 +10,7 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           REDIS_DB: 0
+          ANDELA_API_TOKEN: tWPALrU4pe0XxvOau35nYuLvroTVPc
 
 
       # Specify service dependencies here if necessary
