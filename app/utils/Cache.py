@@ -6,7 +6,7 @@ from config import get_env
 
 class Cache:
 	
-	def __init__(self, adapter='redis', redis_connection={'host': get_env('REDIS_HOST'), 'port': get_env('REDIS_HOST'), 'db': get_env('REDIS_DB')}):
+	def __init__(self, adapter='redis', redis_connection={'host': get_env('REDIS_HOST'), 'port': get_env('REDIS_PORT'), 'db': get_env('REDIS_DB')}):
 		self.cache_obj = None
 		if adapter == 'redis':
 			pool = redis.ConnectionPool(**redis_connection)

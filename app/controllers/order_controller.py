@@ -3,6 +3,8 @@ from app.controllers.base_controller import BaseController
 from app.repositories import OrderRepo, LocationRepo
 from app.repositories.meal_item_repo import MealItemRepo
 from datetime import datetime, timedelta, date
+
+from app.services.andela import AndelaService
 from app.utils.enums import OrderStatus
 from app.utils.auth import Auth
 from app.utils import current_time_by_zone, check_date_current_vs_date_for
@@ -13,6 +15,7 @@ class OrderController(BaseController):
 		BaseController.__init__(self, request)
 		self.order_repo = OrderRepo()
 		self.meal_item_repo = MealItemRepo()
+		self.andela_service = AndelaService()
 
 	def list_orders(self):
 		"""
@@ -25,11 +28,20 @@ class OrderController(BaseController):
 		orders = self.order_repo.filter_by(
 			is_deleted=False, date_booked_for=current_date.strftime('%Y-%m-%d'), location_id=location_id
 		)
-		orders_list = [order.serialize() for order in orders.items]
-		for order in orders_list:
-			meal_items = self.order_repo.get(order['id']).meal_item_orders
-			order['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
-		return self.handle_response('OK', payload={'orders': orders_list, 'meta': self.pagination_meta(orders)})
+
+		order_list = []
+		if len(orders.items) > 0:
+			for order in orders.items:
+				meal_items = self.order_repo.get(order.id).meal_item_orders
+				user = self.andela_service.get_user_by_email_or_id(order.user_id)
+				order_item = order.serialize()
+				order_item['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
+				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+				order_list.append(order_item)
+
+		return self.handle_response('OK', payload={'orders': order_list, 'meta': self.pagination_meta(orders)})
+
+
 
 	def list_orders_date(self, start_date):
 		"""
@@ -39,11 +51,20 @@ class OrderController(BaseController):
 		"""
 		location_id = Auth.get_location()
 		orders = self.order_repo.get_unpaginated(is_deleted=False, date_booked_for=start_date, location_id=location_id)
-		orders_list = [order.serialize() for order in orders]
-		for order in orders_list:
-			meal_items = self.order_repo.get(order['id']).meal_item_orders
-			order['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
-		return self.handle_response('OK', payload={'orders': orders_list})
+		# orders_list = [order.serialize() for order in orders]
+		# for order in orders_list:
+		# 	meal_items = self.order_repo.get(order['id']).meal_item_orders
+		# 	order['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
+		order_list = []
+		if len(orders) > 0:
+			for order in orders:
+				meal_items = self.order_repo.get(order.id).meal_item_orders
+				user = self.andela_service.get_user_by_email_or_id(order.user_id)
+				order_item = order.serialize()
+				order_item['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
+				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+				order_list.append(order_item)
+		return self.handle_response('OK', payload={'orders': order_list})
 
 	def list_orders_date_range(self, start_date, end_date):
 		"""
@@ -57,12 +78,16 @@ class OrderController(BaseController):
 			start_date=start_date, end_date=end_date, location_id=location_id
 		)
 
-		orders_list = [order.serialize() for order in orders.items]
-
-		for order in orders_list:
-			meal_items = self.order_repo.get(order['id']).meal_item_orders
-			order['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
-		return self.handle_response('OK', payload={'orders': orders_list})
+		order_list = []
+		if len(orders.items) > 0:
+			for order in orders.items:
+				meal_items = self.order_repo.get(order.id).meal_item_orders
+				user = self.andela_service.get_user_by_email_or_id(order.user_id)
+				order_item = order.serialize()
+				order_item['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
+				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+				order_list.append(order_item)
+		return self.handle_response('OK', payload={'orders': order_list})
 
 	def get_order(self, order_id):
 		"""
@@ -74,6 +99,10 @@ class OrderController(BaseController):
 		if order:
 			order_serialized = order.serialize()
 			order_serialized['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in order.meal_item_orders]
+
+			user = self.andela_service.get_user_by_email_or_id(order.user_id)
+			order_serialized['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+
 			return self.handle_response('OK', payload={'order': order_serialized})
 		return self.handle_response('Order not found', status_code=400)
 
@@ -84,10 +113,15 @@ class OrderController(BaseController):
 		:return: list of orders in json model
 		"""
 		orders = self.order_repo.filter_by(user_id=user_id, is_deleted=False)
-		orders_list = [order.serialize() for order in orders.items]
-		for order in orders_list:
-			meal_items = self.order_repo.get(order['id']).meal_item_orders
-			order['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
+		orders_list = []
+		if len(orders.items) > 0:
+			for order in orders.items:
+				meal_items = self.order_repo.get(order.id).meal_item_orders
+				user = self.andela_service.get_user_by_email_or_id(order.user_id)
+				order_item = order.serialize()
+				order_item['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
+				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+				orders_list.append(order_item)
 		return self.handle_response('OK', payload={'orders': orders_list})
 
 	def get_order_by_user_id_date_range(self, user_id, start_date, end_date):
@@ -99,11 +133,16 @@ class OrderController(BaseController):
 		:return:
 		"""
 		orders = self.order_repo.get_range_paginated_options(user_id=user_id, start_date=start_date, end_date=end_date)
-		orders_list = [order.serialize() for order in orders.items]
-		for order in orders_list:
-			meal_items = self.order_repo.get(order['id']).meal_item_orders
-			order['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
-		return self.handle_response('OK', payload={'orders': orders_list})
+		order_list = []
+		if len(orders.items) > 0:
+			for order in orders.items:
+				meal_items = self.order_repo.get(order.id).meal_item_orders
+				user = self.andela_service.get_user_by_email_or_id(order.user_id)
+				order_item = order.serialize()
+				order_item['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
+				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+				order_list.append(order_item)
+		return self.handle_response('OK', payload={'orders': order_list})
 
 	def create_order(self):
 		"""

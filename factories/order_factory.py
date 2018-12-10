@@ -17,3 +17,4 @@ class OrderFactory(factory.alchemy.SQLAlchemyModelFactory):
     channel = Channels.web
     date_booked_for = date.today() + timedelta(days=1)
     date_booked = date.today()
+    user_id = '-L5J538y77WvOnzJ1FPG'
