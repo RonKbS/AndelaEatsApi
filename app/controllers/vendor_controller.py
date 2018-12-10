@@ -1,6 +1,5 @@
 '''A controller module for vendor-related
 '''
-from datetime import datetime
 from app.controllers.base_controller import BaseController
 from app.repositories.vendor_repo import VendorRepo
 from app.repositories.vendor_engagement_repo import VendorEngagementRepo

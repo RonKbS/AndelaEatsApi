@@ -42,6 +42,7 @@ python-dateutil==2.7.3
 python-dotenv==0.8.2
 python-editor==1.0.3
 PyYAML==3.13
+redis==3.0.1
 requests==2.18.4
 six==1.11.0
 slackclient==1.2.1
