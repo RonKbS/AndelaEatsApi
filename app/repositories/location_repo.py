@@ -6,7 +6,7 @@ class LocationRepo(BaseRepo):
 	def __init__(self):
 		BaseRepo.__init__(self, Location)
 	
-	def new_location(self, name):
-		location = Location(name=name)
+	def new_location(self, name, zone):
+		location = Location(name=name, zone=zone)
 		location.save()
 		return location
