@@ -1,5 +1,6 @@
 '''A controller module for vendor-related
 '''
+import pdb
 from datetime import datetime
 from app.controllers.base_controller import BaseController
 from app.repositories.vendor_repo import VendorRepo
@@ -76,13 +77,17 @@ class VendorEngagementController(BaseController):
 	def create_vendor_engagement(self):
 		vendor_id, start_date, end_date, status = self.request_params('vendorId', 'startDate', 'endDate', 'status')
 		vendor = self.vendor_repo.get(vendor_id)
-		if vendor:
-			start_date = datetime.strptime(start_date, '%Y-%m-%d')
-			end_date = datetime.strptime(end_date, '%Y-%m-%d')
-			engagement = self.vendor_engagement_repo.new_vendor_engagement(vendor_id, start_date, vendor.location_id, end_date, status)
-			e = engagement.serialize()
-			e['vendor'] = engagement.vendor.serialize()
 
+
+		existing_engagement = self.vendor_engagement_repo.get_existing_engagement(start_date=start_date)
+		if existing_engagement > 0:
+			return self.handle_response('An engagement already exists for this period. Kindly disable engagement first.', status_code=400)
+		if vendor:
+			engagement = self.vendor_engagement_repo.new_vendor_engagement(vendor_id, start_date, vendor.location_id, end_date, status)
+			print(engagement.id)
+			e = engagement.serialize()
+
+			e['vendor'] = engagement.vendor.serialize()
 			return self.handle_response('OK', payload={'engagement': e}, status_code=201)
 
 		return self.handle_response('Invalid vendor_id provided', status_code=400)
