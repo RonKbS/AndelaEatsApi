@@ -6,8 +6,15 @@ from config import get_env
 
 class Cache:
 	
-	def __init__(self, adapter='redis', redis_connection={'host': get_env('REDIS_HOST'), 'port': get_env('REDIS_PORT'), 'db': get_env('REDIS_DB')}):
+	def __init__(self, adapter='redis', redis_connection=None):
 		self.cache_obj = None
+		if redis_connection is None:
+			redis_connection = {
+				'host': get_env('REDIS_HOST'),
+				'port': get_env('REDIS_PORT'),
+				'db': get_env('REDIS_DB'),
+				'password': get_env('REDIS_PASSWORD')}
+
 		if adapter == 'redis':
 			pool = redis.ConnectionPool(**redis_connection)
 			self.cache_obj = redis.StrictRedis(connection_pool=pool)

@@ -44,6 +44,4 @@ class AndelaService:
 			user_data = self.call('GET', url_path)
 			user = user_data['values'][0]
 			self.cache.set(cache_key, user)
-
-		print(user, 'test')
 		return user
