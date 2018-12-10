@@ -8,7 +8,7 @@ from app.utils.Cache import Cache
 class AndelaService:
 	
 	def __init__(self):
-		self.API_URL = 'http://api.andela.com/api/v1'
+		self.API_URL = get_env('API_AUTH_URL')
 		self.API_TOKEN = get_env('ANDELA_API_TOKEN')
 		self.HEADERS = {'api-token': self.API_TOKEN}
 		
