@@ -77,8 +77,8 @@ class VendorEngagementController(BaseController):
 	def create_vendor_engagement(self):
 		vendor_id, start_date, end_date, status = self.request_params('vendorId', 'startDate', 'endDate', 'status')
 		vendor = self.vendor_repo.get(vendor_id)
-
-
+		start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+		end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
 		existing_engagement = self.vendor_engagement_repo.get_existing_engagement(start_date=start_date)
 		if existing_engagement > 0:
 			return self.handle_response('An engagement already exists for this period. Kindly disable engagement first.', status_code=400)
