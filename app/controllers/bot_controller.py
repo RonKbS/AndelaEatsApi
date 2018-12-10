@@ -1,5 +1,7 @@
 import json
 import requests
+
+from app.services.andela import AndelaService
 from app.utils import daterange, current_time_by_zone
 from config import get_env
 from flask import make_response
@@ -15,6 +17,7 @@ class BotController(BaseController):
 		self.slackhelper = SlackHelper()
 		self.menu_repo = MenuRepo()
 		self.meal_repo = MealItemRepo()
+		self.andela_service = AndelaService()
 
 	def bot(self):
 		locations = LocationRepo().fetch_all()
@@ -86,17 +89,16 @@ class BotController(BaseController):
 				meal_items = [meal for meal in MealItemRepo().get_meal_items_by_ids(meal_items)]
 				channel = 'slack'
 				
-				# 	Make a request to Andela's Authentication service. To retrieve User ID
-				r = requests.get(f'http://api.andela.com/api/v1/users?email={slack_user_email}', headers={'api-token': get_env('ANDELA_API_TOKEN')})
-				if r.status_code == 200:
-					user_id = r.json()['values'][0]['id']
-					order = OrderRepo().create_order(
-						user_id=user_id, date_booked_for=date_booked_for, meal_items=meal_items, location_id=location_id, menu_id=menu_id,
-						channel=channel, meal_period=meal_period)
+				# Retrieve User Object
+				user = self.andela_service.get_user_by_email_or_id(slack_user_email)
+				user_id = user['id']
+				order = OrderRepo().create_order(
+					user_id=user_id, date_booked_for=date_booked_for, meal_items=meal_items, location_id=location_id, menu_id=menu_id,
+					channel=channel, meal_period=meal_period)
 	
-					if order:
-						slack_data = {'text': 'Booking Confirmed!'}
-						requests.post(webhook_url, data=json.dumps(slack_data), headers={'Content-Type': 'application/json'})
+				if order:
+					slack_data = {'text': 'Booking Confirmed!'}
+					requests.post(webhook_url, data=json.dumps(slack_data), headers={'Content-Type': 'application/json'})
 				else:
 					slack_data = {'text': 'Booking Failed. Please Retry'}
 					requests.post(webhook_url, data=json.dumps(slack_data), headers={'Content-Type': 'application/json'})
