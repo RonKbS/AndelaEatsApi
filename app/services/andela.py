@@ -2,7 +2,7 @@
 
 import requests
 from config import get_env
-from app.utils.Cache import Cache
+from app.utils.cache import Cache
 
 
 class AndelaService:
