@@ -224,14 +224,16 @@ class OrderController(BaseController):
 
 		order = self.order_repo.find_first(user_id=user_id, meal_period=order_type, date_booked_for=order_date, is_deleted=False)
 		if not order:
-			return self.handle_response('Invalid or incorrect details provided', status_code=400)
+			return self.handle_response(f'User has no {order_type} order for the date.')
 
 		if order.order_status == OrderStatus.collected:
-			return self.handle_response('Order already collected', status_code=409)
+			return self.handle_response('Order already collected')
 
-		order.order_status = OrderStatus.collected
-		order.save()
-		return self.handle_response('OK', payload={'order': order.serialize()})
+		updates = {}
+		updates['order_status'] = OrderStatus.collected
+		self.order_repo.update(order, **updates)
+
+		return self.handle_response('Order successfully collected', payload={'order': order.serialize()})
 
 	def check_order(self):
 		"""
