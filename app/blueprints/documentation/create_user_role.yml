@@ -1,0 +1,71 @@
+Create a User Role
+---
+tags:
+  - User Roles
+summary: Creates a  role for an existing user
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - in: body
+    name: user role
+    description: The user role mapping to be created
+    schema:
+      type: object
+      required:
+        - roleId
+        - emailAddress
+      properties:
+        roleId:
+          type: integer
+        emailAddress:
+          type: string
+definitions:
+  UserRolePayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          user_role:
+            type: object
+            properties:
+              userId:
+                type: string
+              locationId:
+                type: integer
+              roleId:
+                type: integer
+              id:
+                type: integer
+              isDeleted:
+                type: boolean
+              timestamps:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+                  updated_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+responses:
+  201:
+    description: Ok
+    schema:
+          $ref: '#/definitions/UserRolePayload'

@@ -48,19 +48,22 @@ def delete_role(role_id):
 
 @role_blueprint.route('/user/<user_id>', methods=['GET'])
 @Auth.has_permission('view_user_roles')
+@swag_from('documentation/view_user_roles.yml')
 def get_user_role(user_id):
 	return role_controller.get_user_roles(user_id)
 
 
 @role_blueprint.route('/user', methods=['POST'])
-@Security.validator(['roleId|required:int', 'userId|required'])
+@Security.validator(['roleId|required:int', 'emailAddress|required'])
 @Auth.has_permission('create_user_roles')
+@swag_from('documentation/create_user_role.yml')
 def create_user_role():
 	return role_controller.create_user_role()
 
 
 @role_blueprint.route('/user/<int:user_role_id>', methods=['DELETE'])
 @Auth.has_permission('delete_user_roles')
+#@swag_from('documentation/delete_user_roles.yml')
 def delete_user_role(user_role_id):
 	return role_controller.delete_user_role(user_role_id)
 
