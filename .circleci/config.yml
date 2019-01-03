@@ -10,8 +10,8 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           REDIS_DB: 0
-          ANDELA_API_TOKEN: tWPALrU4pe0XxvOau35nYuLvroTVPc
-          API_AUTH_URL: http://api.andela.com/api/v1
+          ANDELA_API_TOKEN: twTwzr6sljBnQs5bGaXjngrQwHXrM0
+          API_AUTH_URL: http://api-staging.andela.com/api/v1
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images

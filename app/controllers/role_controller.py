@@ -69,7 +69,9 @@ class RoleController(BaseController):
 
 	def create_user_role(self):
 		location = Auth.get_location()
-		role_id, user_id = self.request_params('roleId', 'userId')
+		role_id, email_address = self.request_params('roleId', 'emailAddress')
+		user = self.andela_service.get_user_by_email_or_id(email_address)
+		user_id = user.id
 		user_role = self.user_role_repo.get_unpaginated(role_id=role_id, user_id=user_id, is_deleted=False)
 		if not user_role:
 			role = self.role_repo.get(role_id)
