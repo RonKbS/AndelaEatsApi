@@ -1,8 +1,11 @@
+
 from app.controllers.base_controller import BaseController
 from app.repositories.role_repo import RoleRepo
 from app.repositories.user_role_repo import UserRoleRepo
 from app.repositories.permission_repo import PermissionRepo
+from app.services.andela import AndelaService
 from app.utils.auth import Auth
+
 
 class RoleController(BaseController):
 	def __init__(self, request):
@@ -10,6 +13,7 @@ class RoleController(BaseController):
 		self.role_repo = RoleRepo()
 		self.user_role_repo = UserRoleRepo()
 		self.permission_repo = PermissionRepo()
+		self.andela_service = AndelaService()
 
 	''' ROLES '''
 
