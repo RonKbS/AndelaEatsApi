@@ -42,6 +42,9 @@ class AndelaService:
 
 		if user is None:
 			user_data = self.call('GET', url_path)
-			user = user_data['values'][0]
-			self.cache.set(cache_key, user)
+			if not user_data['values']:
+				user = None
+			else:
+				user = user_data['values'][0]
+				self.cache.set(cache_key, user)
 		return user
