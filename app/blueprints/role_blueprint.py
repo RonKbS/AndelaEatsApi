@@ -63,7 +63,7 @@ def create_user_role():
 
 @role_blueprint.route('/user/<int:user_role_id>', methods=['DELETE'])
 @Auth.has_permission('delete_user_roles')
-#@swag_from('documentation/delete_user_roles.yml')
+@swag_from('documentation/delete_user_roles.yml')
 def delete_user_role(user_role_id):
 	return role_controller.delete_user_role(user_role_id)
 
