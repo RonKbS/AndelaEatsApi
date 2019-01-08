@@ -1,3 +1,4 @@
+# import pdb
 
 from app.controllers.base_controller import BaseController
 from app.repositories.role_repo import RoleRepo
@@ -75,7 +76,10 @@ class RoleController(BaseController):
 		location = Auth.get_location()
 		role_id, email_address = self.request_params('roleId', 'emailAddress')
 		user = self.andela_service.get_user_by_email_or_id(email_address)
-		user_id = user.id
+		# if user is None:
+		# 	return self.handle_response('This user record does not exist', status_code=400)
+		# pdb.set_trace()
+		user_id = user['id']
 		user_role = self.user_role_repo.get_unpaginated(role_id=role_id, user_id=user_id, is_deleted=False)
 		if not user_role:
 			role = self.role_repo.get(role_id)
@@ -83,7 +87,7 @@ class RoleController(BaseController):
 				user_role = self.user_role_repo.new_user_role(role_id=role_id, user_id=user_id, location_id=location)
 				return self.handle_response('OK', payload={'user_role': user_role.serialize()}, status_code=201)
 			return self.handle_response('This role does not exist', status_code=400)
-		return self.handle_response('This user_role combination already exists', status_code=400)
+		return self.handle_response('This User has this Role already', status_code=400)
 
 	def delete_user_role(self, user_role_id):
 		user_role = self.user_role_repo.get(user_role_id)
