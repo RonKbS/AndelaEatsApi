@@ -95,7 +95,19 @@ class RoleController(BaseController):
 			updates = {}
 			updates['is_deleted'] = True
 			self.user_role_repo.update(user_role, **updates)
-			return self.handle_response('user_role deleted', payload={"status": "success"})
+			return self.handle_response('user_role deleted for user', payload={"status": "success"})
+		return self.handle_response(
+			'Invalid or incorrect user_role_id provided', status_code=404
+		)
+
+	def disable_user_role(self):
+		user_role_id = self.request_params('userRoleId')
+		user_role = self.user_role_repo.get(user_role_id)
+		if user_role:
+			updates = {}
+			updates['is_active'] = False
+			self.user_role_repo.update(user_role, **updates)
+			return self.handle_response('user_role disabled for user', payload={"status": "success"})
 		return self.handle_response(
 			'Invalid or incorrect user_role_id provided', status_code=404
 		)
