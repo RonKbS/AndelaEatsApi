@@ -1,4 +1,3 @@
-# import pdb
 
 from app.controllers.base_controller import BaseController
 from app.repositories.role_repo import RoleRepo
@@ -76,9 +75,8 @@ class RoleController(BaseController):
 		location = Auth.get_location()
 		role_id, email_address = self.request_params('roleId', 'emailAddress')
 		user = self.andela_service.get_user_by_email_or_id(email_address)
-		# if user is None:
-		# 	return self.handle_response('This user record does not exist', status_code=400)
-		# pdb.set_trace()
+		if user is None:
+			return self.handle_response('This user record does not exist', status_code=400)
 		user_id = user['id']
 		user_role = self.user_role_repo.get_unpaginated(role_id=role_id, user_id=user_id, is_deleted=False)
 		if not user_role:
