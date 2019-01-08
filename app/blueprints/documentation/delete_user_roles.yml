@@ -1,0 +1,36 @@
+Disable User Role
+---
+tags:
+  - User Roles
+summary: Disables a role on a user id
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The id of the vendor
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: roleId
+    in: path
+    type: integer
+    required: true
+    description: Id of the role to be disabled from the user
+    default: 1
+  - name: userId
+    in: path
+    type: integer
+    required: true
+    description: Id of the user
+    default: 1
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/StatusPayload'
