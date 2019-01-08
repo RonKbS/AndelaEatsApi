@@ -1,8 +1,8 @@
-Delete User Role
+Disable User Role
 ---
 tags:
   - User Roles
-summary: Delete a role on a user id
+summary: Disables a role on a user id
 consumes:
   - application/json
 parameters:
@@ -21,7 +21,7 @@ parameters:
     in: path
     type: integer
     required: true
-    description: Id of the record to be Delete from the user
+    description: Id of the record to be disabled from the user
     default: 1
 responses:
   200:
