@@ -100,7 +100,8 @@ class RoleController(BaseController):
 			'Invalid or incorrect user_role_id provided', status_code=404
 		)
 
-	def disable_user_role(self, user_role_id):
+	def disable_user_role(self):
+		user_role_id = self.request_params('userRoleId')
 		user_role = self.user_role_repo.get(user_role_id)
 		if user_role:
 			updates = {}

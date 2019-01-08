@@ -17,7 +17,7 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
-  - name: user_role_id
+  - name: userRoleId
     in: path
     type: integer
     required: true
