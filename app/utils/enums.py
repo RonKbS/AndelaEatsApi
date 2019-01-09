@@ -48,3 +48,13 @@ class RatingType(str, enum.Enum):
     @classmethod
     def has_value(cls, value):
         return any(value == item.value for item in cls)
+
+
+class ActionType(str, enum.Enum):
+    create = "create"
+    update = "update"
+    delete = "delete"
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
