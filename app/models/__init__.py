@@ -8,6 +8,7 @@ from .vendor_rating import VendorRating
 from .menu import Menu
 from .meal_item import MealItem
 from .order import Order
+from .activity import Activity
 
 
 # from .order import Order

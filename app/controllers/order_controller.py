@@ -1,3 +1,5 @@
+import pdb
+
 from sqlalchemy import and_
 from app.controllers.base_controller import BaseController
 from app.repositories import OrderRepo, LocationRepo
@@ -28,12 +30,13 @@ class OrderController(BaseController):
 		orders = self.order_repo.filter_by(
 			is_deleted=False, date_booked_for=current_date.strftime('%Y-%m-%d'), location_id=location_id
 		)
-
+		print ("i am in here ")
 		order_list = []
 		if len(orders.items) > 0:
 			for order in orders.items:
 				meal_items = self.order_repo.get(order.id).meal_item_orders
 				user = self.andela_service.get_user_by_email_or_id(order.user_id)
+
 				order_item = order.serialize()
 				order_item['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
