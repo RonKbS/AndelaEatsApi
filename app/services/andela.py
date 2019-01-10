@@ -16,7 +16,6 @@ class AndelaService:
 		
 	def call(self, method, url_path, **kwargs):
 		url = self.create_request_url(url_path)
-		
 		r = requests.request(method, url, headers=self.HEADERS, **kwargs)
 		if r.status_code in [200, 201]:
 			return r.json()
@@ -37,9 +36,7 @@ class AndelaService:
 		else:
 			url_path = f'/users?ids={key}'
 			cache_key = key
-
 		user = self.cache.get(cache_key)
-
 		if user is None:
 			user_data = self.call('GET', url_path)
 			if not user_data['values']:
