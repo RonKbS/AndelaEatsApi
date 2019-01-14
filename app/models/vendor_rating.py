@@ -16,3 +16,4 @@ class VendorRating(BaseModel):
 	engagement_id = db.Column(db.Integer(), db.ForeignKey('vendor_engagements.id'))
 	vendor = db.relationship('Vendor', lazy=False)
 	engagement = db.relationship('VendorEngagement', lazy=False)
+	main_meal_id = db.Column(db.Integer(), db.ForeignKey('meal_items.id'))
