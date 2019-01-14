@@ -12,6 +12,7 @@ class VendorRatingController(BaseController):
 		BaseController.__init__(self, request)
 		self.vendor_rating_repo = VendorRatingRepo()
 		self.vendor_repo = VendorRepo()
+		self.vendor_engagement_repo = VendorEngagementRepo()
 		self.menu_repo = MenuRepo()
 		self.order_repo = OrderRepo()
 
@@ -38,7 +39,9 @@ class VendorRatingController(BaseController):
 
 	def create_vendor_rating(self):
 		'''Adds a vendor rating during a specific engagement'''
-		(vendor_id, comment, rating, channel, engagement_id) = self.request_params('vendorId', 'comment', 'rating', 'channel', 'engagementId')
+		(vendor_id, comment, rating, channel, engagement_id) = self.request_params(
+			'vendorId', 'comment', 'rating', 'channel', 'engagementId'
+		)
 		user_id = Auth.user('id')
 
 		if self.vendor_repo.get(vendor_id):
@@ -52,7 +55,7 @@ class VendorRatingController(BaseController):
 		return self.handle_response('Invalid vendor_id provided', status_code=400)
 
 	def create_order_rating(self):
-		'''Adds a order rating during a specific engagement '''
+		"""Adds a order rating during a specific engagement """
 
 		(order_id, comment, rating, channel) = self.request_params('orderId', 'comment', 'rating', 'channel')
 		user_id = Auth.user('id')
@@ -63,7 +66,8 @@ class VendorRatingController(BaseController):
 				vendor_id = menu.vendor_engagement.vendor_id
 				engagement_id = menu.vendor_engagement.id
 				rating = self.vendor_rating_repo.new_rating(
-					vendor_id, user_id, rating, RatingType.order, order_id, engagement_id, channel, comment)
+					vendor_id, user_id, rating, RatingType.order, order_id, engagement_id, channel, comment, menu.main_meal_id
+				)
 				rating_obj = rating.serialize()
 				if rating:
 					updates = {}
@@ -72,6 +76,21 @@ class VendorRatingController(BaseController):
 				return self.handle_response('Rating created', payload={'rating': rating_obj}, status_code=201)
 
 		return self.handle_response('Invalid vendor_id provided', status_code=400)
+
+	def create_meal_rating(self):
+		"""Adds a meal rating during a specific engagement """
+
+		(main_meal_id, engagement_id, comment, rating, channel) = self.request_params('mainMealId', 'engagementId', 'comment', 'rating', 'channel')
+		user_id = Auth.user('id')
+		vendor_engagement = self.vendor_engagement_repo.get(engagement_id)
+		vendor_id = vendor_engagement.vendor_id
+		rating = self.vendor_rating_repo.new_rating(
+			vendor_id, user_id, rating, RatingType.order, main_meal_id, engagement_id, channel, comment, main_meal_id
+		)
+		rating_obj = rating.serialize()
+
+		return self.handle_response('Rating created', payload={'rating': rating_obj}, status_code=201)
+
 
 	def update_vendor_rating(self, rating_id):
 		'''edits an existing rating'''
