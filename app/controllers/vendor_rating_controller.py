@@ -2,7 +2,7 @@
 '''
 
 from app.controllers.base_controller import BaseController
-from app.repositories import VendorRatingRepo, VendorRepo, VendorEngagementRepo, OrderRepo, MenuRepo
+from app.repositories import VendorRatingRepo, VendorRepo, VendorEngagementRepo, OrderRepo, MenuRepo, MealItemRepo
 from app.utils.auth import Auth
 from app.utils.enums import RatingType
 
@@ -14,6 +14,7 @@ class VendorRatingController(BaseController):
 		self.vendor_repo = VendorRepo()
 		self.vendor_engagement_repo = VendorEngagementRepo()
 		self.menu_repo = MenuRepo()
+		self.meal_repo = MealItemRepo()
 		self.order_repo = OrderRepo()
 
 	def list_ratings(self, vendor_id):
@@ -55,42 +56,46 @@ class VendorRatingController(BaseController):
 		return self.handle_response('Invalid vendor_id provided', status_code=400)
 
 	def create_order_rating(self):
-		"""Adds a order rating during a specific engagement """
+		"""Adds a order or meal rating during a specific engagement """
 
-		(order_id, comment, rating, channel) = self.request_params('orderId', 'comment', 'rating', 'channel')
+		(order_id, main_meal_id, engagement_id, comment, rating, channel) = self.request_params('orderId', 'mainMealId', 'engagementId', 'comment', 'rating', 'channel')
+		if not(order_id or main_meal_id):
+			return self.handle_response('Please indicate what you are rating', status_code=400)
 		user_id = Auth.user('id')
-		order = self.order_repo.get(order_id)
-		if order:
+		engagement = self.vendor_engagement_repo.get(engagement_id)
+		if not engagement:
+				return self.handle_response('Engagement with this id is not found', status_code=400)
+		vendor_id = engagement.vendor_id
+		if order_id:
+			rating_type = RatingType.order
+			type_id = order_id
+			order = self.order_repo.get(order_id)
+			if not order:
+				return self.handle_response('Order with this id is not found', status_code=400)
+			if order.has_rated:
+				return self.handle_response('This order has been rated', status_code=400)
 			menu = self.menu_repo.get(order.menu_id)
-			if menu:
-				vendor_id = menu.vendor_engagement.vendor_id
-				engagement_id = menu.vendor_engagement.id
-				rating = self.vendor_rating_repo.new_rating(
-					vendor_id, user_id, rating, RatingType.order, order_id, engagement_id, channel, comment, menu.main_meal_id
-				)
-				rating_obj = rating.serialize()
-				if rating:
-					updates = {}
-					updates['has_rated'] = True
-					updated_order = self.order_repo.update(order, **updates).serialize()
-				return self.handle_response('Rating created', payload={'rating': rating_obj}, status_code=201)
+			meal_id = menu.main_meal_id
+					
+		if main_meal_id:
+			if not self.meal_repo.get(main_meal_id):
+				return self.handle_response('Meal item with this id not found', status_code=400)
+			rating_type = RatingType.meal
+			type_id = main_meal_id
+			user_meal_rating = self.vendor_rating_repo.get_unpaginated(user_id=user_id, type_id=type_id, rating_type='meal')
+			if user_meal_rating:
+				return self.handle_response('You have already rated this meal', status_code=400)
 
-		return self.handle_response('Invalid vendor_id provided', status_code=400)
-
-	def create_meal_rating(self):
-		"""Adds a meal rating during a specific engagement """
-
-		(main_meal_id, engagement_id, comment, rating, channel) = self.request_params('mainMealId', 'engagementId', 'comment', 'rating', 'channel')
-		user_id = Auth.user('id')
-		vendor_engagement = self.vendor_engagement_repo.get(engagement_id)
-		vendor_id = vendor_engagement.vendor_id
 		rating = self.vendor_rating_repo.new_rating(
-			vendor_id, user_id, rating, RatingType.order, main_meal_id, engagement_id, channel, comment, main_meal_id
-		)
+					vendor_id, user_id, rating, rating_type, type_id, engagement_id, channel, comment, type_id
+				)
+		if rating_type == RatingType.order:
+			updates = {}
+			updates['has_rated'] = True
+			updated_order = self.order_repo.update(order, **updates).serialize()
+
 		rating_obj = rating.serialize()
-
-		return self.handle_response('Rating created', payload={'rating': rating_obj}, status_code=201)
-
+		return self.handle_response('Rating successful', payload={'rating': rating_obj}, status_code=201)
 
 	def update_vendor_rating(self, rating_id):
 		'''edits an existing rating'''

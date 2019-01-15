@@ -30,7 +30,7 @@ def create_vendor_rating():
 
 
 @rating_blueprint.route('/order/', methods=['POST'])
-@Security.validator(['orderId|required:int', 'rating|required:int'])
+@Security.validator(['rating|required:int', 'engagementId|required:int'])
 @swag_from('documentation/create_order_rating.yml')
 def create_order_rating():
 	return vendor_rating_controller.create_order_rating()
