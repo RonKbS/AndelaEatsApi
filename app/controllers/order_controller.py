@@ -30,7 +30,6 @@ class OrderController(BaseController):
 		orders = self.order_repo.filter_by(
 			is_deleted=False, date_booked_for=current_date.strftime('%Y-%m-%d'), location_id=location_id
 		)
-		print ("i am in here ")
 		order_list = []
 		if len(orders.items) > 0:
 			for order in orders.items:

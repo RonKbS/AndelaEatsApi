@@ -42,6 +42,11 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
+      - run:
+          name: run coverage
+          command: |
+            . venv/bin/activate
+            coverage run --source app/ -m unittest discover -s tests/  && coverage report && coveralls
 
       - save_cache:
           paths:
