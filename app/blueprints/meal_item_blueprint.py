@@ -37,7 +37,6 @@ def create_meal():
 
 
 @meal_item_blueprint.route('/<int:meal_item_id>', methods=['PATCH', 'PUT'])
-@Security.validator(['mealName|required:string', 'description|required:string', 'image|required', 'mealType|required'])
 @Auth.has_permission('update_meal_item')
 @swag_from('documentation/update_single_meal_item.yml')
 def update_meal(meal_item_id):
