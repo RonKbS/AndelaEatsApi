@@ -54,10 +54,11 @@ class MealItemController(BaseController):
         if meal:
             if meal.is_deleted:
                 return self.handle_response('Bad Request. This meal item is deleted', status_code=400)
-            if self.meal_repo.get_unpaginated(name=name):
-                return self.handle_response('Meal item with this name already exists', status_code=400)
+
             updates = {}
             if name:
+                if self.meal_repo.get_unpaginated(name=name):
+                    return self.handle_response('Meal item with this name already exists', status_code=400)
                 updates['name'] = name
             if description:
                 updates['description'] = description
@@ -65,7 +66,7 @@ class MealItemController(BaseController):
                 updates['image'] = image_url
             if meal_type:
                 updates['meal_type'] = meal_type
-                
+
             self.meal_repo.update(meal, **updates)
             return self.handle_response('OK', payload={'mealItem': meal.serialize()})
         
