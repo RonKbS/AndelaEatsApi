@@ -35,6 +35,7 @@ class TestingEnv(EnvConfig):
     # SQLALCHEMY_DATABASE_URI = get_env('DATABASE_TEST_URL')
 
     DEBUG = True
+    PRESERVE_CONTEXT_ON_EXCEPTION = False
 
 
 class StagingEnv(EnvConfig):
