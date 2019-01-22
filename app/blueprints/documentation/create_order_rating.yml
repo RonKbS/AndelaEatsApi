@@ -23,13 +23,20 @@ parameters:
     schema:
       type: object
       required:
-        - orderId
+        - orderId or mainMealId
         - comment
         - rating
         - channel
       properties:
         orderId:
           type: integer
+          required: optional
+        mainMealId:
+          type: integer
+          required: true
+        serviceDate:
+          descrition: The day the meal or order was served
+          type: date
           required: true
         comment:
           type: string

@@ -17,11 +17,11 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
-  - name: vendor_id
+  - name: service_date
     in: path
-    type: integer
+    type: date
     required: true
-    description: the id of the vendor
+    description: the date the meal or order was served
     default: 1
   - name: page
     in: path
