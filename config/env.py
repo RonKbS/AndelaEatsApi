@@ -7,6 +7,7 @@ class EnvConfig(object):
     CSRF_ENABLED = True
     SECRET = get_env('SECRET')
     SQLALCHEMY_DATABASE_URI = get_env('DATABASE_URL')
+    JSON_SORT_KEYS = False
     SWAGGER = {
         'title': 'AndelaEATS API',
         'footer_text': '<b>Copyright Andela Eats</b>',

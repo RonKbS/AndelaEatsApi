@@ -14,7 +14,7 @@ class TestVendorRatingRepo(BaseTestCase):
 
 	def test_new_vendor_rating_method_returns_new_vendor_rating_object(self):
 		vendor_rating = VendorRatingFactory.build()
-		new_vendor_rating = self.repo.new_vendor_rating(vendor_rating.vendor_id, vendor_rating.user_id, vendor_rating.rating, vendor_rating.channel, vendor_rating.comment)
+		new_vendor_rating = self.repo.new_rating(vendor_rating.vendor_id, vendor_rating.user_id, vendor_rating.rating, vendor_rating.service_date, vendor_rating.rating_type, vendor_rating.type_id, vendor_rating.engagement_id, vendor_rating.channel, vendor_rating.comment)
 
 		self.assertIsInstance(new_vendor_rating, VendorRating)
 		self.assertEqual(vendor_rating.vendor_id, new_vendor_rating.vendor_id)
