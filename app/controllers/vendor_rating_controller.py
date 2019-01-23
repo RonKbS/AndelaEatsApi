@@ -21,21 +21,21 @@ class VendorRatingController(BaseController):
         """retrieves a list of all ratings"""
 
         ratings = self.vendor_rating_repo.filter_by(service_date=datetime.strptime(date, '%Y-%m-%d'))
-        print('RRRRRRRRRRRR', len(ratings.items))
+        if ratings.items:
+            result = []
+            vendor_name = self.vendor_repo.get(ratings.items[0].vendor_id).name
+            for rating in ratings.items:
+                meal_name = self.meal_repo.get(rating.main_meal_id).name
 
-        result = []
-        vendor_name = self.vendor_repo.get(ratings.items[0].vendor_id).name
-        for rating in ratings.items:
-            meal_name = self.meal_repo.get(rating.main_meal_id).name
+                if not(meal_name in [item['mainMeal'] for item in result]):
+                    meal_rating = {'mainMeal': meal_name,
+                                   'overallRating': self.vendor_rating_repo.meal_average(rating.main_meal_id, date),
+                                   'items': [rtng.serialize() for rtng in ratings.items if rtng.main_meal_id == rating.main_meal_id]
+                                   }
+                    result.append(meal_rating)
 
-            if not(meal_name in [item['mainMeal'] for item in result]):
-                meal_rating = {'mainMeal': meal_name,
-                               'OverallRating': self.vendor_rating_repo.meal_average(rating.main_meal_id, date),
-                               'items': [rtng.serialize() for rtng in ratings.items if rtng.main_meal_id == rating.main_meal_id]
-                               }
-                result.append(meal_rating)
-
-        return self.handle_response('OK', payload={'date': date, 'vendor': vendor_name, 'result': result})
+            return self.handle_response('OK', payload={'date': date, 'vendor': vendor_name, 'result': result})
+        return self.handle_response('No ratings for this date', status_code=404)
 
 
     def get_vendor_rating(self, rating_id):
