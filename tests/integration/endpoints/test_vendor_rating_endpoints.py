@@ -13,6 +13,112 @@ class TestVendorRatingEndpoints(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def test_create_vendor_rating_endpoint_no_token(self):
+        rating = VendorRatingFactory.build()
+        order_id = OrderFactory.create().id
+        vendor_id = VendorFactory.create().id
+        engagement_id = VendorEngagementFactory.create().id
+        main_meal_id = MealItemFactory.create().id
+        data = {'mainMealId': main_meal_id, 'vendorId': vendor_id, 'engagementId': engagement_id, 'serviceDate': datetime.strftime(rating.service_date, '%Y-%m-%d'), 'ratingType': rating.rating_type, 'orderId': order_id, 'user_id': rating.user_id, 'rating': rating.rating, 'comment': rating.comment, 'channel': rating.channel}
+        response = self.client().post(self.make_url('/ratings/order/'), data=self.encode_to_json_string(data), headers=self.headers_without_token())
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response_json['msg'], 'Authorization Header is Expected')
+
+    def test_create_vendor_rating_endpoint_invalid_token(self):
+        rating = VendorRatingFactory.build()
+        order_id = OrderFactory.create().id
+        vendor_id = VendorFactory.create().id
+        engagement_id = VendorEngagementFactory.create().id
+        main_meal_id = MealItemFactory.create().id
+        data = {'mainMealId': main_meal_id, 'vendorId': vendor_id, 'engagementId': engagement_id,
+                'serviceDate': datetime.strftime(rating.service_date, '%Y-%m-%d'), 'ratingType': rating.rating_type,
+                'orderId': order_id, 'user_id': rating.user_id, 'rating': rating.rating, 'comment': rating.comment,
+                'channel': rating.channel}
+        response = self.client().post(self.make_url('/ratings/order/'), data=self.encode_to_json_string(data),
+                                      headers={
+                                                'Content-Type': 'application/json',
+                                                'X-Location': '1',
+                                                'Authorization': 'Bearer vnvhnv.hhbhjvjvcbcgff.cggnncbnnf'
+                                                })
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response_json['msg'], 'Error Decoding')
+
+    def test_create_vendor_rating_endpoint_invalid_auth_format(self):
+        rating = VendorRatingFactory.build()
+        order_id = OrderFactory.create().id
+        vendor_id = VendorFactory.create().id
+        engagement_id = VendorEngagementFactory.create().id
+        main_meal_id = MealItemFactory.create().id
+        data = {'mainMealId': main_meal_id, 'vendorId': vendor_id, 'engagementId': engagement_id,
+                    'serviceDate': datetime.strftime(rating.service_date, '%Y-%m-%d'), 'ratingType': rating.rating_type,
+                    'orderId': order_id, 'user_id': rating.user_id, 'rating': rating.rating, 'comment': rating.comment,
+                    'channel': rating.channel}
+        response = self.client().post(self.make_url('/ratings/order/'), data=self.encode_to_json_string(data),
+                                          headers={
+                                              'Content-Type': 'application/json',
+                                              'X-Location': '1',
+                                              'Authorization': 'Ebarer {}'.format(self.get_valid_token())
+                                          })
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response_json['msg'], 'Authorization Header Must Start With Bearer')
+
+
+    def test_create_vendor_rating_endpoint_invalid_location_id(self):
+        rating = VendorRatingFactory.build()
+        order_id = OrderFactory.create().id
+        vendor_id = VendorFactory.create().id
+        engagement_id = VendorEngagementFactory.create().id
+        main_meal_id = MealItemFactory.create().id
+        data = {'mainMealId': main_meal_id, 'vendorId': vendor_id, 'engagementId': engagement_id,
+                    'serviceDate': datetime.strftime(rating.service_date, '%Y-%m-%d'), 'ratingType': rating.rating_type,
+                    'orderId': order_id, 'user_id': rating.user_id, 'rating': rating.rating, 'comment': rating.comment,
+                    'channel': rating.channel}
+        response = self.client().post(self.make_url('/ratings/order/'), data=self.encode_to_json_string(data),
+                                          headers={
+                                              'Content-Type': 'application/json',
+                                              'X-Location': 'Z',
+                                              'Authorization': 'Bearer {}'.format(self.get_valid_token())
+                                          })
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response_json['msg'], 'Location Header Value is Invalid')
+
+
+    def test_create_vendor_rating_endpoint_invalid_auth(self):
+        rating = VendorRatingFactory.build()
+        order_id = OrderFactory.create().id
+        vendor_id = VendorFactory.create().id
+        engagement_id = VendorEngagementFactory.create().id
+        main_meal_id = MealItemFactory.create().id
+        data = {'mainMealId': main_meal_id, 'vendorId': vendor_id, 'engagementId': engagement_id,
+                    'serviceDate': datetime.strftime(rating.service_date, '%Y-%m-%d'), 'ratingType': rating.rating_type,
+                    'orderId': order_id, 'user_id': rating.user_id, 'rating': rating.rating, 'comment': rating.comment,
+                    'channel': rating.channel}
+        response = self.client().post(self.make_url('/ratings/order/'), data=self.encode_to_json_string(data),
+                                          headers={
+                                              'Content-Type': 'application/json',
+                                              'X-Location': '1',
+                                              'Authorization': 'Bearer'
+                                          })
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response_json['msg'], 'Internal Application Error')
+
+
+
     def test_create_vendor_rating_endpoint(self):
         rating = VendorRatingFactory.build()
         order_id = OrderFactory.create().id
@@ -57,9 +163,12 @@ class TestVendorRatingEndpoints(BaseTestCase):
         self.assertEqual(payload['rating']['comment'], rating.comment)
         self.assertEqual(payload['rating']['rating'], rating.rating)
 
-        """Search for a non-existing rating returns 400 error"""
-        response = self.client().get(self.make_url('/ratings/100'), headers=self.headers())
-        self.assert400(response)
+    def test_call_exempted_url(self):
+        """Test that a call to '/apispec_1.json' does not require authentication"""
+
+        response = self.client().get('/apispec_1.json')
+
+        self.assert200(response)
 
     def test_get_single_rating_without_permission(self):
         """Test that users without the right permission cannot see details of a single rating vendor rating"""
