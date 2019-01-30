@@ -19,7 +19,9 @@ class TestAuth(BaseTestCase):
     def test_current_time_by_time_zone_positive_timezone(self):
         res = current_time_by_zone('+3')
 
-        self.assertEqual(res.hour, datetime.utcnow().hour + 3)
+        raw_utc = datetime.utcnow().hour + 3
+        result = raw_utc if raw_utc < 24 else raw_utc - 24
+        self.assertEqual(res.hour, result)
 
     def test_current_time_by_time_zone_negative_timezone(self):
         resp = current_time_by_zone('-4')
