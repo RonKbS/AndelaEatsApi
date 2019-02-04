@@ -7,6 +7,7 @@ from app.controllers.menu_controller import MenuController
 from app.models import MealItem, Menu
 from app.repositories.menu_repo import MenuRepo
 from app.repositories.meal_item_repo import MealItemRepo
+from app.utils.enums import MealPeriods
 from tests.base_test_case import BaseTestCase
 
 
@@ -193,3 +194,26 @@ class TestMenuController(BaseTestCase):
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'Menu deleted'
             assert result.get_json()['payload']['status'] == 'success'
+
+    @patch.object(MealPeriods, 'has_value')
+    @patch('app.Auth.get_location')
+    def test_list_menus_invalid_meal_period_date(
+        self,
+        mock_get_location,
+        mock_meal_periods_has_value
+    ):
+        '''Test list_menus response when the meal period or date is invalid.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get_location.return_value = 1
+            mock_meal_periods_has_value.return_value = False
+            menu_controller = MenuController(self.request_context)
+
+            # Act
+            result = menu_controller.list_menus('', '')
+
+            # Assert
+            assert result.status_code == 404
+            assert result.get_json()['msg'] == 'Provide valid meal period ' \
+                'and date'
