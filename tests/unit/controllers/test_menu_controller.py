@@ -413,3 +413,33 @@ class TestMenuController(BaseTestCase):
             assert result.get_json()['msg'] == 'Provide valid meal period ' \
                 'and date range'
 
+    @patch('app.Auth.get_location')
+    @patch.object(MealPeriods, 'has_value')
+    def test_list_menus_range_start_date_gte_end_date(
+        self,
+        mock_meal_periods_has_value,
+        mock_auth_get_location
+    ):
+        '''Test list_menu_ranges response when the start date
+        is gte end date.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_meal_periods_has_value.return_value = True
+            mock_auth_get_location.return_value = 1
+            mock_meal_period = 'lunch'
+            mock_period_start = '2019-01-28'
+            mock_period_end = '2019-01-01'
+            menu_controller = MenuController(self.request_context)
+
+            # Act
+            result = menu_controller.list_menus_range(
+                mock_meal_period,
+                mock_period_start,
+                mock_period_end
+            )
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Provide valid date ' \
+                'range. start_date cannot be greater than end_date'
