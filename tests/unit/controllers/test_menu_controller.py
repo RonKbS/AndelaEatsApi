@@ -200,3 +200,59 @@ class TestMenuController(BaseTestCase):
             assert result.status_code == 404
             assert result.get_json()['msg'] == 'Provide valid meal period ' \
                 'and date'
+
+    @patch.object(MealPeriods, 'has_value')
+    @patch('app.Auth.get_location')
+    @patch.object(MenuRepo, 'get_unpaginated')
+    @patch.object(MealItemRepo, 'get')
+    @patch.object(MenuRepo, 'get_meal_items')
+    def test_list_menus_valid_meal_period_date(
+        self,
+        mock_menu_repo_get_meal_items,
+        mock_meal_repo_get,
+        mock_menu_repo_get_unpaginated,
+        mock_auth_get_location,
+        mock_meal_periods_has_value
+    ):
+        '''Test list_menus response when the meal period or date is valid.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_menu = Menu(
+                    date=datetime.now(),
+                    meal_period='',
+                    location_id=1,
+                    main_meal_id=1,
+                    allowed_side=1,
+                    allowed_protein=1,
+                    side_items='',
+                    protein_items='',
+                    vendor_engagement_id=1,
+                    created_at=datetime.now(),
+                    updated_at=datetime.now()
+                )
+            mock_meal_item = MealItem(
+                id=1,
+                meal_type=1,
+                name='',
+                description='',
+                image='',
+                location_id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
+            mock_meal_periods_has_value.return_value = True
+            mock_auth_get_location.return_value = 1
+            mock_menu_repo_get_unpaginated.return_value = [
+                mock_menu,
+            ]
+            mock_meal_repo_get.return_value = mock_meal_item
+            mock_menu_repo_get_meal_items.return_value = []
+            menu_controller = MenuController(self.request_context)
+
+            # Act
+            result = menu_controller.list_menus('lunch', '2019-02-01')
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
