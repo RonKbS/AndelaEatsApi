@@ -567,3 +567,64 @@ class TestMenuController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'This menu is ' \
                 'already deleted'
+
+    @patch.object(MenuController, 'request_params')
+    @patch.object(MenuRepo, 'get')
+    @patch.object(MenuRepo, 'update')
+    @patch.object(MealItemRepo, 'get')
+    def test_update_menu_ok_response(
+        self,
+        mock_meal_item_repo_get,
+        mock_menu_repo_update,
+        mock_menu_repo_get,
+        mock_menu_controller_request_params
+    ):
+        '''Test update_menu when the response is OK.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_menu_controller_request_params.return_value = (
+                '2019-01-01',
+                'lunch',
+                1,
+                1,
+                1,
+                '1,1',
+                '1,2',
+                1
+            )
+            mock_menu = Menu(
+                date=datetime.now(),
+                meal_period='',
+                location_id=1,
+                main_meal_id=1,
+                allowed_side=1,
+                allowed_protein=1,
+                side_items='1,2',
+                protein_items='1,2',
+                vendor_engagement_id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
+            mock_meal_item = MealItem(
+                id=1,
+                meal_type=1,
+                name='',
+                description='',
+                image='',
+                location_id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
+            mock_menu_repo_get.return_value = mock_menu
+            mock_menu_repo_update.return_value = mock_menu
+            mock_meal_item_repo_get.return_value = mock_meal_item
+            mock_menu_id = 1
+            menu_controller = MenuController(self.request_context)
+
+            # Act
+            result = menu_controller.update_menu(mock_menu_id)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
