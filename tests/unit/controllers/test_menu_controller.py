@@ -4,7 +4,7 @@ from datetime import datetime
 from unittest.mock import Mock, patch
 
 from app.controllers.menu_controller import MenuController
-from app.models import MealItem
+from app.models import MealItem, Menu
 from app.repositories.menu_repo import MenuRepo
 from app.repositories.meal_item_repo import MealItemRepo
 from tests.base_test_case import BaseTestCase
@@ -127,3 +127,69 @@ class TestMenuController(BaseTestCase):
             # Assert
             assert result.status_code == 201
             assert result.get_json()['msg'] == "OK"
+
+    @patch.object(MenuRepo, 'get')
+    def test_delete_menu_not_found(
+        self,
+        mock_menu_repo_get
+    ):
+        '''Test response on delete_menu when menu does not exist.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_menu_repo_get.return_value = None
+            menu_controller = MenuController(self.request_context)
+
+            # Act
+            result = menu_controller.delete_menu(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Invalid or incorrect ' \
+                'menu_id provided'
+
+    @patch.object(MenuRepo, 'get')
+    def test_delete_menu_already_deleted(
+        self,
+        mock_menu_repo_get
+    ):
+        '''Test response on delete_menu when menu is already
+        deleted.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_menu_repo_get.return_value = Menu(
+                is_deleted=True
+            )
+            menu_controller = MenuController(self.request_context)
+
+            # Act
+            result = menu_controller.delete_menu(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Menu has already been deleted'
+
+    @patch.object(MealItemRepo, 'update')
+    @patch.object(MenuRepo, 'get')
+    def test_delete_menu_successful(
+        self,
+        mock_menu_repo_get,
+        mock_meal_repo_update
+    ):
+        '''Test delete_menu success.
+        '''
+        with self.app.app_context():
+            mock_menu_repo_get.return_value = Menu(
+                is_deleted=False
+            )
+            mock_meal_repo_update.return_value = Mock()
+            menu_controller = MenuController(self.request_context)
+
+            # Act
+            result = menu_controller.delete_menu(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'Menu deleted'
+            assert result.get_json()['payload']['status'] == 'success'
