@@ -512,3 +512,29 @@ class TestMenuController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(MenuController, 'request_params')
+    @patch.object(MenuRepo, 'get')
+    def test_update_menu_when_menu_doesnot_exist(
+        self,
+        mock_menu_repo_get,
+        mock_menu_controller_request_params
+    ):
+        '''Test update_menu when the menu does not exist.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_menu_controller_request_params.return_value = (
+                None, None, None, None, None, None, None, None
+            )
+            mock_menu_repo_get.return_value = None
+            mock_menu_id = 1
+            menu_controller = MenuController(self.request_context)
+
+            # Act
+            result = menu_controller.update_menu(mock_menu_id)
+
+            # Assert
+            assert result.status_code == 404
+            assert result.get_json()['msg'] == 'This menu_id ' \
+                'does not exist'
