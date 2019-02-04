@@ -16,9 +16,6 @@ class TestMenuController(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
-    @patch.object(MenuRepo, 'get_meal_items')
-    @patch.object(MealItemRepo, 'get')
-    @patch.object(MenuRepo, 'new_menu')
     @patch.object(MenuRepo, 'get_unpaginated')
     @patch.object(MenuController, 'request_params')
     @patch('app.Auth.get_location')
@@ -26,10 +23,7 @@ class TestMenuController(BaseTestCase):
         self,
         mock_get_location,
         mock_request_params,
-        mock_get_unpaginated,
-        mock_new_menu,
-        mock_get,
-        mock_get_meal_items
+        mock_get_unpaginated
     ):
         '''Test the response returned when menu already exists.
         '''
@@ -41,27 +35,16 @@ class TestMenuController(BaseTestCase):
             )
             mock_get_unpaginated.return_value = [
                 {
-                    'date': Mock(),
-                    'meal_period': Mock(),
-                    'location_id': Mock()
+                    'date': datetime.now(),
+                    'meal_period': 'lunch',
+                    'location_id': 1,
+                    'main_meal_id': 1,
+                    'allowed_side': 1,
+                    'allowed_protein': 1,
+                    'side_items': '',
+                    'protein_items': ''
                 },
             ]
-            mock_new_menu.return_value = {
-                'date': datetime.now(),
-                'meal_period': Mock(),
-                'main_meal_id': Mock(),
-                'allowed_side': Mock(),
-                'location_id': Mock()
-            }
-            mock_get.return_value = {
-                'meal_type': Mock(),
-                'name': Mock(),
-                'description': Mock(),
-                'image': Mock(),
-                'location_id': Mock(),
-                'location': Mock()
-            }
-            mock_get_meal_items.return_value = Mock()
             menu_controller = MenuController(self.request_context)
 
             # Act
