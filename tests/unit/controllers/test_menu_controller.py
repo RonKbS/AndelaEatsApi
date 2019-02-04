@@ -382,3 +382,34 @@ class TestMenuController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch('app.Auth.get_location')
+    @patch.object(MealPeriods, 'has_value')
+    def test_list_menus_ranges_invalid_meal_period(
+        self,
+        mock_meal_periods_has_value,
+        mock_auth_get_location
+    ):
+        '''Test list_menu_ranges response when the meal period is invalid.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_auth_get_location.return_value = 1
+            mock_meal_periods_has_value.return_value = False
+            mock_meal_period = 'lunch'
+            mock_period_start = '2019-01-01'
+            mock_period_end = '2019-02-28'
+            menu_controller = MenuController(self.request_context)
+
+            # Act
+            result = menu_controller.list_menus_range(
+                mock_meal_period,
+                mock_period_start,
+                mock_period_end
+            )
+
+            # Arrange
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Provide valid meal period ' \
+                'and date range'
+
