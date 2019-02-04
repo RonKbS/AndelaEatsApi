@@ -443,3 +443,72 @@ class TestMenuController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Provide valid date ' \
                 'range. start_date cannot be greater than end_date'
+
+    @patch('app.Auth.get_location')
+    @patch.object(MealPeriods, 'has_value')
+    @patch.object(MenuRepo, 'get_range_paginated_options')
+    @patch.object(MealItemRepo, 'get')
+    @patch.object(MenuController, 'pagination_meta')
+    def test_list_menus_range_ok_response(
+        self,
+        mock_menu_controller_pagination_meta,
+        mock_meal_item_repo_get,
+        mock_menu_repo_get_range_paginated_options,
+        mock_meal_periods_has_value,
+        mock_auth_get_location
+    ):
+        '''Test list_menus_range OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_auth_get_location.return_value = 1
+            mock_meal_periods_has_value.return_value = True
+            mock_menu = Menu(
+                    date=datetime.now(),
+                    meal_period='',
+                    location_id=1,
+                    main_meal_id=1,
+                    allowed_side=1,
+                    allowed_protein=1,
+                    side_items='1,2',
+                    protein_items='1,2',
+                    vendor_engagement_id=1,
+                    created_at=datetime.now(),
+                    updated_at=datetime.now()
+                )
+            mock_meal_item = MealItem(
+                id=1,
+                meal_type=1,
+                name='',
+                description='',
+                image='',
+                location_id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
+            mock_menu_repo_get_range_paginated_options.return_value.items = [
+                mock_menu,
+            ]
+
+            mock_meal_item_repo_get.return_value = mock_meal_item
+            mock_period_start_date = '2019-01-01'
+            mock_period_end_date = '2019-02-28'
+            mock_menu_controller_pagination_meta.return_value = {
+                'total_rows': 1,
+                'total_pages': 1,
+                'current_page': 1,
+                'next_page': False,
+                'prev_page': False
+            }
+            menu_controller = MenuController(self.request_context)
+
+            # Act
+            result = menu_controller.list_menus_range(
+                'lunch',
+                mock_period_start_date,
+                mock_period_end_date
+            )
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
