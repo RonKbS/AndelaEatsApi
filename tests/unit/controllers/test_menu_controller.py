@@ -1,6 +1,6 @@
 '''Unit tests for the menu_controller module.
 '''
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
 from app.controllers.menu_controller import MenuController
@@ -256,3 +256,30 @@ class TestMenuController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch('app.Auth.get_location')
+    @patch.object(MealPeriods, 'has_value')
+    def test_list_menus_range_admin_period_doesnot_exist(
+        self,
+        mock_meal_periods_has_value,
+        mock_auth_get_location
+    ):
+        '''Test list_menus_range_admin when period doesn't exist.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_auth_get_location.return_value = 1
+            mock_meal_periods_has_value.return_value = False
+            menu_controller = MenuController(self.request_context)
+
+            # Act
+            result = menu_controller.list_menus_range_admin(
+                'lunch',
+                datetime.now(),
+                (datetime.now() + timedelta(days=10))
+            )
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Provide valid meal period ' \
+                'and date range'
