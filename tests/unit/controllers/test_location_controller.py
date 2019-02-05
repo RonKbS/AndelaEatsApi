@@ -68,3 +68,30 @@ class TestLocationController(BaseTestCase):
             # Assert
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Invalid or Missing location_id'
+
+    @patch.object(LocationRepo, 'get')
+    def test_get_location_ok_response(
+        self,
+        mock_location_repo_get
+    ):
+        '''Test get_location OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_location = Location(
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                name='Mock location',
+                zone='Mock zone'
+            )
+            mock_location_id = 1
+            mock_location_repo_get.return_value = mock_location
+            location_controller = LocationController(self.request_context)
+
+            # Act
+            result = location_controller.get_location(mock_location_id)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
