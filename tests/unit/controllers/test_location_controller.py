@@ -95,3 +95,34 @@ class TestLocationController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(LocationController, 'request_params')
+    @patch.object(LocationRepo, 'new_location')
+    def test_create_location_ok_response(
+        self,
+        mock_location_repo_new_location,
+        mock_location_controller_request_params
+    ):
+        '''Test create_location OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_location = Location(
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                name='Mock location',
+                zone='Mock zone'
+            )
+            mock_name = 'Mock name'
+            mock_zone = 'Mock zone'
+            mock_location_repo_new_location.return_value = mock_location
+            mock_location_controller_request_params. return_value = mock_name, mock_zone
+            location_controller = LocationController(self.request_context)
+
+            # Act
+            result = location_controller.create_location()
+
+            # Assert
+            assert result.status_code == 201
+            assert result.get_json()['msg'] == 'OK'
