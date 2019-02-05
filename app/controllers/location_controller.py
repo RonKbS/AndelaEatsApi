@@ -16,7 +16,7 @@ class LocationController(BaseController):
 		location = self.location_repo.get(location_id)
 		if location:
 			return self.handle_response('OK', payload={'location': location.serialize()})
-		return self.handle_response('Invalid or Missing location_id')
+		return self.handle_response('Invalid or Missing location_id', status_code=400)
 	
 	def create_location(self):
 		name, zone = self.request_params('name', 'zone')
