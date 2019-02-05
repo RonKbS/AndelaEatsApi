@@ -126,3 +126,25 @@ class TestLocationController(BaseTestCase):
             # Assert
             assert result.status_code == 201
             assert result.get_json()['msg'] == 'OK'
+
+    def test_update_location(self):
+        '''Test update_location no code execution.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_location_id = 1
+            location_controller = LocationController(self.request_context)
+
+            # Act
+            location_controller.update_location(mock_location_id)
+
+    def test_location_location(self):
+        '''Test update_location no code execution.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_location_id = 1
+            location_controller = LocationController(self.request_context)
+
+            # Act
+            location_controller.delete_location(mock_location_id)
