@@ -649,3 +649,48 @@ class TestVendorRatingController(BaseTestCase):
             assert result.status_code == 404
             assert result.get_json()['msg'] == 'Invalid or incorrect ' \
                 'rating_id provided'
+
+    @patch.object(VendorRatingRepo, 'get')
+    @patch.object(VendorRatingController, 'get_json')
+    @patch('app.Auth.user')
+    def test_update_vendor_rating_when_rating_is_forbidden(
+        self,
+        mock_auth_user,
+        mock_vendor_rating_controller_get_json,
+        mock_vendor_rating_repo_get
+    ):
+        '''Test update_vendor_rating when rating is forbidden.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_auth_user.return_value = 1
+            mock_vendor_rating_controller_get_json.return_value = {
+                'comment': 'Mock comment'
+            }
+            mock_vendor_rating = VendorRating(
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                vendor_id=1,
+                user_id=2,
+                comment='Mock comment',
+                service_date=datetime.now(),
+                rating=3.0,
+                channel='web',
+                rating_type='meal',
+                type_id=1,
+                engagement_id=1,
+                main_meal_id=1
+            )
+            mock_vendor_rating_repo_get.return_value = mock_vendor_rating
+            vendor_rating_controller = VendorRatingController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_rating_controller.update_vendor_rating(1)
+
+            # Assert
+            assert result.status_code == 403
+            assert result.get_json()['msg'] == 'You are not allowed to ' \
+                'update a rating that is not yours'
