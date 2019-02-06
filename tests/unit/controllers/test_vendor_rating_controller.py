@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from app.controllers.vendor_rating_controller import VendorRatingController
 from app.models.meal_item import MealItem
+from app.models.order import Order
 from app.models.vendor import Vendor
 from app.models.vendor_engagement import VendorEngagement
 from app.models.vendor_rating import VendorRating
@@ -359,6 +360,7 @@ class TestVendorRatingController(BaseTestCase):
     ):
         '''Test create_order_rating when order doesnot exist.
         '''
+        # Arrange
         with self.app.app_context():
             mock_meal_item = MealItem(
                 id=1,
@@ -400,3 +402,74 @@ class TestVendorRatingController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Order with this id is not' \
                 ' found'
+
+    @patch.object(OrderRepo, 'get')
+    @patch.object(VendorRatingController, 'request_params')
+    @patch('app.Auth.user')
+    @patch.object(MealItemRepo, 'get')
+    @patch.object(VendorEngagementRepo, 'get')
+    def test_create_order_rating_when_order_already_rated(
+        self,
+        mock_vendor_engagement_repo_get,
+        mock_meal_item_repo_get,
+        mock_auth_user,
+        mock_vendor_rating_controller_request_params,
+        mock_order_repo_get
+    ):
+        '''Test create_order_rating when order has already been rated.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_meal_item = MealItem(
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                meal_type='main',
+                name='Mock meal',
+                description='Mock meal description',
+                image='',
+                location_id=1
+            )
+            mock_vendor_engagement = VendorEngagement(
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                vendor_id=1,
+                location_id=1,
+                start_date=datetime.now(),
+                end_date=(datetime.now() + timedelta(days=5)),
+                status=1,
+                termination_reason='Mock reason'
+            )
+            mock_order = Order(
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                user_id='user_id',
+                date_booked_for=datetime.now(),
+                date_booked=datetime.now(),
+                channel='web',
+                meal_period='lunch',
+                order_status='booked',
+                has_rated=True,
+                menu_id=1,
+                location_id=1
+            )
+            mock_vendor_rating_controller_request_params.return_value = (
+                1, None, None, None, 3, None, None
+            )
+            mock_auth_user.return_value = 1
+            mock_meal_item_repo_get.return_value = mock_meal_item
+            mock_vendor_engagement_repo_get.return_value = \
+                mock_vendor_engagement
+            mock_order_repo_get.return_value = mock_order
+            vendor_rating_controller = VendorRatingController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_rating_controller.create_order_rating()
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'This order has been rated'
