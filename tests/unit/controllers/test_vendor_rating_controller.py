@@ -619,3 +619,33 @@ class TestVendorRatingController(BaseTestCase):
             # Assert
             assert result.status_code == 201
             assert result.get_json()['msg'] == 'Rating successful'
+
+    @patch.object(VendorRatingController, 'get_json')
+    @patch.object(VendorRatingRepo, 'get')
+    def test_update_vendor_rating_when_rating_is_invalid(
+        self,
+        mock_vendor_rating_repo_get,
+        mock_vendor_rating_controller_get_json
+    ):
+        '''Test update_vendor_rating when rating is invalid.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_rating_id = 1
+            mock_vendor_rating_controller_get_json.return_value = {
+                'comment': 'Mock comment'
+            }
+            mock_vendor_rating_repo_get.return_value = None
+            vendor_rating_controller = VendorRatingController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_rating_controller.update_vendor_rating(
+                mock_rating_id
+            )
+
+            # Assert
+            assert result.status_code == 404
+            assert result.get_json()['msg'] == 'Invalid or incorrect ' \
+                'rating_id provided'
