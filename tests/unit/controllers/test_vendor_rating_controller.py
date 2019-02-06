@@ -4,6 +4,7 @@ from datetime import datetime
 from unittest.mock import patch
 
 from app.controllers.vendor_rating_controller import VendorRatingController
+from app.models.vendor import Vendor
 from app.models.vendor_rating import VendorRating
 from app.repositories.meal_item_repo import MealItemRepo
 from app.repositories.vendor_engagement_repo import VendorEngagementRepo
@@ -176,3 +177,69 @@ class TestVendorRatingController(BaseTestCase):
             # Assert
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Invalid vendor_id provided'
+
+    @patch.object(VendorRatingRepo, 'new_rating')
+    @patch.object(VendorEngagementRepo, 'get')
+    @patch.object(VendorRatingController, 'request_params')
+    @patch('app.Auth.user')
+    @patch.object(VendorRepo, 'get')
+    def test_create_vendor_rating_ok_response(
+        self,
+        mock_vendor_repo_get,
+        mock_auth_user,
+        mock_vendor_rating_controller_request_params,
+        mock_vendor_engagement_repo_get,
+        mock_vendor_rating_repo_new_rating
+    ):
+        '''Test create_vendor_rating OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor = Vendor(
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                name='Mock vendor',
+                address='Mock address',
+                tel='',
+                contact_person='Mock contact person',
+                is_active=True,
+                location_id=1
+            )
+            mock_vendor_rating = VendorRating(
+                vendor_id=1,
+                user_id=1,
+                comment='Mock comment',
+                service_date=datetime.now(),
+                rating=1.0,
+                channel='Mock channel',
+                rating_type='engagement',
+                type_id=0,
+                engagement_id=1,
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                main_meal_id=1
+            )
+            mock_vendor_repo_get.return_value = mock_vendor
+            mock_auth_user.return_value = 1
+            mock_vendor_rating_controller_request_params.return_value = (
+                'Mock comment',
+                2.0,
+                '2019-02-01',
+                'Mock channel',
+                1
+            )
+            mock_vendor_engagement_repo_get.return_value.vendor_id = 1
+            mock_vendor_rating_repo_new_rating \
+                .return_value = mock_vendor_rating
+            vendor_rating_controller = VendorRatingController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_rating_controller.create_vendor_rating()
+
+            # Assert
+            assert result.status_code == 201
+            assert result.get_json()['msg'] == 'Rating created'
