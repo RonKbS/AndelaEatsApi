@@ -267,3 +267,33 @@ class TestVendorRatingController(BaseTestCase):
             result.status_code == 400
             result.get_json()['msg'] == 'Rating must be between 1 and 5' \
                 ', inclusive'
+
+    @patch.object(VendorRatingController, 'request_params')
+    @patch('app.Auth.user')
+    @patch.object(MealItemRepo, 'get')
+    def test_create_order_rating_when_meal_item_doesnot_exist(
+        self,
+        mock_meal_item_repo_get,
+        mock_auth_user,
+        mock_vendor_rating_controller_request_params
+    ):
+        '''Test create_order_rating when meal item does not exist.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_rating_controller_request_params.return_value = (
+                None, None, None, None, 3, None, None
+            )
+            mock_auth_user.return_value = 1
+            mock_meal_item_repo_get.return_value = None
+            vendor_rating_controller = VendorRatingController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_rating_controller.create_order_rating()
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Meal item with this id not ' \
+                'found'
