@@ -243,3 +243,27 @@ class TestVendorRatingController(BaseTestCase):
             # Assert
             assert result.status_code == 201
             assert result.get_json()['msg'] == 'Rating created'
+
+    @patch.object(VendorRatingController, 'request_params')
+    def test_create_order_rating_when_rating_invalid(
+        self,
+        mock_vendor_rating_controller_request_params
+    ):
+        '''Test create_order_rating when rating is invalid.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_rating_controller_request_params.return_value = (
+                None, None, None, None, 6, None, None
+            )
+            vendor_rating_controller = VendorRatingController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_rating_controller.create_order_rating()
+
+            # Assert
+            result.status_code == 400
+            result.get_json()['msg'] == 'Rating must be between 1 and 5' \
+                ', inclusive'
