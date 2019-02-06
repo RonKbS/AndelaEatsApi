@@ -6,6 +6,7 @@ from unittest.mock import patch
 from app.controllers.vendor_rating_controller import VendorRatingController
 from app.models.vendor_rating import VendorRating
 from app.repositories.meal_item_repo import MealItemRepo
+from app.repositories.vendor_engagement_repo import VendorEngagementRepo
 from app.repositories.vendor_rating_repo import VendorRatingRepo
 from app.repositories.vendor_repo import VendorRepo
 from tests.base_test_case import BaseTestCase
@@ -142,3 +143,36 @@ class TestVendorRatingController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(VendorEngagementRepo, 'get')
+    @patch.object(VendorRatingController, 'request_params')
+    @patch('app.Auth.user')
+    @patch.object(VendorRepo, 'get')
+    def test_create_vendor_rating_when_vendor_doesnot_exist(
+        self,
+        mock_vendor_repo_get,
+        mock_auth_user,
+        mock_vendor_rating_controller_request_params,
+        mock_vendor_engagement_repo_get
+    ):
+        '''Test create_vendor_rating when vendor doesnot exist.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_repo_get.return_value = None
+            mock_vendor_rating_controller_request_params.return_value = (
+                None, None, None, None, None
+            )
+            mock_auth_user.return_value = None
+            mock_vendor_repo_get.return_value = None
+            mock_vendor_engagement_repo_get.return_value.vendor_id = None
+            vendor_rating_controller = VendorRatingController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_rating_controller.create_vendor_rating()
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Invalid vendor_id provided'
