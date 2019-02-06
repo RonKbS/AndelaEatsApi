@@ -26,7 +26,7 @@ class RoleController(BaseController):
 		role = self.role_repo.get(role_id)
 		if role:
 			return self.handle_response('OK', payload={'role': role.serialize()})
-		return self.handle_response('Invalid or Missing role_id')
+		return self.handle_response('Invalid or Missing role_id', status_code=400)
 
 	def create_role(self):
 		name, help_ = self.request_params('name', 'help')
