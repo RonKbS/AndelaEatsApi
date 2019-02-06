@@ -85,3 +85,22 @@ class TestVendorRatingController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(VendorRatingRepo, 'get')
+    def test_get_vendor_rating_when_rating_doesnot_exist(
+        self,
+        mock_vendor_rating_repo_get
+    ):
+        '''Test get_vendor_rating when the rating does not exist.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_rating_repo_get.return_value = None
+            vendor_rating_controller = VendorRatingController(self.request_context)
+
+            # Act
+            result = vendor_rating_controller.get_vendor_rating(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Bad Request'
