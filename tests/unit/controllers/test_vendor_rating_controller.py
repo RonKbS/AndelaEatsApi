@@ -96,7 +96,9 @@ class TestVendorRatingController(BaseTestCase):
         # Arrange
         with self.app.app_context():
             mock_vendor_rating_repo_get.return_value = None
-            vendor_rating_controller = VendorRatingController(self.request_context)
+            vendor_rating_controller = VendorRatingController(
+                self.request_context
+            )
 
             # Act
             result = vendor_rating_controller.get_vendor_rating(1)
@@ -104,3 +106,39 @@ class TestVendorRatingController(BaseTestCase):
             # Assert
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Bad Request'
+
+    @patch.object(VendorRatingRepo, 'get')
+    def test_get_vendor_rating_ok_response(
+        self,
+        mock_vendor_rating_repo_get
+    ):
+        '''Test get_vendor_rating OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_rating = VendorRating(
+                vendor_id=1,
+                user_id=1,
+                comment='Mock comment',
+                service_date=datetime.now(),
+                rating=1.0,
+                channel='Mock channel',
+                rating_type='engagement',
+                type_id=0,
+                engagement_id=1,
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                main_meal_id=1
+            )
+            mock_vendor_rating_repo_get.return_value = mock_vendor_rating
+            vendor_rating_controller = VendorRatingController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_rating_controller.get_vendor_rating(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
