@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from app.controllers.role_controller import RoleController
 from app.models.role import Role
+from app.models.user_role import UserRole
 from app.repositories.role_repo import RoleRepo
 from app.repositories.user_role_repo import UserRoleRepo
 from app.repositories.permission_repo import PermissionRepo
@@ -23,6 +24,15 @@ class TestRoleController(BaseTestCase):
                 name='Mock role',
                 help='Mock help'
             )
+        self.mock_user_role = UserRole(
+            id=1,
+            role_id=1,
+            location_id=1,
+            user_id=1,
+            is_active=True,
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
 
     @patch.object(RoleController, 'pagination_meta')
     @patch.object(RoleRepo, 'filter_by')
@@ -281,3 +291,24 @@ class TestRoleController(BaseTestCase):
             # Assert
             assert result.status_code == 404
             assert result.get_json()['msg'] == 'There are no roles for this user'
+
+    @patch.object(UserRoleRepo, 'get_unpaginated')
+    def test_get_user_roles_ok_response(
+        self,
+        mock_user_role_repo_get_unpaginated
+    ):
+        '''Test get_user_roles OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_user_role_repo_get_unpaginated.return_value = [
+                self.mock_user_role,
+            ]
+            role_controler = RoleController(self.request_context)
+
+            # Act
+            result = role_controler.get_user_roles(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
