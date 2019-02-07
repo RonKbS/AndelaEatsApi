@@ -262,3 +262,22 @@ class TestRoleController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'role deleted'
+
+    @patch.object(UserRoleRepo, 'get_unpaginated')
+    def test_get_user_roles_when_user_has_no_roles(
+        self,
+        mock_user_role_repo_get_unpaginated
+    ):
+        '''Test get_user_roles when the user has no roles.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_user_role_repo_get_unpaginated.return_value = None
+            role_controler = RoleController(self.request_context)
+
+            # Act
+            result = role_controler.get_user_roles(1)
+
+            # Assert
+            assert result.status_code == 404
+            assert result.get_json()['msg'] == 'There are no roles for this user'
