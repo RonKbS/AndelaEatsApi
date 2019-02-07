@@ -46,7 +46,7 @@ jobs:
           name: run test and coverage
           command: |
             . venv/bin/activate
-            pytest && coverage report && coveralls
+            pytest --cov=app/ && coverage report && coveralls
 
       - save_cache:
           paths:
