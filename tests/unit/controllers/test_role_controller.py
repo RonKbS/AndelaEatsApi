@@ -662,3 +662,30 @@ class TestRoleController(BaseTestCase):
             # Assert
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'This permission already exists'
+
+    @patch.object(RoleController, 'request_params')
+    @patch.object(PermissionRepo, 'get_unpaginated')
+    @patch.object(RoleRepo, 'get')
+    def test_create_role_permission_when_role_doesnot_exist(
+        self,
+        mock_role_repo_get,
+        mock_permission_repo_get_unpaginated,
+        mock_role_controller_request_params
+    ):
+        '''Test create_role_permission when role does not exist.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_role_controller_request_params.return_value = (
+                1, 'name', 'keyword'
+            )
+            mock_permission_repo_get_unpaginated.return_value = None
+            mock_role_repo_get.return_value = None
+            role_controler = RoleController(self.request_context)
+
+            # Act
+            result = role_controler.create_role_permission()
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'This role does not exist'
