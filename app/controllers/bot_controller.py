@@ -233,8 +233,18 @@ class BotController(BaseController):
                                                        is_deleted=False)
                 if not menus:
                     #   No Menu for provided date
+                    back_buttons = [{'name': 'back', 'text': 'Back', 'type': "button", 'value': location_id}]
+                    request_buttons = [
+                        {
+                            "text": "",
+                            "callback_id": "center_selector",
+                            "color": "#3AA3E3",
+                            "attachment_type": "default",
+                            "actions": back_buttons
+                        }
+                    ]
                     return self.handle_response(slack_response={
-                        'text': f'Sorry No Menu found for Date: {date}, Meal Period: {period}'})
+                        'text': f'Sorry No Menu found for Date: {date}, Meal Period: {period}', 'attachments': request_buttons})
                 text = ''
 
                 for menu in menus:
@@ -273,17 +283,28 @@ class BotController(BaseController):
 
         if (payload['type'] == 'interactive_message' and payload['callback_id'] == 'action_selector' and
             payload['actions'][0]['value'].split('_')[2] == 'order') or (payload['callback_id'] == 'after_menu_list' and payload['actions'][0]['value'].split('_')[2] == 'order'):
-
             payload_action_value = payload['actions'][0]['value']
             meal_period = payload_action_value.split('_')[0]
             selected_date = payload_action_value.split('_')[1]
-            location_id = payload_action_value.split('_')[2]
+            location_id = payload_action_value.split('_')[3]
             menus = self.menu_repo.get_unpaginated(date=selected_date, meal_period=meal_period,
                                                    is_deleted=False)
             if not menus:
                 #   No Menu for provided date
+                back_buttons = [{'name': 'back', 'text': 'Back', 'type': "button", 'value': location_id}]
+
+                request_buttons = [
+                    {
+                        "text": "",
+                        "callback_id": "center_selector",
+                        "color": "#3AA3E3",
+                        "attachment_type": "default",
+                        "actions": back_buttons
+                    }
+                ]
                 return self.handle_response(slack_response={
-                    'text': f'Sorry No Menu found for Date: {selected_date}, Meal Period: {meal_period}'})
+                    'text': f'Sorry No Menu found for Date: {selected_date}, Meal Period: {meal_period}', 'attachments': request_buttons}
+                    )
 
             meal_buttons = [
                 {'name': 'main_meal', 'type': 'button', 'text': f'{menu.main_meal.name}',
@@ -363,8 +384,19 @@ class BotController(BaseController):
                                                    is_deleted=False)
             if not menus:
                 #   No Menu for provided date
+                back_buttons = [{'name': 'back', 'text': 'Back', 'type': "button", 'value': location_id}]
+
+                request_buttons = [
+                    {
+                        "text": "",
+                        "callback_id": "center_selector",
+                        "color": "#3AA3E3",
+                        "attachment_type": "default",
+                        "actions": back_buttons
+                    }
+                ]
                 return self.handle_response(slack_response={
-                    'text': f'Sorry No Menu found for Date: {selected_date}, Meal Period: {meal_period}'})
+                    'text': f'Sorry No Menu found forr Date: {selected_date}, Meal Period: {meal_period}', 'attachments': request_buttons})
 
             meal_buttons = [
                 {'name': 'main_meal', 'type': 'button', 'text': f'{menu.main_meal.name}',
