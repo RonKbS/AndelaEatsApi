@@ -86,7 +86,7 @@ class BotController(BaseController):
                 menu_id = state[0]
                 meal_period = state[1]
                 date_booked_for = state[2]
-                location_id = state[3]
+                location_id = state[4]
                 submitted_values = payload['submission']
                 meal_items = [int(v) for k, v in submitted_values.items()]
                 meal_items.append(MenuRepo().get(menu_id).main_meal_id)
@@ -99,8 +99,7 @@ class BotController(BaseController):
 
                 order = OrderRepo().create_order(
                     user_id=user_id, date_booked_for=date_booked_for, meal_items=meal_items, location_id=location_id,
-                    menu_id=menu_id,
-                    channel=channel, meal_period=meal_period)
+                    menu_id=menu_id, channel=channel, meal_period=meal_period)
 
                 if order:
                     slack_data = {'text': 'Booking Confirmed!'}
@@ -195,13 +194,92 @@ class BotController(BaseController):
             return self.handle_response(slack_response={'text': f'Select Meal Period', 'attachments': request_buttons})
 
         if payload['type'] == 'interactive_message' and payload['callback_id'] == 'period_selector':
-            payload_action_value = payload['actions'][0]['value']
+            period = payload['actions'][0]['value'].split('_')[0]
+            date = payload['actions'][0]['value'].split('_')[1]
+            location_id = payload['actions'][0]['value'].split('_')[2]
+            actions = {
+                "attachments": [
+                    {
+                        "text": 'What do you want to do?',
+                        "callback_id": "action_selector",
+                        "color": "#3AA3E3",
+                        "attachment_type": "default",
+                        "actions": [
+                            {
+                                "name": "main meal",
+                                "text": "View Menu List",
+                                "type": "button",
+                                "value": f'{period}_{date}_menu_{location_id}'
+                            },
+                            {
+                                "name": "main meal",
+                                "text": "Place order",
+                                "type": "button",
+                                "value": f'{period}_{date}_order_{location_id}'
+                            }
+                        ]
+                    }
+                ]
+            }
+            return self.handle_response(slack_response=actions)
 
+        if payload['type'] == 'interactive_message' and payload['callback_id'] == 'action_selector':
+            payload_action_value = payload['actions'][0]['value']
+            if payload_action_value.split('_')[2] == 'menu':
+                date = payload_action_value.split('_')[1]
+                period = payload_action_value.split('_')[0]
+                location_id = payload_action_value.split('_')[3]
+                menus = self.menu_repo.get_unpaginated(date=date, meal_period=period,
+                                                       is_deleted=False)
+                if not menus:
+                    #   No Menu for provided date
+                    return self.handle_response(slack_response={
+                        'text': f'Sorry No Menu found for Date: {date}, Meal Period: {period}'})
+                text = ''
+
+                for menu in menus:
+                    side_items_list = menu.side_items.split(',')
+                    protein_items_list = menu.protein_items.split(',')
+
+                    main = self.meal_repo.get(menu.main_meal_id).name
+                    sides = [side.name for side in self.meal_repo.get_meal_items_by_ids(side_items_list)]
+                    proteins = [protein.name for protein in self.meal_repo.get_meal_items_by_ids(protein_items_list)]
+                    menu_info = f'Main meal: *{main}*\n Side items: {", ".join(sides)}\nProtein items: {", ".join(proteins)}\n\n\n'
+                    text += menu_info
+
+                meals = {
+                        "text": f'{period.upper()}',
+                        "attachments": [
+                    {
+                        "text": text,
+                        "callback_id": "after_menu_list",
+                        "color": "#3AA3E3",
+                        "attachment_type": "default",
+                        "actions": [
+                            {
+                                "name": "main meal",
+                                "text": "Rate meal",
+                                "type": "button",
+                                "value": f'{period}_{date}_rate_{location_id}_{location_id}'
+                            },
+                            {
+                                "name": "main meal",
+                                "text": "Place an order",
+                                "type": "button",
+                                "value": f'{period}_{date}_order_{location_id}_{location_id}'
+                            }
+                        ]}]}
+                return self.handle_response(slack_response=meals)
+
+        if (payload['type'] == 'interactive_message' and payload['callback_id'] == 'action_selector' and
+            payload['actions'][0]['value'].split('_')[2] == 'order') or (payload['callback_id'] == 'after_menu_list' and payload['actions'][0]['value'].split('_')[2] == 'order'):
+
+            payload_action_value = payload['actions'][0]['value']
             meal_period = payload_action_value.split('_')[0]
             selected_date = payload_action_value.split('_')[1]
             location_id = payload_action_value.split('_')[2]
             menus = self.menu_repo.get_unpaginated(date=selected_date, meal_period=meal_period,
-                                                       is_deleted=False)
+                                                   is_deleted=False)
             if not menus:
                 #   No Menu for provided date
                 return self.handle_response(slack_response={
@@ -216,60 +294,15 @@ class BotController(BaseController):
             request_buttons = [
                 {
                     "text": "",
-                    "callback_id": "main_meal_selector",
+                    "callback_id": "meal_action_selector",
                     "color": "#3AA3E3",
                     "attachment_type": "default",
                     "actions": meal_buttons
                 }
             ]
+
             return self.handle_response(
                 slack_response={'text': 'Select Main Meal', 'attachments': request_buttons})
-
-
-        if payload['type'] == 'interactive_message' and payload['callback_id'] == 'main_meal_selector':
-            payload_action_value = payload['actions'][0]['value']
-            menu_id = payload_action_value.split('_')[0]
-
-            menu = MenuRepo().get(menu_id)
-            main = self.meal_repo.get(menu.main_meal_id).name
-            side_items_list = menu.side_items.split(',')
-            protein_items_list = menu.protein_items.split(',')
-
-            sides = [side.name for side in self.meal_repo.get_meal_items_by_ids(side_items_list)]
-            proteins = [protein.name for protein in self.meal_repo.get_meal_items_by_ids(protein_items_list)]
-
-            resp = {
-                "text": "Meal details",
-                "attachments": [
-                    {
-                        "text": f'Main meal: {main}\n Side items: {", ".join(sides)} (choose {menu.allowed_side})\nProtein items: {", ".join(proteins)} (choose {menu.allowed_protein})',
-                        "callback_id": "meal_action_selector",
-                        "color": "#3AA3E3",
-                        "attachment_type": "default",
-                        "actions": [
-                            {
-                                "name": "main meal",
-                                "text": "Back",
-                                "type": "button",
-                                "value": f'{menu_id}_back'
-                            },
-                            {
-                                "name": "main meal",
-                                "text": "Place order",
-                                "type": "button",
-                                "value": f'{menu.id}_{menu.meal_period}_{menu.date.date()}_{menu.location_id}_order'
-                            },
-                            {
-                                "name": "main meal",
-                                "text": "Rate meal",
-                                "type": "button",
-                                "value": f'{menu_id}_rating'
-                            }
-                        ]
-                    }
-                ]
-            }
-            return self.handle_response(slack_response=resp)
 
         if payload['type'] == 'interactive_message' and payload['callback_id'] == 'meal_action_selector':
             payload_action_value = payload['actions'][0]['value']
@@ -319,68 +352,66 @@ class BotController(BaseController):
                                    callback_id='final_selection', state=state)
 
                 return self.handle_response(slack_response={'text': 'Select Meal Protein and Sides'})
-            elif payload_action_value.find('back') > -1:
-                payload_action_value = payload['actions'][0]['value']
-                menu_id = payload_action_value.split('_')[0]
-                menu = self.menu_repo.get(menu_id)
 
-                meal_period = menu.meal_period
-                selected_date = menu.date
+        if payload['callback_id'] == 'after_menu_list' and payload['actions'][0]['value'].split('_')[2] == 'rate':
 
-                menus = self.menu_repo.get_unpaginated(date=selected_date, meal_period=meal_period,
-                                                       is_deleted=False)
-                if not menus:
-                    #   No Menu for provided date
-                    return self.handle_response(slack_response={
-                        'text': f'Sorry No Menu found for Date: {selected_date}, Meal Period: {meal_period}'})
+            payload_action_value = payload['actions'][0]['value']
+            meal_period = payload_action_value.split('_')[0]
+            selected_date = payload_action_value.split('_')[1]
+            location_id = payload_action_value.split('_')[2]
+            menus = self.menu_repo.get_unpaginated(date=selected_date, meal_period=meal_period,
+                                                   is_deleted=False)
+            if not menus:
+                #   No Menu for provided date
+                return self.handle_response(slack_response={
+                    'text': f'Sorry No Menu found for Date: {selected_date}, Meal Period: {meal_period}'})
 
-                meal_buttons = [
-                    {'name': 'main_meal', 'type': 'button', 'text': f'{menu.main_meal.name}',
-                     'value': f'{menu.id}_{payload_action_value}'}
-                    for menu in menus
-                ]
+            meal_buttons = [
+                {'name': 'main_meal', 'type': 'button', 'text': f'{menu.main_meal.name}',
+                 'value': f'{menu.id}_{payload_action_value}'}
+                for menu in menus
+            ]
 
-                request_buttons = [
-                    {
-                        "text": "",
-                        "callback_id": "main_meal_selector",
-                        "color": "#3AA3E3",
-                        "attachment_type": "default",
-                        "actions": meal_buttons
-                    }
-                ]
-                return self.handle_response(
-                    slack_response={'text': 'Select Main Meal', 'attachments': request_buttons})
+            request_buttons = [
+                {
+                    "text": "",
+                    "callback_id": "rating_selector",
+                    "color": "#3AA3E3",
+                    "attachment_type": "default",
+                    "actions": meal_buttons
+                }
+            ]
 
-            else:
-                if payload_action_value.find('rating') > -1:
-                    menu_id = payload_action_value.split('_')[0]
-                    menu = self.menu_repo.get(menu_id)
+            return self.handle_response(
+                slack_response={'text': 'Select Main Meal', 'attachments': request_buttons})
 
-                    trigger_id = payload['trigger_id']
+        if payload['callback_id'] == 'rating_selector':
 
-                    main_meal = menu.main_meal_id
+            menu_id = payload['actions'][0]['value'].split('_')[0]
+            menu = self.menu_repo.get(menu_id)
+            trigger_id = payload['trigger_id']
+            main_meal = menu.main_meal_id
 
-                    request_dialog_element = [{
-                        'label': f'Rate meal: {self.meal_repo.get(main_meal).name}',
-                        'type': 'select',
-                        'name': 'rating value',
-                        'options': [{'label': f'{value}', 'value': f'{value}'} for value in range(1, 6)]
-                    },
-                        {
-                            'label': 'Add a short comment',
-                            'type': 'text',
-                            'name': 'comment'
+            request_dialog_element = [{
+                'label': f'Rate meal: {self.meal_repo.get(main_meal).name}',
+                'type': 'select',
+                'name': 'rating value',
+                'options': [{'label': f'{value}', 'value': f'{value}'} for value in range(1, 6)]
+            },
+                {
+                    'label': 'Add a short comment',
+                    'type': 'text',
+                    'name': 'comment'
 
-                        }
-                    ]
+                }
+            ]
 
-                    state = f'{payload_action_value}'
-                    self.create_dialog(dialog_elem=request_dialog_element, trigger_id=trigger_id,
-                                       title='Rate a meal',
-                                       callback_id='submit_rating', state=state)
+            state = f'{payload["actions"][0]["value"]}'
+            self.create_dialog(dialog_elem=request_dialog_element, trigger_id=trigger_id,
+                               title='Rate a meal',
+                               callback_id='submit_rating', state=state)
 
-                    return self.handle_response(slack_response={'text': 'Meal rating'})
+            return self.handle_response(slack_response={'text': 'Meal rating'})
 
     def create_dialog(self, dialog_elem, trigger_id, title, callback_id, state=None):
         dialog = {
