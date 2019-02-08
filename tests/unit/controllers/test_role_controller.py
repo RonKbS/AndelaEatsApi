@@ -455,3 +455,23 @@ class TestRoleController(BaseTestCase):
             # Assert
             # assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(UserRoleRepo, 'get')
+    def delete_user_role_when_role_doesnot_exist(
+        self,
+        mock_user_role_repo_get
+    ):
+        '''Test delete_user_role when the role does not exist.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_user_role_repo_get.return_value = None
+            role_controler = RoleController(self.request_context)
+
+            # Act
+            result = role_controler.delete_user_role(1)
+
+            # Assert
+            assert result.status_code == 404
+            assert result.get_json()['msg'] == 'Invalid or incorrect ' \
+                'user_role_id provided'
