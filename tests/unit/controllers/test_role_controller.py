@@ -414,3 +414,44 @@ class TestRoleController(BaseTestCase):
             # Assert
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'This role does not exist'
+
+    @patch.object(UserRoleRepo, 'new_user_role')
+    @patch.object(RoleRepo, 'get')
+    @patch.object(UserRoleRepo, 'get_unpaginated')
+    @patch('app.Auth.get_location')
+    @patch.object(RoleController, 'request_params')
+    @patch.object(AndelaService, 'get_user_by_email_or_id')
+    def test_create_user_role_ok_response(
+        self,
+        mock_andela_service_get_user,
+        mock_role_controller_request_params,
+        mock_auth_get_location,
+        mock_user_role_repo_get_unpaginated,
+        mock_role_repo_get,
+        mock_user_role_repo_new_user_role
+    ):
+        '''Test create_user_role when user is already assigned to the role.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_role_controller_request_params.return_value = (
+                1,
+                'joseph@mail.com'
+            )
+            mock_andela_service_get_user.return_value = {
+                'id': 1,
+                'mail': 'joseph@mail.com'
+            }
+            mock_auth_get_location.return_value = 1
+            mock_user_role_repo_get_unpaginated.return_value = None
+            mock_role_repo_get.return_value = self.mock_role
+            mock_user_role_repo_new_user_role.return_value = \
+                self.mock_user_role
+            role_controler = RoleController(self.request_context)
+
+            # Act
+            result = role_controler.create_user_role()
+
+            # Assert
+            # assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
