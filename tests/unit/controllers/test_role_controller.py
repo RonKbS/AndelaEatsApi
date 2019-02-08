@@ -826,3 +826,23 @@ class TestRoleController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(PermissionRepo, 'get')
+    def test_delete_role_permission_when_permission_doesnot_exist(
+        self,
+        mock_permission_repo_get
+    ):
+        '''Test delete_role_permission when permission doesn't exist.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_permission_repo_get.return_value = None
+            role_controler = RoleController(self.request_context)
+
+            # Act
+            result = role_controler.delete_role_permission(1)
+
+            # Assert
+            assert result.status_code == 404
+            assert result.get_json()['msg'] == 'Invalid or incorrect ' \
+                'permission id provided'
