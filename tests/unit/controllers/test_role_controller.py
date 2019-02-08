@@ -497,3 +497,51 @@ class TestRoleController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'user_role deleted for user'
+
+    @patch.object(RoleController, 'request_params')
+    @patch.object(UserRoleRepo, 'get')
+    def test_disable_user_role_when_role_doesnot_exist(
+        self,
+        mock_user_role_repo_get,
+        mock_role_controller_request_params
+    ):
+        '''Test disable_user_role when the role doesnot exist.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_role_controller_request_params.return_value = 1
+            mock_user_role_repo_get.return_value = None
+            role_controler = RoleController(self.request_context)
+
+            # Act
+            result = role_controler.disable_user_role()
+
+            # Assert
+            assert result.status_code == 404
+            assert result.get_json()['msg'] == 'Invalid or incorrect ' \
+                'user_role_id provided'
+
+    @patch.object(UserRoleRepo, 'update')
+    @patch.object(RoleController, 'request_params')
+    @patch.object(UserRoleRepo, 'get')
+    def test_disable_user_role_ok_response(
+        self,
+        mock_user_role_repo_get,
+        mock_role_controller_request_params,
+        mock_user_role_repo_update
+    ):
+        '''Test disable_user_role OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_role_controller_request_params.return_value = 1
+            mock_user_role_repo_get.return_value = self.mock_user_role
+            mock_user_role_repo_update.return_value = self.mock_user_role
+            role_controler = RoleController(self.request_context)
+
+            # Act
+            result = role_controler.disable_user_role()
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'user_role disabled for user'
