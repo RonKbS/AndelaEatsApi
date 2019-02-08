@@ -19,10 +19,10 @@ class ActivityRepo(BaseRepo):
 	def get_range_action_paginated_options(self, action_type, start_date, end_date):
 		return Activity.query.filter(
 			Activity.action_type == action_type,
-			Activity.created_at >= start_date, Activity.created_add <= end_date
+			Activity.created_at >= start_date, Activity.created_at <= end_date
 		).order_by(Activity.created_at.desc()).paginate(error_out=False)
 
 	def get_range_paginated_options(self, start_date, end_date):
 		return Activity.query.filter(
-			Activity.created_at >= start_date, Activity.created_add <= end_date
+			Activity.created_at >= start_date, Activity.created_at <= end_date
 		).order_by(Activity.created_at.desc()).paginate(error_out=False)
