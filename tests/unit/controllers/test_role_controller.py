@@ -4,6 +4,7 @@ from datetime import datetime
 from unittest.mock import patch
 
 from app.controllers.role_controller import RoleController
+from app.models.permission import Permission
 from app.models.role import Role
 from app.models.user_role import UserRole
 from app.repositories.role_repo import RoleRepo
@@ -545,3 +546,58 @@ class TestRoleController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'user_role disabled for user'
+
+    @patch.object(PermissionRepo, 'get_unpaginated')
+    def test_get_role_permissions_ok_response(
+        self,
+        mock_permission_repo_get_unpaginated
+    ):
+        '''Test get_role_permissions OK response.
+        '''
+        # Arrange
+        mock_permission = Permission(
+            id=1,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
+            role_id=1,
+            name='Mock permission',
+            keyword='mock'
+        )
+        mock_permission_repo_get_unpaginated.return_value = [
+            mock_permission,
+        ]
+        role_controller = RoleController(self.request_context)
+
+        # Act
+        result = role_controller.get_role_permissions(1)
+
+        # Assert
+        assert result.status_code == 200
+        assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(PermissionRepo, 'filter_by')
+    def test_get_single_permission_ok_response(
+        self,
+        mock_permission_repo_filter_by
+    ):
+        '''Test get_single_permission OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_permission = Permission(
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                role_id=1,
+                name='Mock permission',
+                keyword='mock'
+            )
+            mock_permission_repo_filter_by.return_value = mock_permission
+            role_controler = RoleController(self.request_context)
+
+            # Act
+            result = role_controler.get_single_permission(1,1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
