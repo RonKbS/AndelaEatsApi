@@ -846,3 +846,33 @@ class TestRoleController(BaseTestCase):
             assert result.status_code == 404
             assert result.get_json()['msg'] == 'Invalid or incorrect ' \
                 'permission id provided'
+
+    @patch.object(PermissionRepo, 'get')
+    @patch.object(RoleRepo, 'update')
+    def test_delete_role_permission_ok_response(
+        self,
+        mock_role_repo_update,
+        mock_permission_repo_get
+    ):
+        '''Test delete_role_permission OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_permission = Permission(
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                role_id=1,
+                name='Mock permission',
+                keyword='mock'
+            )
+            mock_permission_repo_get.return_value = mock_permission
+            mock_role_repo_update.return_value = self.mock_role
+            role_controler = RoleController(self.request_context)
+
+            # Act
+            result = role_controler.delete_role_permission(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'permission deleted'
