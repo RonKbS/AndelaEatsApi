@@ -788,3 +788,41 @@ class TestRoleController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Permission with this name ' \
                 'already exists'
+
+    @patch.object(RoleRepo, 'update')
+    @patch.object(PermissionRepo, 'find_first')
+    @patch.object(RoleController, 'request_params')
+    @patch.object(PermissionRepo, 'get')
+    def test_update_permission_ok_response(
+        self,
+        mock_permission_repo_get,
+        mock_role_controller_request_params,
+        mock_permission_repo_find_first,
+        mock_role_repo_update
+    ):
+        '''Test update_permission when permission already updated.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_role_controller_request_params.return_value = (
+                1, 'name', 'keyword'
+            )
+            mock_permission = Permission(
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                role_id=1,
+                name='Mock permission',
+                keyword='mock'
+            )
+            mock_permission_repo_get.return_value = mock_permission
+            mock_permission_repo_find_first.return_value = None
+            mock_role_repo_update.return_value = self.mock_role
+            role_controler = RoleController(self.request_context)
+
+            # Act
+            result = role_controler.update_permission(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
