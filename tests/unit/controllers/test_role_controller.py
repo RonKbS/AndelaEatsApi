@@ -689,3 +689,41 @@ class TestRoleController(BaseTestCase):
             # Assert
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'This role does not exist'
+
+    @patch.object(PermissionRepo, 'new_permission')
+    @patch.object(RoleController, 'request_params')
+    @patch.object(PermissionRepo, 'get_unpaginated')
+    @patch.object(RoleRepo, 'get')
+    def test_create_role_permission_ok_response(
+        self,
+        mock_role_repo_get,
+        mock_permission_repo_get_unpaginated,
+        mock_role_controller_request_params,
+        mock_permission_repo_new_permission
+    ):
+        '''Test create_role_permission OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_permission = Permission(
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                role_id=1,
+                name='Mock permission',
+                keyword='mock'
+            )
+            mock_role_repo_get.return_value = self.mock_role
+            mock_permission_repo_get_unpaginated.return_value = None
+            mock_role_controller_request_params.return_value = (
+                1, 'name', 'keyword'
+            )
+            mock_permission_repo_new_permission.return_value = mock_permission
+            role_controller = RoleController(self.request_context)
+
+            # Act
+            result = role_controller.create_role_permission()
+
+            # Assert
+            assert result.status_code == 201
+            assert result.get_json()['msg'] == 'OK'
