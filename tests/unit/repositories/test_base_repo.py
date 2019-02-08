@@ -49,6 +49,77 @@ class TestBaseRepository(BaseTestCase):
 		
 		self.assertNotEqual(vendor_2.id, vendor_.id)
 
+	def test_fetch_all_method_returns_paginated_results(self):
+		vendor_1 = VendorFactory.create()
+		vendor_2 = VendorFactory.create()
+
+		paginated_result = self.repo.fetch_all()
+
+		self.assertEqual(len(paginated_result.items), 2)
+		self.assertEqual(paginated_result.items[0], vendor_1)
+		self.assertEqual(paginated_result.items[1], vendor_2)
+
+	def test_filter_all_method_returns_paginated_results(self):
+		vendor_1 = VendorFactory.create()
+		vendor_2 = VendorFactory.create()
+
+		paginated_result = self.repo.filter_all()
+
+		self.assertEqual(len(paginated_result.items), 2)
+		self.assertEqual(paginated_result.items[0], vendor_1)
+		self.assertEqual(paginated_result.items[1], vendor_2)
+
+	def test_filter_and_count_method_returns_correct_count(self):
+		vendor_1 = VendorFactory.create()
+		vendor_2 = VendorFactory.create()
+
+		result = self.repo.filter_and_count()
+
+		self.assertEqual(result, 2)
+
+	def test_filter_and_order_method_returns_correct_order(self):
+		vendor_1 = VendorFactory.create()
+		vendor_2 = VendorFactory.create()
+
+		result = self.repo.filter_and_order('created_at')
+
+		self.assertEqual(result.count(), 2)
+		self.assertNotEqual(result.first(), vendor_2)
+
+
+	def test_order_by_method_returns_correct_order(self):
+		vendor_1 = VendorFactory.create()
+		vendor_2 = VendorFactory.create()
+
+		result = self.repo.order_by('created_at')
+
+		self.assertEqual(result.count(), 2)
+		self.assertNotEqual(result.first(), vendor_2)
+
+	def test_paginate_method_returns_paginated_results(self):
+		vendor_1 = VendorFactory.create()
+		vendor_2 = VendorFactory.create()
+
+		paginated_result = self.repo.paginate()
+
+		self.assertEqual(len(paginated_result.items), 2)
+		self.assertEqual(paginated_result.items[0], vendor_1)
+		self.assertEqual(paginated_result.items[1], vendor_2)
+
+	def test_filter_method_returns_paginated_results(self):
+		vendor_1 = VendorFactory.create()
+		vendor_2 = VendorFactory.create()
+
+		paginated_result = self.repo.filter()
+
+		self.assertEqual(len(paginated_result.items), 2)
+		self.assertEqual(paginated_result.items[0], vendor_1)
+		self.assertEqual(paginated_result.items[1], vendor_2)
+
+
+
+
+
 
 		
 		
