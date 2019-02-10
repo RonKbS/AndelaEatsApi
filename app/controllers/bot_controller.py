@@ -508,7 +508,8 @@ class BotController(BaseController):
                     end_on = current_date + timedelta(days=6)
 
                 if current_date.strftime('%a') == 'Sun':
-                    start_on = current_date + timedelta(days=1)
+                    next_day = 1 if int(current_date.strftime('%H')) < 15 else 2
+                    start_on = current_date + timedelta(days=next_day)
                     end_on = current_date + timedelta(days=5)
 
         return tuple((start_on, end_on))
