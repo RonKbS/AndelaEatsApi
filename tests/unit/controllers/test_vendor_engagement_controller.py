@@ -353,3 +353,32 @@ class TestVendorEngagementController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Invalid or incorrect ' \
                 'engagement_id provided'
+
+    @patch.object(VendorEngagementController, 'request_params')
+    @patch.object(VendorEngagementRepo, 'get')
+    @patch.object(VendorEngagementRepo, 'update')
+    def test_update_vendor_engagement_ok_response(
+        self,
+        mock_update,
+        mock_get,
+        mock_request_params
+    ):
+        '''Test update_vendor_engagement when engagement is invalid.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_request_params.return_value = (
+                1, '2019-02-11', '2019-02-11', 'mock status', 'mock_reason'
+            )
+            mock_get.return_value = self.mock_vendor_engagement
+            mock_update.return_value = self.mock_vendor_engagement
+            vendor_engagement_controller = VendorEngagementController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_engagement_controller.update_vendor_engagement(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
