@@ -191,3 +191,24 @@ class TestVendorEngagementController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(VendorEngagementRepo, 'get')
+    def test_get_vendor_engagement_when_request_is_bad(
+        self,
+        mock_vendor_engagement_repo_get
+    ):
+        '''Test get_vendor_engagement when the request is bad.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_engagement_repo_get.return_value = None
+            vendor_engagement_controller = VendorEngagementController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_engagement_controller.get_vendor_engagement(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Bad Request'
