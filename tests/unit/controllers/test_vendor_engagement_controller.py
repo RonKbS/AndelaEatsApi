@@ -156,3 +156,38 @@ class TestVendorEngagementController(BaseTestCase):
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
 
+    @patch('app.utils.auth.Auth.get_location')
+    @patch.object(VendorEngagementRepo, 'get_engagement_by_date')
+    @patch.object(VendorEngagementController, 'pagination_meta')
+    def test_upcoming_vendor_engagements_ok_response(
+        self,
+        mock_pagination_meta,
+        mock_get_engagement_by_date,
+        mock_get_location
+    ):
+        '''Test update_vendor_engagements when the request is bad.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_pagination_meta.return_value = {
+                'total_rows': 1,
+                'total_pages': 1,
+                'current_page': 1,
+                'next_page': 1,
+                'prev_page': 1
+            }
+            mock_get_engagement_by_date.return_value.items = [
+                self.mock_vendor_engagement,
+            ]
+            mock_get_location.return_value = 1
+            vendor_engagement_controller = VendorEngagementController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_engagement_controller \
+                .upcoming_vendor_engagements()
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
