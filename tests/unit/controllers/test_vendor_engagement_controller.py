@@ -98,3 +98,25 @@ class TestVendorEngagementController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Invalid Vendor'
 
+    @patch.object(VendorRepo, 'get')
+    def test_list_vendor_engagements_by_vendor_when_vendor_is_disabled(
+        self,
+        mock_vendor_repo_get
+    ):
+        '''Test list_vendor_engagements when vendor is disabled.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_repo_get.return_value.is_active = False
+            vendor_engagement_controller = VendorEngagementController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_engagement_controller. \
+                list_vendor_engagements_by_vendor(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Vendor is disabled'
+
