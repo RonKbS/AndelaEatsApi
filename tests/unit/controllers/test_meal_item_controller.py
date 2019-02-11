@@ -335,3 +335,22 @@ class TestMealItemController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(MealItemRepo, 'get')
+    def test_delete_meal_when_meal_doesnot_exist(
+        self,
+        mock_get
+    ):
+        '''Test delete_meal when meal item doesnot exist.
+        '''
+        with self.app.app_context():
+            mock_get.return_value = None
+            meal_item_controller = MealItemController(self.request_context)
+
+            # Act
+            result = meal_item_controller.delete_meal(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Invalid or incorrect meal_id' \
+                ' provided'
