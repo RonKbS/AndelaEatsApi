@@ -120,3 +120,39 @@ class TestVendorEngagementController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Vendor is disabled'
 
+    @patch.object(VendorEngagementController, 'pagination_meta')
+    @patch.object(VendorRepo, 'get')
+    @patch.object(VendorEngagementRepo, 'filter_by')
+    def test_list_vendor_engagements_by_vendor_ok_response(
+        self,
+        mock_vendor_engagement_repo_filter_by,
+        mock_vendor_repo_get,
+        mock_pagination_meta
+    ):
+        '''Test list_vendor_engagements OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_engagement_repo_filter_by.return_value.items = [
+                self.mock_vendor_engagement,
+            ]
+            mock_vendor_repo_get.return_value = self.mock_vendor
+            mock_pagination_meta.return_value = {
+                'total_rows': 1,
+                'total_pages': 1,
+                'current_page': 1,
+                'next_page': 1,
+                'prev_page': 1
+            }
+            vendor_engagement_controller = VendorEngagementController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_engagement_controller \
+                .list_vendor_engagements_by_vendor(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
+
