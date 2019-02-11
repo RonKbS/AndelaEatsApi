@@ -261,3 +261,26 @@ class TestMealItemController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Invalid or incorrect meal_id' \
                 ' provided'
+
+    @patch.object(MealItemController, 'request_params')
+    @patch.object(MealItemRepo, 'get')
+    def test_update_meal_when_meal_is_deleted(
+        self,
+        mock_get,
+        mock_request_params
+    ):
+        '''Test update_meal when the meal is deleted.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get.return_value = self.mock_deleted_meal_item
+            mock_request_params.return_value = ('Mock', 'Mock', 'Mock', 'Mock')
+            meal_item_controller = MealItemController(self.request_context)
+
+            # Act
+            result = meal_item_controller.update_meal(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Bad Request. This meal item ' \
+                'is deleted'
