@@ -310,3 +310,28 @@ class TestMealItemController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Meal item with this name ' \
                 'already exists'
+
+    @patch.object(MealItemController, 'request_params')
+    @patch.object(MealItemRepo, 'get')
+    @patch.object(MealItemRepo, 'get_unpaginated')
+    def test_update_meal_ok_response(
+        self,
+        mock_get_unpaginated,
+        mock_get,
+        mock_request_params
+    ):
+        '''Test update_meal OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get.return_value = self.mock_meal_item
+            mock_request_params.return_value = ('mock', 'mock', 'mock', 'mock')
+            mock_get_unpaginated.return_value = None
+            meal_item_controller = MealItemController(self.request_context)
+
+            # Act
+            result = meal_item_controller.update_meal(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
