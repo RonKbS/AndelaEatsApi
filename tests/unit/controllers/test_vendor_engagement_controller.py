@@ -234,3 +234,33 @@ class TestVendorEngagementController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(VendorEngagementController, 'request_params')
+    @patch.object(VendorRepo, 'get')
+    @patch.object(VendorEngagementRepo, 'get_existing_engagement')
+    def test_create_vendor_engagement_when_engagement_already_exists(
+        self,
+        mock_get_existing_engagement,
+        mock_get,
+        mock_request_params
+    ):
+        '''Test create_vendor_engagement when engagement already exists.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_request_params.return_value = (
+                1, '2019-02-11', '2019-02-11', 'mock status'
+            )
+            mock_get.return_value = self.mock_vendor
+            mock_get_existing_engagement.return_value = 1
+            vendor_engagement_controller = VendorEngagementController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_engagement_controller.create_vendor_engagement()
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'An engagement already exists' \
+                ' for this period. Kindly disable engagement first.'
