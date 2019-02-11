@@ -24,6 +24,16 @@ class TestMealItemController(BaseTestCase):
             image='Mock image',
             location_id=1
         )
+        self.mock_deleted_meal_item = MealItem(
+            is_deleted=True,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
+            meal_type='Mock meal type',
+            name='Mock meal item',
+            description='Mock description',
+            image='Mock image',
+            location_id=1
+        )
 
     @patch.object(MealItemRepo, 'get_unpaginated')
     @patch('app.Auth.get_location')
@@ -73,6 +83,65 @@ class TestMealItemController(BaseTestCase):
 
             # Act
             result = meal_item_controller.list_meals_page(1, 10)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(MealItemRepo, 'get')
+    def test_get_meal_when_meal_item_doesnot_exist(
+        self,
+        mock_get
+    ):
+        '''Test get_meal when meal item doesn't exist.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get.return_value = None
+            meal_item_controller = MealItemController(self.request_context)
+
+            # Act
+            result = meal_item_controller.get_meal(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Bad Request. This meal id ' \
+                'does not exist'
+
+    @patch.object(MealItemRepo, 'get')
+    def test_get_meal_when_meal_is_deleted(
+        self,
+        mock_get
+    ):
+        '''Test get_meal when meal is deleted.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get.return_value = self.mock_deleted_meal_item
+            meal_item_controller = MealItemController(self.request_context)
+
+            # Act
+            result = meal_item_controller.get_meal(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Bad Request. This meal item' \
+                ' is deleted'
+
+    @patch.object(MealItemRepo, 'get')
+    def test_get_meal_ok_response(
+        self,
+        mock_get
+    ):
+        '''Test get_meal OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get.return_value = self.mock_meal_item
+            meal_item_controller = MealItemController(self.request_context)
+
+            # Act
+            result = meal_item_controller.get_meal(1)
 
             # Assert
             assert result.status_code == 200
