@@ -174,3 +174,34 @@ class TestMealItemController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Meal item with this name ' \
                 'already exists'
+
+    @patch.object(MealTypes, 'has_value')
+    @patch('app.Auth.get_location')
+    @patch.object(MealItemController, 'request_params')
+    @patch.object(MealItemRepo, 'get_unpaginated')
+    def test_create_meal_when_meal_type_doesnot_exist(
+        self,
+        mock_get_unpaginated,
+        mock_request_params,
+        mock_get_location,
+        mock_has_value
+    ):
+        '''Test create_meal when the meal type doesnot exists.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_request_params.return_value = (
+                'Mock', 'Mock', 'Mock', 'Mock'
+            )
+            mock_get_unpaginated.return_value = None
+            mock_get_location.return_value = 1
+            mock_has_value.return_value = False
+            meal_item_controller = MealItemController(self.request_context)
+
+            # Act
+            result = meal_item_controller.create_meal()
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Invalid meal type. Must be' \
+                ' main, protein or side'
