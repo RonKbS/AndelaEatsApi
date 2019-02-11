@@ -489,13 +489,23 @@ class TestVendorEngagementController(BaseTestCase):
             assert result.get_json()['msg'] == 'This engagement cannot be' \
                 ' deleted because it has a child object'
 
-    # @patch.object(VendorEngagementRepo, 'get')
-    # def test_delete_engagement_ok_response(
-    #     self,
-    #     mock_get
-    # ):
-    #     '''Test delete_engagement OK response.
-    #     '''
-    #     # Arrange
-    #     with self.app.app_context():
-    #         mock_get.return_value = self.mock_vendor_engagement
+    @patch.object(VendorEngagementRepo, 'get')
+    def test_delete_engagement_ok_response(
+        self,
+        mock_get
+    ):
+        '''Test delete_engagement OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get.return_value = self.mock_vendor_engagement_no_child
+            vendor_engagement_controller = VendorEngagementController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_engagement_controller.delete_engagement(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'Engagement deleted'
