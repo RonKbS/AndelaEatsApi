@@ -26,7 +26,9 @@ class TestAuth(BaseTestCase):
     def test_current_time_by_time_zone_negative_timezone(self):
         resp = current_time_by_zone('-4')
 
-        self.assertEqual(resp.hour, datetime.utcnow().hour - 4)
+        raw_utc = datetime.utcnow().hour - 4
+        result = raw_utc if raw_utc < 24 else raw_utc + 24
+        self.assertEqual(resp.hour, result)
 
     def test_check_date_current_vs_date_for_invalid(self):
         d1 = datetime.strptime('2019-01-01', '%Y-%m-%d')
