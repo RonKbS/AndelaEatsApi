@@ -382,3 +382,47 @@ class TestVendorEngagementController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(VendorEngagementRepo, 'get')
+    def test_delete_engagement_when_engagement_is_invalid(
+        self,
+        mock_get
+    ):
+        '''Test delete_engagement when engagement is already deleted.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get.return_value = None
+            vendor_engagement_controller = VendorEngagementController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_engagement_controller.delete_engagement(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Invalid or incorrect' \
+                ' engagement_id provided'
+
+    @patch.object(VendorEngagementRepo, 'get')
+    def test_delete_engagement_when_engagement_already_deleted(
+        self,
+        mock_get
+    ):
+        '''Test delete_engagement when engagement is already deleted.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get.return_value.is_deleted = True
+            vendor_engagement_controller = VendorEngagementController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_engagement_controller.delete_engagement(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'This engagement has already' \
+                ' been deleted'
