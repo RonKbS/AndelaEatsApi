@@ -374,3 +374,25 @@ class TestMealItemController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Bad Request. This meal item' \
                 ' is deleted'
+
+    @patch.object(MealItemRepo, 'get')
+    @patch.object(MealItemRepo, 'update')
+    def test_delete_meal_ok_response(
+        self,
+        mock_update,
+        mock_get
+    ):
+        '''Test delete_meal OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get.return_value = self.mock_meal_item
+            mock_update.return_value = self.mock_meal_item
+            meal_item_controller = MealItemController(self.request_context)
+
+            # Act
+            result = meal_item_controller.delete_meal(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
