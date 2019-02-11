@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from app.controllers.vendor_engagement_controller import \
     VendorEngagementController
+from app.models.menu import Menu
 from app.models.vendor import Vendor
 from app.models.vendor_engagement import VendorEngagement
 from app.repositories.vendor_engagement_repo import VendorEngagementRepo
@@ -29,6 +30,45 @@ class TestVendorEngagementController(BaseTestCase):
             location_id=1
         )
         self.mock_vendor_engagement = VendorEngagement(
+            id=1,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
+            vendor_id=1,
+            location_id=1,
+            start_date=datetime.now(),
+            end_date=datetime.now(),
+            status=1,
+            termination_reason='Mock reason',
+            vendor=self.mock_vendor
+        )
+        self.mock_menu = Menu(
+            is_deleted=False,
+            date=datetime.now(),
+            meal_period='',
+            location_id=1,
+            main_meal_id=1,
+            allowed_side=1,
+            allowed_protein=1,
+            side_items='',
+            protein_items='',
+            vendor_engagement_id=1,
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
+        self.mock_vendor_engagement = VendorEngagement(
+            id=1,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
+            vendor_id=1,
+            location_id=1,
+            start_date=datetime.now(),
+            end_date=datetime.now(),
+            status=1,
+            termination_reason='Mock reason',
+            vendor=self.mock_vendor,
+            menus=[self.mock_menu, ]
+        )
+        self.mock_vendor_engagement_no_child = VendorEngagement(
             id=1,
             created_at=datetime.now(),
             updated_at=datetime.now(),
@@ -426,3 +466,36 @@ class TestVendorEngagementController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'This engagement has already' \
                 ' been deleted'
+
+    @patch.object(VendorEngagementRepo, 'get')
+    def test_delete_engagement_when_engagement_has_child(
+        self,
+        mock_get
+    ):
+        '''Test delete_engagement when engagement has a child.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get.return_value = self.mock_vendor_engagement
+            vendor_engagement_controller = VendorEngagementController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_engagement_controller.delete_engagement(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'This engagement cannot be' \
+                ' deleted because it has a child object'
+
+    # @patch.object(VendorEngagementRepo, 'get')
+    # def test_delete_engagement_ok_response(
+    #     self,
+    #     mock_get
+    # ):
+    #     '''Test delete_engagement OK response.
+    #     '''
+    #     # Arrange
+    #     with self.app.app_context():
+    #         mock_get.return_value = self.mock_vendor_engagement
