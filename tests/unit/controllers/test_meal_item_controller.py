@@ -284,3 +284,29 @@ class TestMealItemController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Bad Request. This meal item ' \
                 'is deleted'
+
+    @patch.object(MealItemController, 'request_params')
+    @patch.object(MealItemRepo, 'get')
+    @patch.object(MealItemRepo, 'get_unpaginated')
+    def test_update_meal_when_name_already_exists(
+        self,
+        mock_get_unpaginated,
+        mock_get,
+        mock_request_params
+    ):
+        '''Test update_meal when meal name already exists.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_request_params.return_value = ('mock', 'mock', 'mock', 'mock')
+            mock_get.return_value = self.mock_meal_item
+            mock_get_unpaginated.return_value = self.mock_meal_item
+            meal_item_controller = MealItemController(self.request_context)
+
+            # Act
+            result = meal_item_controller.update_meal(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Meal item with this name ' \
+                'already exists'
