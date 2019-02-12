@@ -87,7 +87,7 @@ class TestOrderController(BaseTestCase):
            '.get_range_paginated_options_all')
     @patch('app.repositories.order_repo.OrderRepo.get')
     @patch('app.services.andela.AndelaService.get_user_by_email_or_id')
-    def test_list_orders_date_ok_response(
+    def test_list_orders_date_range_ok_response(
         self,
         mock_get_user_by_email_or_id,
         mock_get,
