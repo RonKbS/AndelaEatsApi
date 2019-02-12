@@ -4,6 +4,7 @@ from datetime import datetime, date
 from unittest.mock import patch
 
 from app.controllers.order_controller import OrderController
+from app.models.location import Location
 from app.models.order import Order
 from app.models.meal_item import MealItem
 from tests.base_test_case import BaseTestCase
@@ -299,3 +300,50 @@ class TestOrderController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'You have already booked for ' \
                 'this meal period.'
+
+    @patch('app.utils.auth.Auth.user')
+    @patch('app.utils.auth.Auth.get_location')
+    @patch('app.controllers.order_controller.OrderController.request_params')
+    @patch('app.repositories.order_repo.OrderRepo.user_has_order')
+    @patch('app.repositories.location_repo.LocationRepo.get')
+    @patch('app.utils.current_time_by_zone')
+    def test_create_order_when_date_booked_is_in_past(
+        self,
+        mock_current_time_by_zone,
+        mock_get,
+        mock_user_has_order,
+        mock_request_params,
+        mock_get_location,
+        mock_user
+    ):
+        '''Test create_date when the date booked is in the past.
+        '''
+        mock_user.return_value = {
+            'id': 1,
+            'mail': 'joseph@mail.com',
+            'first_name': 'Joseph',
+            'last_name': 'Serunjogi'
+        }
+        mock_get_location.return_value = 1
+        mock_request_params.return_value = (
+            '2019-02-01', 'web', 'lunch', [self.mock_meal_item, ], 1
+        )
+        mock_user_has_order.return_value = False
+        mock_get.return_value = Location(
+            id=1,
+            created_at=datetime.now,
+            updated_at=datetime.now(),
+            is_deleted=False,
+            name='mock',
+            zone='+3'
+        )
+        mock_current_time_by_zone.return_value = '2019-02-11'
+        order_controller = OrderController(self.request_context)
+
+        # Act
+        result = order_controller.create_order()
+
+        # Assert
+        assert result.status_code == 400
+        assert result.get_json()['msg'] == 'You are not allowed to book for ' \
+            'a date in the past'
