@@ -48,36 +48,6 @@ class BotController(BaseController):
         if payload['type'] == 'dialog_submission':
             slack_user_info = self.slackhelper.user_info(slack_id)
             slack_user_email = slack_user_info['user']['profile']['email']
-            slack_user_fname = slack_user_info['user']['profile']['first_name']
-            slack_user_lname = slack_user_info['user']['profile']['last_name']
-
-            if payload['callback_id'] == 'location_period_selector':
-                self.post_params('payload', 'trigger_id')
-
-                location_id = int(payload['submission']['location'])
-                meal_period = payload['submission']['meal_period']
-
-                location = LocationRepo().get(location_id)
-                menu_start_end_on = BotController.get_menu_start_end_on(location)
-                start_on = menu_start_end_on[0]
-                end_on = menu_start_end_on[1]
-
-                date_options = [{
-                    'label': '{}, {}'.format(day.strftime('%a'), day.strftime('%b %-d')),
-                    'value': '{}_{}_{}'.format(day.strftime('%Y-%m-%d'), location.id, meal_period)} for day in
-                    daterange(start_on, end_on)]
-
-                dialog_element = [
-                    {
-                        "label": "Select Date",
-                        "type": "select",
-                        "name": "selected_date",
-                        "options": date_options
-                    },
-                ]
-
-                self.create_dialog(dialog_elem=dialog_element, trigger_id=trigger_id, title='Select Date',
-                                   callback_id='date_selector')
 
             if payload['callback_id'] == 'final_selection':
 

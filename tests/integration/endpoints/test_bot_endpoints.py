@@ -1,8 +1,10 @@
+import json
 from unittest.mock import Mock, patch
 from datetime import datetime
 from tests.base_test_case import BaseTestCase
 from app.controllers import BotController
-from factories import LocationFactory
+from factories import LocationFactory, MenuFactory
+from tests.mock import center_selected
 
 
 class TestBotEndpoints(BaseTestCase):
@@ -10,6 +12,7 @@ class TestBotEndpoints(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
         self.bot_controller = BotController(self.request_context)
+        self.menu_factory = MenuFactory
 
     def test_bot(self):
         with self.app.app_context():
@@ -22,7 +25,6 @@ class TestBotEndpoints(BaseTestCase):
             self.assertEqual(response_json['attachments'][0]['callback_id'], 'center_selector')
             self.assertEqual(response_json['attachments'][0]['attachment_type'], 'default')
             self.assertEqual(len(response_json['attachments'][0]['actions']), 0)
-
 
     @patch('app.controllers.bot_controller.current_time_by_zone')
     def test_get_menu_start_end_on_before_3pm_sunday(self, mock_get):
@@ -50,6 +52,7 @@ class TestBotEndpoints(BaseTestCase):
         mock_get.return_value = datetime.strptime('2019-02-11', '%Y-%m-%d')
 
         result = self.bot_controller.get_menu_start_end_on(LocationFactory.build())
+
 
         self.assertEqual(type(result), tuple)
         self.assertEqual(result[0], datetime(2019, 2, 12, 0, 0))
