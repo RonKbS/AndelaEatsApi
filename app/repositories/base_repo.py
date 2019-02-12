@@ -1,3 +1,4 @@
+from sqlalchemy import desc, asc
 
 class BaseRepo:
 	
@@ -45,6 +46,16 @@ class BaseRepo:
 		"""Query and filter the data of the model."""
 		#return self._model.query.filter_by(is_deleted=False).paginate(**kwargs, error_out=False)
 		return self._model.query.filter_by(**kwargs).paginate(error_out=False)
+
+	def filter_by_desc(self, *args, **kwargs):
+		"""Query and filter the data of the model in descending order"""
+		return self._model.query.filter_by(**kwargs).order_by(desc(*args)) \
+			.paginate(error_out=False)
+
+	def filter_by_asc(self, *args, **kwargs):
+		"""Query and filter the data of the model in ascending order"""
+		return self._model.query.filter_by(**kwargs).order_by(asc(*args)) \
+			.paginate(error_out=False)
 
 	def get_unpaginated(self, **kwargs):
 		"""Query and filter the data of the model."""

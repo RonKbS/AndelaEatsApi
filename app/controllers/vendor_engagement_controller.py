@@ -16,7 +16,10 @@ class VendorEngagementController(BaseController):
 	def list_vendor_engagements(self):
 		location = Auth.get_location()
 
-		engagements = self.vendor_engagement_repo.filter_by(is_deleted=False, location_id=location)
+		engagements = self.vendor_engagement_repo.filter_by_desc(
+			self.vendor_engagement_repo._model.start_date,
+			is_deleted=False, location_id=location
+		)
 
 		engagements_list = []
 		for e in engagements.items:
