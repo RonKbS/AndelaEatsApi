@@ -516,3 +516,39 @@ class TestOrderController(BaseTestCase):
             # Assert
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Order has already been deleted'
+
+    @patch('app.controllers.order_controller.OrderController.request_params')
+    @patch('app.repositories.meal_item_repo.MealItemRepo.get')
+    @patch('app.repositories.order_repo.OrderRepo.get')
+    @patch('app.controllers.order_controller.datetime')
+    def test_update_order_when_updated_booking_is_late(
+        self,
+        mock_datetime,
+        mock_order_repo_get,
+        mock_meal_item_repo_get,
+        mock_request_params
+    ):
+        '''Test update_order when the updated booking is late.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_datetime.now = Mock(
+                return_value=datetime(2019, 2, 12, 15, 45, 0)
+            )
+            mock_datetime.strptime = Mock(
+                return_value=datetime(2019, 2, 12, 15, 45, 0)
+            )
+            mock_request_params.return_value = (
+                '2019-02-12', 'web', []
+            )
+            mock_meal_item_repo_get.return_value = [self.mock_meal_item, ]
+            mock_order_repo_get.return_value = self.mock_order
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.update_order(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'It is too late to book meal ' \
+                'for the selected date '
