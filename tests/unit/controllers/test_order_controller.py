@@ -263,3 +263,39 @@ class TestOrderController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch('app.utils.auth.Auth.user')
+    @patch('app.utils.auth.Auth.get_location')
+    @patch('app.controllers.order_controller.OrderController.request_params')
+    @patch('app.repositories.order_repo.OrderRepo.user_has_order')
+    def test_create_order_when_meal_period_is_already_booked(
+        self,
+        mock_user_has_order,
+        mock_request_params,
+        mock_get_location,
+        mock_user
+    ):
+        '''Test create_order when meal period is already booked.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_user.return_value = {
+                'id': 1,
+                'mail': 'joseph@mail.com',
+                'first_name': 'Joseph',
+                'last_name': 'Serunjogi'
+            }
+            mock_get_location.return_value = 1
+            mock_request_params.return_value = (
+                '2019-02-01', 'web', 'lunch', [self.mock_meal_item, ], 1
+            )
+            mock_user_has_order.return_value = True
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.create_order()
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'You have already booked for ' \
+                'this meal period.'
