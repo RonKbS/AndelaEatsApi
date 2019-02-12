@@ -401,3 +401,63 @@ class TestOrderController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'It is too late to book a ' \
                 'meal for the selected date '
+
+    @patch('app.Auth.user')
+    @patch('app.Auth.get_location')
+    @patch('app.controllers.order_controller.OrderController.request_params')
+    @patch('app.repositories.order_repo.OrderRepo.user_has_order')
+    @patch('app.repositories.location_repo.LocationRepo.get')
+    @patch('app.utils.check_date_current_vs_date_for')
+    @patch('app.utils.datetime')
+    @patch('app.repositories.meal_item_repo.MealItemRepo'
+           '.get_meal_items_by_ids')
+    @patch('app.repositories.order_repo.OrderRepo.create_order')
+    def test_create_order_ok_response(
+        self,
+        mock_create_order,
+        mock_get_meals_by_ids,
+        mock_datetime,
+        mock_check_date_current_vs_date_for,
+        mock_location_repo_get,
+        mock_user_has_order,
+        mock_request_params,
+        mock_get_location,
+        mock_auth_user
+    ):
+        '''Test create_order OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_datetime.utcnow = Mock(
+                return_value=datetime(2019, 2, 13, 9, 0, 0)
+            )
+            mock_auth_user.return_value = {
+                'id': 1,
+                'mail': 'joseph@mail.com',
+                'first_name': 'Joseph',
+                'last_name': 'Serunjogi'
+            }
+            mock_get_location.return_value = 1
+            mock_request_params.return_value = (
+                '2019-02-13', 'web', 'lunch', [self.mock_meal_item, ], 1
+            )
+            mock_user_has_order.return_value = False
+            mock_location_repo_get.return_value = Location(
+                id=1,
+                created_at=datetime.now,
+                updated_at=datetime.now(),
+                is_deleted=False,
+                name='mock',
+                zone='+3'
+            )
+            mock_check_date_current_vs_date_for.return_value = False
+            mock_get_meals_by_ids.return_value = [self.mock_meal_item, ]
+            mock_create_order.return_value = self.mock_order
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.create_order()
+
+            # Assert
+            assert result.status_code == 201
+            assert result.get_json()['msg'] == 'OK'
