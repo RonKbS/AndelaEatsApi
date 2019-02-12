@@ -1,7 +1,7 @@
 '''Unit tests for the OrderController.
 '''
 from datetime import datetime, date
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from app.controllers.order_controller import OrderController
 from app.models.location import Location
@@ -324,7 +324,7 @@ class TestOrderController(BaseTestCase):
             'first_name': 'Joseph',
             'last_name': 'Serunjogi'
         }
-        mock_get_location.return_value = 1
+        mock_get_location.return_value = Mock()
         mock_request_params.return_value = (
             '2019-02-01', 'web', 'lunch', [self.mock_meal_item, ], 1
         )
@@ -337,7 +337,7 @@ class TestOrderController(BaseTestCase):
             name='mock',
             zone='+3'
         )
-        mock_current_time_by_zone.return_value = '2019-02-11'
+        mock_current_time_by_zone.return_value = Mock()
         order_controller = OrderController(self.request_context)
 
         # Act
