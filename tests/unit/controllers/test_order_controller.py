@@ -10,10 +10,6 @@ from app.models.meal_item import MealItem
 from tests.base_test_case import BaseTestCase
 
 
-def mocked_current_time_by_zone(self):
-    return datetime(2019, 2, 12, 16, 00, 00)
-
-
 class TestOrderController(BaseTestCase):
 
     def setUp(self):
@@ -357,15 +353,12 @@ class TestOrderController(BaseTestCase):
     @patch('app.controllers.order_controller.OrderController.request_params')
     @patch('app.repositories.order_repo.OrderRepo.user_has_order')
     @patch('app.repositories.location_repo.LocationRepo.get')
-    @patch(
-        'app.utils.current_time_by_zone',
-        side_effect='mocked_current_time_by_zone'
-    )
     @patch('app.utils.check_date_current_vs_date_for')
+    @patch('app.utils.datetime')
     def test_create_order_when_booked_late(
         self,
+        mock_datetime,
         mock_check_date_current_vs_date_for,
-        mock_current_time_by_zone,
         mock_location_repo_get,
         mock_user_has_order,
         mock_request_params,
@@ -376,6 +369,9 @@ class TestOrderController(BaseTestCase):
         '''
         # Arrange
         with self.app.app_context():
+            mock_datetime.utcnow = Mock(
+                return_value=datetime(2019, 2, 13, 16, 0, 0)
+            )
             mock_auth_user.return_value = {
                 'id': 1,
                 'mail': 'joseph@mail.com',
@@ -404,4 +400,4 @@ class TestOrderController(BaseTestCase):
             # Assert
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'It is too late to book a ' \
-                'meal for the selected date'
+                'meal for the selected date '
