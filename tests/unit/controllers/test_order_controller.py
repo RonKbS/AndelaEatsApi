@@ -347,3 +347,49 @@ class TestOrderController(BaseTestCase):
         assert result.status_code == 400
         assert result.get_json()['msg'] == 'You are not allowed to book for ' \
             'a date in the past'
+
+    @patch('app.Auth.user')
+    @patch('app.Auth.get_location')
+    @patch('app.controllers.order_controller.OrderController.request_params')
+    @patch('app.repositories.order_repo.OrderRepo.user_has_order')
+    @patch('app.repositories.location_repo.LocationRepo.get')
+    @patch('app.utils.current_time_by_zone')
+    @patch('app.utils.check_date_current_vs_date_for')
+    def test_create_order_when_booked_late(
+        self,
+        mock_check_date_current_vs_date_for,
+        mock_current_time_by_zone,
+        mock_location_repo_get,
+        mock_user_has_order,
+        mock_request_params,
+        mock_get_location,
+        mock_auth_user
+    ):
+        '''Testing create_order when booked late.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_auth_user.return_value = {
+                'id': 1,
+                'mail': 'joseph@mail.com',
+                'first_name': 'Joseph',
+                'last_name': 'Serunjogi'
+            }
+            mock_get_location.return_value = 1
+            mock_request_params.return_value = (
+                '2019-02-12', 'web', 'lunch', [self.mock_meal_item, ], 1
+            )
+            mock_user_has_order.return_value = False
+            mock_location_repo_get.return_value = Mock()
+            mock_datetime = datetime(2019, 2, 12, 16, 00, 00)
+            mock_current_time_by_zone.return_value = mock_datetime
+            mock_check_date_current_vs_date_for.return_value = True
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.create_order()
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'It is too late to book a ' \
+                'meal for the selected date'
