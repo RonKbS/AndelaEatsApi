@@ -228,3 +228,38 @@ class TestOrderController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch('app.repositories.order_repo.OrderRepo'
+           '.get_range_paginated_options')
+    @patch('app.repositories.order_repo.OrderRepo.get')
+    @patch('app.services.andela.AndelaService.get_user_by_email_or_id')
+    def test_get_order_by_user_id_date_range_ok_response(
+        self,
+        mock_get_user_by_email_or_id,
+        mock_get,
+        mock_get_range_paginated_options
+    ):
+        '''Test get_order_user_id_date_range OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get_range_paginated_options.return_value.items = [
+                self.mock_order,
+            ]
+            mock_get.return_value.meal_item_orders = [self.mock_meal_item, ]
+            mock_get_user_by_email_or_id.return_value = {
+                'id': 1,
+                'mail': 'joseph@mail.com',
+                'first_name': 'Joseph',
+                'last_name': 'Serunjogi'
+            }
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.get_order_by_user_id_date_range(
+                1, '2019-01-11', '2019-02-11'
+            )
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
