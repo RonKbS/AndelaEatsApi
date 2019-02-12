@@ -10,6 +10,10 @@ from app.models.meal_item import MealItem
 from tests.base_test_case import BaseTestCase
 
 
+def mocked_current_time_by_zone(self):
+    return datetime(2019, 2, 12, 16, 00, 00)
+
+
 class TestOrderController(BaseTestCase):
 
     def setUp(self):
@@ -353,7 +357,10 @@ class TestOrderController(BaseTestCase):
     @patch('app.controllers.order_controller.OrderController.request_params')
     @patch('app.repositories.order_repo.OrderRepo.user_has_order')
     @patch('app.repositories.location_repo.LocationRepo.get')
-    @patch('app.utils.current_time_by_zone')
+    @patch(
+        'app.utils.current_time_by_zone',
+        side_effect='mocked_current_time_by_zone'
+    )
     @patch('app.utils.check_date_current_vs_date_for')
     def test_create_order_when_booked_late(
         self,
@@ -377,12 +384,17 @@ class TestOrderController(BaseTestCase):
             }
             mock_get_location.return_value = 1
             mock_request_params.return_value = (
-                '2019-02-12', 'web', 'lunch', [self.mock_meal_item, ], 1
+                '2019-02-13', 'web', 'lunch', [self.mock_meal_item, ], 1
             )
             mock_user_has_order.return_value = False
-            mock_location_repo_get.return_value = Mock()
-            mock_datetime = datetime(2019, 2, 12, 16, 00, 00)
-            mock_current_time_by_zone.return_value = mock_datetime
+            mock_location_repo_get.return_value = Location(
+                id=1,
+                created_at=datetime.now,
+                updated_at=datetime.now(),
+                is_deleted=False,
+                name='mock',
+                zone='+3'
+            )
             mock_check_date_current_vs_date_for.return_value = True
             order_controller = OrderController(self.request_context)
 
@@ -393,4 +405,3 @@ class TestOrderController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'It is too late to book a ' \
                 'meal for the selected date'
-
