@@ -116,6 +116,30 @@ class TestBaseRepository(BaseTestCase):
 		self.assertEqual(paginated_result.items[0], vendor_1)
 		self.assertEqual(paginated_result.items[1], vendor_2)
 
+	def test_filter_by_asc_method_returns_ascending_ordered_results(self):
+		vendor_1 = VendorFactory.create()
+		vendor_2 = VendorFactory.create()
+
+		vendor_names = sorted([vendor.name for vendor in [vendor_1, vendor_2]])
+
+		results = self.repo.filter_by_asc(Vendor.name)
+
+		self.assertEqual(vendor_names[0], results.items[0].name)
+		self.assertEqual(vendor_names[1], results.items[1].name)
+
+	def test_filter_by_desc_method_returns_descending_ordered_results(self):
+		vendor_1 = VendorFactory.create()
+		vendor_2 = VendorFactory.create()
+
+		vendor_names = sorted(
+			[vendor.name for vendor in [vendor_1, vendor_2]],
+			reverse=True
+		)
+
+		results = self.repo.filter_by_desc(Vendor.name)
+		self.assertEqual(vendor_names[0], results.items[0].name)
+		self.assertEqual(vendor_names[1], results.items[1].name)
+
 
 
 
