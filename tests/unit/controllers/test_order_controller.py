@@ -152,3 +152,22 @@ class TestOrderController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch('app.repositories.order_repo.OrderRepo.get')
+    def test_get_order_when_order_doesnot_exist(
+        self,
+        mock_get
+    ):
+        '''Test get_order when order doesnot exist.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get.return_value = None
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.get_order(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Order not found'
