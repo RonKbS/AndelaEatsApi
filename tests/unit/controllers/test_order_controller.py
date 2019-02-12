@@ -171,3 +171,30 @@ class TestOrderController(BaseTestCase):
             # Assert
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Order not found'
+
+    @patch('app.repositories.order_repo.OrderRepo.get')
+    @patch('app.services.andela.AndelaService.get_user_by_email_or_id')
+    def test_get_order_ok_response(
+        self,
+        mock_get_user_by_email_or_id,
+        mock_get
+    ):
+        '''Test get_order OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get.return_value = self.mock_order
+            mock_get_user_by_email_or_id.return_value = {
+                'id': 1,
+                'mail': 'joseph@mail.com',
+                'first_name': 'Joseph',
+                'last_name': 'Serunjogi'
+            }
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.get_order(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
