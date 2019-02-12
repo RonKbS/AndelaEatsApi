@@ -393,3 +393,4 @@ class TestOrderController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'It is too late to book a ' \
                 'meal for the selected date'
+
