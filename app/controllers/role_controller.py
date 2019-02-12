@@ -118,8 +118,9 @@ class RoleController(BaseController):
 		return self.handle_response('OK', payload={'role_id': role_id, 'role_permissions': perm_list})
 
 	def get_single_permission(self, role_id, permission_id):
-		permission = self.permission_repo.filter_by(role_id=role_id, permission_id=permission_id)
-		return self.handle_response('OK', payload={'permission': permission.serialize()})
+		permission = self.permission_repo.filter_by(role_id=role_id, id=permission_id)
+		permissions = [permission.serialize() for permission in permission.items]
+		return self.handle_response('OK', payload={'permission': permissions})
 
 	def get_all_permissions(self):
 		permissions = self.permission_repo.get_unpaginated()

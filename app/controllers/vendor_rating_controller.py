@@ -58,6 +58,8 @@ class VendorRatingController(BaseController):
 
         if self.vendor_repo.get(vendor_id):
 
+            service_date = datetime.strptime(service_date, '%Y-%m-%d')
+
             rating = self.vendor_rating_repo.new_rating(vendor_id, user_id, rating, service_date, RatingType.engagement,
                         engagement_id, engagement_id, channel, comment)
             rtng = rating.serialize()

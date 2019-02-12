@@ -5,6 +5,8 @@ from datetime import datetime
 from factories import VendorFactory, VendorRatingFactory, UserRoleFactory, RoleFactory, PermissionFactory, \
     VendorEngagementFactory, OrderFactory, MealItemFactory
 
+from .user_role import create_user_role
+
 
 
 class TestVendorRatingEndpoints(BaseTestCase):
@@ -119,7 +121,7 @@ class TestVendorRatingEndpoints(BaseTestCase):
 
 
 
-    def test_create_vendor_rating_endpoint(self):
+    def test_create_order_rating_endpoint(self):
         rating = VendorRatingFactory.build()
         order_id = OrderFactory.create().id
         vendor_id = VendorFactory.create().id
@@ -203,3 +205,37 @@ class TestVendorRatingEndpoints(BaseTestCase):
         """Updating a non-existent rating should return 400 error"""
         response = self.client().patch(self.make_url(f'/ratings/777777777'), data=self.encode_to_json_string(data), headers=self.headers())
         self.assert404(response)
+
+    def test_list_rating_endpoint(self):
+        vendor = VendorFactory.create()
+
+        engagement = VendorEngagementFactory.create(vendor=vendor)
+
+        rating = VendorRatingFactory.create(engagement=engagement)
+
+        create_user_role('view_ratings')
+
+        response = self.client().get(self.make_url(f'/ratings/{rating.service_date.strftime("%Y-%m-%d")}'),
+                                     headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assert404(response)
+        self.assertEqual(response_json['msg'], 'No ratings for this date')
+
+    def test_create_vendor_rating_endpoint(self):
+        vendor  = VendorFactory.create()
+
+        engagement = VendorEngagementFactory.create(vendor=vendor)
+        engagement_rating = VendorRatingFactory.build(engagement_id=engagement.id)
+
+        rating_data = {'rating': engagement_rating.rating, 'engagementId': engagement_rating.engagement_id,
+                       'serviceDate': engagement_rating.service_date.strftime('%Y-%m-%d')}
+
+        response = self.client().post(self.make_url(f'/ratings/'), data=self.encode_to_json_string(rating_data),
+                                      headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response_json['msg'], 'Rating created')
+        self.assertEqual(response_json['payload']['rating']['id'], engagement_rating.id)
+

@@ -1,7 +1,7 @@
 '''Unit tests for the role controller.
 '''
 from datetime import datetime
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from app.controllers.role_controller import RoleController
 from app.models.permission import Permission
@@ -592,7 +592,11 @@ class TestRoleController(BaseTestCase):
                 name='Mock permission',
                 keyword='mock'
             )
-            mock_permission_repo_filter_by.return_value = mock_permission
+            mock_permission_item = MagicMock()
+            mock_permission_item.items.return_value = mock_permission
+
+            mock_permission_repo_filter_by.return_value = mock_permission_item
+
             role_controler = RoleController(self.request_context)
 
             # Act

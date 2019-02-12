@@ -4,7 +4,6 @@ import requests
 from app.services.andela import AndelaService
 from app.utils import daterange, current_time_by_zone
 from app.utils.enums import RatingType
-from datetime import datetime
 from flask import make_response
 from datetime import timedelta
 from app.repositories import LocationRepo, MenuRepo, MealItemRepo, OrderRepo, VendorEngagementRepo, VendorRatingRepo

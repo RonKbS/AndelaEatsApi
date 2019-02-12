@@ -22,6 +22,18 @@ class BaseTestCase(TestCase):
 	@staticmethod
 	def user_id():
 		return Auth.decode_token(BaseTestCase.get_valid_token())['UserInfo']['id']
+
+	@staticmethod
+	def user_email():
+		return Auth.decode_token(BaseTestCase.get_valid_token())['UserInfo']['email']
+
+	@staticmethod
+	def user_first_and_last_name():
+		return (
+				Auth.decode_token(BaseTestCase.get_valid_token())['UserInfo']['firstName'],
+				Auth.decode_token(BaseTestCase.get_valid_token())['UserInfo']['lastName']
+		)
+
 	@staticmethod
 	def get_invalid_token():
 		return 'some.invalid.token'
