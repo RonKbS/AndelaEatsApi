@@ -489,3 +489,30 @@ class TestOrderController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Invalid or incorrect order_id ' \
                 'provided'
+
+    @patch('app.controllers.order_controller.OrderController.request_params')
+    @patch('app.repositories.meal_item_repo.MealItemRepo.get')
+    @patch('app.repositories.order_repo.OrderRepo.get')
+    def test_update_order_when_order_has_been_deleted(
+        self,
+        mock_order_repo_get,
+        mock_meal_item_repo_get,
+        mock_request_params
+    ):
+        '''Test update_order when the order has been deleted.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_request_params.return_value = (
+                '2019-02-12', 'web', []
+            )
+            mock_meal_item_repo_get.return_value = Mock()
+            mock_order_repo_get.return_value.is_deleted = True
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.update_order(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Order has already been deleted'
