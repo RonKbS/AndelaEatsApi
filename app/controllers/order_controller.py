@@ -226,7 +226,7 @@ class OrderController(BaseController):
 
 		order = self.order_repo.find_first(user_id=user_id, meal_period=order_type, date_booked_for=order_date, is_deleted=False)
 		if not order:
-			return self.handle_response(f'User has no {order_type} order for the date.')
+			return self.handle_response(f'User has no {order_type} order for the date.', status_code=400)
 
 		if order.order_status == OrderStatus.collected:
 			return self.handle_response('Order already collected')
