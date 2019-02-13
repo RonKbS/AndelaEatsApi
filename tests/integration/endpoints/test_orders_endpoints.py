@@ -187,7 +187,7 @@ class TestOrderEndpoints(BaseTestCase):
 		self.assert200(response)
 
 		response1 = self.client().post(self.make_url('/orders/collect'), data=self.encode_to_json_string(data) , headers=self.headers())
-		self.assertEqual(response1.status_code, 200)
+		self.assertEqual(response1.status_code, 400)
 
 	def test_collect_order_not_valid_endpoint(self):
 		order = OrderFactory.create()
@@ -199,7 +199,7 @@ class TestOrderEndpoints(BaseTestCase):
 
 		data={'userId': user_id, 'orderType': 'blahblah', 'orderDate': order.date_booked_for.strftime('%Y-%m-%d')}
 		response = self.client().post(self.make_url('/orders/collect'), data=self.encode_to_json_string(data) , headers=self.headers())
-		self.assert200(response)
+		self.assert400(response)
 
 	def test_get_all_orders_by_user_id_endpoint(self):
 		orders = OrderFactory.create_batch(3)
