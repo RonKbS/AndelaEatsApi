@@ -763,3 +763,23 @@ class TestOrderController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch('app.repositories.order_repo.OrderRepo.get')
+    def test_delete_order_when_order_doesnot_exist(
+        self,
+        mock_order_repo_get
+    ):
+        '''Test delete_order when the order doesnot exist.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_order_repo_get.return_value = None
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.delete_order(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Invalid or incorrect ' \
+                'order_id provided'
