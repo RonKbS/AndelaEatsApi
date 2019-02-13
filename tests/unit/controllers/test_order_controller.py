@@ -30,6 +30,20 @@ class TestOrderController(BaseTestCase):
             menu_id=1,
             location_id=1
         )
+        self.mock_collected_order = Order(
+            is_deleted=False,
+            created_at=datetime.now(),
+            id=1,
+            user_id='mock',
+            date_booked_for=date.today(),
+            date_booked=date.today(),
+            channel='web',
+            meal_period='lunch',
+            order_status='collected',
+            has_rated=True,
+            menu_id=1,
+            location_id=1
+        )
         self.mock_meal_item = MealItem(
             is_deleted=False,
             created_at=datetime.now(),
@@ -642,3 +656,28 @@ class TestOrderController(BaseTestCase):
             assert result.get_json()['msg'] == f'User has no {fake_order_id}' \
                 ' order for the date.'
 
+    @patch('app.controllers.order_controller.OrderController.request_params')
+    @patch('app.repositories.order_repo.OrderRepo.find_first')
+    def test_collect_order_when_order_already_collected(
+        self,
+        mock_find_first,
+        mock_request_params
+    ):
+        '''Test collect_order when order is already collected.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_find_first.return_value = self.mock_collected_order
+            mock_request_params.return_value = (
+                1,
+                'mock',
+                '2019-02-13'
+            )
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.collect_order()
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Order already collected'
