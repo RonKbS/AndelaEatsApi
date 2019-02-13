@@ -612,3 +612,33 @@ class TestOrderController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch('app.controllers.order_controller.OrderController.request_params')
+    @patch('app.repositories.order_repo.OrderRepo.find_first')
+    def test_collect_order_when_user_has_no_order_for_date(
+        self,
+        mock_find_first,
+        mock_request_params
+    ):
+        '''Test collect_order when user has no order for date.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_find_first.return_value = None
+            mock_user_id = Mock(return_value=1)
+            fake_order_id = Mock(return_value=1)
+            mock_request_params.return_value = (
+                mock_user_id,
+                fake_order_id,
+                '2019-02-13'
+            )
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.collect_order()
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == f'User has no {fake_order_id}' \
+                ' order for the date.'
+
