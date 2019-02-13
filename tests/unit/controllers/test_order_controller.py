@@ -2,6 +2,8 @@
 '''
 from datetime import datetime, date
 from unittest.mock import Mock, patch
+from faker import Faker
+from faker.providers import date_time
 
 from app.controllers.order_controller import OrderController
 from app.models.location import Location
@@ -46,6 +48,8 @@ class TestOrderController(BaseTestCase):
             'next_page': False,
             'prev_page': False
         }
+        self.faker = Faker()
+        self.faker.add_provider(date_time)
 
     @patch('app.controllers.order_controller.OrderController.pagination_meta')
     @patch('app.services.andela.AndelaService.get_user_by_email_or_id')
@@ -355,8 +359,10 @@ class TestOrderController(BaseTestCase):
     @patch('app.repositories.location_repo.LocationRepo.get')
     @patch('app.utils.check_date_current_vs_date_for')
     @patch('app.utils.datetime')
+    @patch('app.controllers.order_controller.datetime')
     def test_create_order_when_booked_late(
         self,
+        mock_order_controller_datetime,
         mock_datetime,
         mock_check_date_current_vs_date_for,
         mock_location_repo_get,
@@ -369,6 +375,12 @@ class TestOrderController(BaseTestCase):
         '''
         # Arrange
         with self.app.app_context():
+            mock_order_controller_datetime.now = Mock(
+                return_value=datetime(2019, 2, 13, 15, 0, 0)
+            )
+            mock_order_controller_datetime.strptime = Mock(
+                return_value=datetime(2019, 2, 14, 13, 0, 0)
+            )
             mock_datetime.utcnow = Mock(
                 return_value=datetime(2019, 2, 13, 16, 0, 0)
             )
@@ -380,7 +392,7 @@ class TestOrderController(BaseTestCase):
             }
             mock_get_location.return_value = 1
             mock_request_params.return_value = (
-                '2019-02-13', 'web', 'lunch', [self.mock_meal_item, ], 1
+                Mock(), 'web', 'lunch', [self.mock_meal_item, ], 1
             )
             mock_user_has_order.return_value = False
             mock_location_repo_get.return_value = Location(
@@ -412,8 +424,10 @@ class TestOrderController(BaseTestCase):
     @patch('app.repositories.meal_item_repo.MealItemRepo'
            '.get_meal_items_by_ids')
     @patch('app.repositories.order_repo.OrderRepo.create_order')
+    @patch('app.controllers.order_controller.datetime')
     def test_create_order_ok_response(
         self,
+        mock_order_controller_datetime,
         mock_create_order,
         mock_get_meals_by_ids,
         mock_datetime,
@@ -428,6 +442,12 @@ class TestOrderController(BaseTestCase):
         '''
         # Arrange
         with self.app.app_context():
+            mock_order_controller_datetime.now = Mock(
+                return_value=datetime(2019, 2, 13, 15, 0, 0)
+            )
+            mock_order_controller_datetime.strptime = Mock(
+                return_value=datetime(2019, 2, 14, 13, 0, 0)
+            )
             mock_datetime.utcnow = Mock(
                 return_value=datetime(2019, 2, 13, 9, 0, 0)
             )
@@ -438,8 +458,9 @@ class TestOrderController(BaseTestCase):
                 'last_name': 'Serunjogi'
             }
             mock_get_location.return_value = 1
+            mock_date_booked = Mock()
             mock_request_params.return_value = (
-                '2019-02-13', 'web', 'lunch', [self.mock_meal_item, ], 1
+                mock_date_booked, 'web', 'lunch', [self.mock_meal_item, ], 1
             )
             mock_user_has_order.return_value = False
             mock_location_repo_get.return_value = Location(
