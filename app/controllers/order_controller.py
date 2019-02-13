@@ -229,7 +229,7 @@ class OrderController(BaseController):
 			return self.handle_response(f'User has no {order_type} order for the date.', status_code=400)
 
 		if order.order_status == OrderStatus.collected:
-			return self.handle_response('Order already collected')
+			return self.handle_response('Order already collected', status_code=400)
 
 		updates = {}
 		updates['order_status'] = OrderStatus.collected
