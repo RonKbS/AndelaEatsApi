@@ -817,3 +817,27 @@ class TestOrderController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Order has already been' \
                 ' deleted'
+
+    @patch('app.utils.auth.Auth.user')
+    @patch('app.repositories.order_repo.OrderRepo.get')
+    def test_delete_order_when_user_deleting_order_is_not_the_owner(
+        self,
+        mock_order_repo_get,
+        mock_auth_user
+    ):
+        '''Test delete_order when the user deleting the order is not
+        the owner.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_auth_user.return_value = 2
+            mock_order_repo_get.return_value = self.mock_order
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.delete_order(1)
+
+            # Assert
+            assert result.status_code == 403
+            assert result.get_json()['msg'] == 'You cannot delete an order' \
+                ' that is not yours'
