@@ -573,3 +573,42 @@ class TestOrderController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'It is too late to book meal ' \
                 'for the selected date '
+
+    @patch('app.controllers.order_controller.OrderController.request_params')
+    @patch('app.repositories.meal_item_repo.MealItemRepo.get')
+    @patch('app.repositories.order_repo.OrderRepo.get')
+    @patch('app.controllers.order_controller.datetime')
+    @patch('app.repositories.order_repo.OrderRepo.update')
+    def test_update_order_ok_response(
+        self,
+        mock_order_repo_update,
+        mock_order_controller_datetime,
+        mock_order_repo_get,
+        mock_meal_item_repo_get,
+        mock_request_params
+    ):
+        '''Test update_order OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_order_controller_datetime.now = Mock(
+                return_value=datetime(2019, 2, 12, 12, 45, 0)
+            )
+            mock_order_controller_datetime.strptime = Mock(
+                return_value=datetime(2019, 2, 13, 0, 0, 0)
+            )
+            mock_date_booked = Mock()
+            mock_request_params.return_value = (
+                mock_date_booked, 'web', [self.mock_meal_item, ]
+            )
+            mock_meal_item_repo_get.return_value = [self.mock_meal_item, ]
+            mock_order_repo_get.return_value = self.mock_order
+            mock_order_repo_update.return_value = self.mock_order
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.update_order(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'

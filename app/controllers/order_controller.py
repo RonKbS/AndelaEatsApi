@@ -200,6 +200,8 @@ class OrderController(BaseController):
 				order_date_midnight = datetime.strptime(date_booked_for, '%Y-%m-%d').replace(hour=00).replace(
 					minute=00).replace(second=00)
 				current_time = datetime.now()
+				print(current_time, order_date_midnight)
+				print(order_date_midnight - current_time)
 				if order_date_midnight - current_time < timedelta('hours' == 7):
 					return self.handle_response('It is too late to book meal for the selected date ', status_code=400)
 				updates['date_booked_for'] = datetime.strptime(date_booked_for, '%Y-%m-%d')
