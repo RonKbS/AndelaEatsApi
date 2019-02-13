@@ -2,6 +2,9 @@ import datetime
 from tests.base_test_case import BaseTestCase
 from app.repositories import RoleRepo
 from factories import PermissionFactory, RoleFactory, UserRoleFactory
+from .user_role import create_user_role
+from unittest.mock import Mock, patch
+
 
 class TestRoleEndpoints(BaseTestCase):
 
@@ -126,3 +129,90 @@ class TestRoleEndpoints(BaseTestCase):
 
 		self.assert404(response)
 		self.assertEqual(response_json['msg'], 'Invalid or incorrect role_id provided')
+
+	def test_get_user_role_endpoint(self):
+
+		new_role, user_id = create_user_role('view_user_roles')
+
+		response = self.client().get(self.make_url(f'/roles/user/{user_id}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assert200(response)
+		self.assertEqual(response_json['msg'], 'OK')
+		self.assertEqual(response_json['payload']['user_role'][0]['id'], new_role.id)
+
+	@patch('app.controllers.role_controller.AndelaService.get_user_by_email_or_id')
+	def test_create_user_role_endpoint(self, mock_andela_get_user_by_email):
+
+		mock_andela_get_user_by_email.return_value = {'id': self.user_id()}
+
+		create_user_role('create_user_roles')
+
+		new_role = RoleFactory.create()
+
+
+		user_role_data = { 'roleId': new_role.id, 'emailAddress': self.user_email()}
+
+		response = self.client().post(self.make_url(f'/roles/user'), data=self.encode_to_json_string(user_role_data),
+									  headers=self.headers())
+
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assertEqual(response.status_code, 201)
+		self.assertEqual(response_json['msg'], 'OK')
+		self.assertEqual(response_json['payload']['user_role']['roleId'], new_role.id)
+
+	def test_delete_user_role(self):
+		create_user_role('delete_user_roles')
+
+		new_role, _ = create_user_role('test_role')
+
+		response = self.client().delete(self.make_url(f'/roles/user/delete/{new_role.id}'), headers=self.headers())
+
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response_json['msg'], 'user_role deleted for user')
+		self.assertEqual(response_json['payload']['status'], 'success')
+
+	def test_disable_user_role_endpoint(self):
+		create_user_role('delete_user_roles')
+
+		new_role, _ = create_user_role('test_role')
+
+		user_role_data = {'userRoleId': new_role.id}
+
+		response = self.client().post(self.make_url(f'/roles/user/disable/'), data=self.encode_to_json_string(user_role_data),
+									  headers=self.headers())
+
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response_json['msg'], 'user_role disabled for user')
+		self.assertEqual(response_json['payload']['status'], 'success')
+
+	def test_get_role_permissions(self):
+		new_role, _ = create_user_role('view_permissions')
+
+		response = self.client().get(self.make_url(f'/roles/{new_role.id}/permissions'), headers=self.headers())
+
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response_json['msg'], 'OK')
+		self.assertEqual(response_json['payload']['role_id'], new_role.id)
+
+	def test_get_single_permission_endpoint(self):
+		create_user_role('view_permissions')
+
+		new_role = RoleFactory.create()
+		new_permission = PermissionFactory.create(keyword='delete_roles', name='delete_roles', role_id=new_role.id)
+
+		response = self.client().get(self.make_url(f'/roles/{new_role.id}/permissions/{new_permission.id}'), headers=self.headers())
+
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response_json['msg'], 'OK')
+		self.assertEqual(response_json['payload']['permission'][0]['id'], new_permission.id)
+

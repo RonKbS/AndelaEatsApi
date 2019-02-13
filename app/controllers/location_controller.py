@@ -24,7 +24,20 @@ class LocationController(BaseController):
 		return self.handle_response('OK', payload={'location': location.serialize()}, status_code=201)
 	
 	def update_location(self, location_id):
-		pass
+		name, zone = self.request_params('name', 'zone')
+		location = self.location_repo.get(location_id)
+
+		if location:
+			location = self.location_repo.update(location, **dict(name=name, zone=zone))
+			return self.handle_response('OK', payload={'location': location.serialize()}, status_code=201)
+
+		return self.handle_response('Location Not Found', status_code=404)
 	
-	def delete_location(self, delete_location):
-		pass
+	def delete_location(self, location_id):
+		location = self.location_repo.get(location_id)
+
+		if location and not location.is_deleted:
+			location = self.location_repo.update(location, **dict(is_deleted=True))
+			return self.handle_response('Location deleted successfully', payload={'location': location.serialize()}, status_code=200)
+
+		return self.handle_response('Location Not Found', status_code=404)

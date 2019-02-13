@@ -191,3 +191,27 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 
 		self.assert400(response)
 		self.assertEqual(response_json['msg'], 'This engagement cannot be deleted because it has a child object')
+
+	def test_list_engagements_by_vendor_endpoint(self):
+		vendor = VendorFactory.create()
+		engagement = VendorEngagementFactory.create(vendor=vendor)
+
+		response = self.client().get(self.make_url(f'/engagements/vendor/{vendor.id}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assert200(response)
+		self.assertEqual(response_json['msg'], 'OK')
+		self.assertEqual(response_json['payload']['engagements'][0]['vendor']['id'], vendor.id)
+
+	def test_upcoming_engagements_endpoint(self):
+		vendor = VendorFactory.create()
+		engagement = VendorEngagementFactory.create(vendor=vendor)
+
+		response = self.client().get(self.make_url(f'/engagements/upcoming'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assert200(response)
+		self.assertEqual(response_json['msg'], 'OK')
+		self.assertEqual(response_json['payload']['engagements'][0]['vendor']['id'], vendor.id)
+
+

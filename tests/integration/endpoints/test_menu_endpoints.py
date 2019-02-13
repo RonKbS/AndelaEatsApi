@@ -623,3 +623,26 @@ class MenuEndpoints(BaseTestCase):
 
         self.assert404(response)
         self.assertEqual(response_json['msg'], 'This menu_id does not exist')
+
+    def test_list_menu_range_endpoint_succeeds(self):
+        meal_item_repo = MealItemRepo()
+
+        main_meal_item = meal_item_repo.new_meal_item(name="main1", description="descr1", image="image1",
+                                                      meal_type="main", location_id=1)
+        side_meal_item = meal_item_repo.new_meal_item(name="side1", description="descr11", image="image11",
+                                                      meal_type="side", location_id=1)
+        protein_meal_item = meal_item_repo.new_meal_item(name="protein1", description="descr11", image="image12",
+                                                         meal_type="protein", location_id=1)
+
+        menu = MenuFactory.create(main_meal_id=main_meal_item.id,
+                                  side_items=str(side_meal_item.id), protein_items=str(protein_meal_item.id))
+
+        start_date = menu.vendor_engagement.start_date - timedelta(days=1)
+
+        response = self.client().get(self.make_url(f'/menus/{menu.meal_period}/{start_date}/{menu.vendor_engagement.end_date}'),
+                                     headers=self.headers())
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response_json['msg'], 'OK')
+        self.assertEqual(response_json['payload']['menuList'][0]['menus'][0]['id'], menu.id)

@@ -6,6 +6,8 @@ from datetime import date, timedelta
 from app.utils import db
 from app.repositories import OrderRepo
 from app.utils.enums import OrderStatus
+from unittest.mock import patch
+from .user_role import create_user_role
 
 
 class TestOrderEndpoints(BaseTestCase):
@@ -16,7 +18,6 @@ class TestOrderEndpoints(BaseTestCase):
 	def test_create_order_with_invalid_details_endpoint(self):
 		items = [item.id for item in MealItemFactory.create_batch(4)]
 		menu = MenuFactory.create()
-		
 		LocationFactory.create(id=1, zone='+1')
 		data = {'dateBookedFor': (date.today() + timedelta(days=-3)).strftime('%Y-%m-%d'), 'channel': 'web', 'mealPeriod': 'lunch', 'menuId': menu.id}
 
@@ -28,9 +29,7 @@ class TestOrderEndpoints(BaseTestCase):
 		data.update({'mealItems': items})
 		response1 = self.client().post(self.make_url('/orders/'), data=self.encode_to_json_string(data), headers=self.headers())
 		self.assert400(response1)
-		
 		data.update({'dateBookedFor': (date.today() + timedelta(days=2)).strftime('%Y-%m-%d')})
-		
 		response2 = self.client().post(self.make_url('/orders/'), data=self.encode_to_json_string(data), headers=self.headers())
 		self.assertEqual(response2.status_code, 201)
 
@@ -53,7 +52,7 @@ class TestOrderEndpoints(BaseTestCase):
 			self.make_url('/orders/'), data=self.encode_to_json_string(data), headers=self.headers())
 
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
-		
+
 		payload = response_json['payload']
 		self.assertEqual(response.status_code, 201)
 		self.assertJSONKeyPresent(response_json, 'payload')
@@ -327,3 +326,43 @@ class TestOrderEndpoints(BaseTestCase):
 
 		self.assert400(response)
 		self.assertEqual(response_json['msg'], 'Order has already been deleted')
+
+	@patch('app.controllers.order_controller.AndelaService.get_user_by_email_or_id')
+	def test_list_orders_date_range_endpoint(self, mock_andela_get_user_by_email):
+
+		first_name, last_name = self.user_first_and_last_name()
+		mock_andela_get_user_by_email.return_value = {
+			'id': self.user_id(),
+			'first_name': first_name,
+			'last_name': last_name
+		}
+
+		create_user_role('view_orders')
+
+		order = OrderFactory.create()
+
+		response = self.client().get(self.make_url(f'/orders/{order.date_booked}/{order.date_booked_for}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assert200(response)
+		self.assertEqual(response_json['msg'], 'OK')
+		self.assertEqual(response_json['payload']['orders'][0]['id'], order.id)
+
+	@patch('app.controllers.order_controller.AndelaService.get_user_by_email_or_id')
+	def test_get_order_by_user_id_date_range_endpoint(self, mock_andela_get_user_by_email):
+		first_name, last_name = self.user_first_and_last_name()
+		mock_andela_get_user_by_email.return_value = {
+			'id': self.user_id(),
+			'first_name': first_name,
+			'last_name': last_name
+		}
+
+		order = OrderFactory.create()
+
+		response = self.client().get(self.make_url(f'/orders/user/{order.user_id}/{order.date_booked}/{order.date_booked_for}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assert200(response)
+		self.assertEqual(response_json['msg'], 'OK')
+		self.assertEqual(response_json['payload']['orders'][0]['id'], order.id)
+
