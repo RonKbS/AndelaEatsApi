@@ -30,6 +30,20 @@ class TestOrderController(BaseTestCase):
             menu_id=1,
             location_id=1
         )
+        self.mock_deleted_order = Order(
+            is_deleted=True,
+            created_at=datetime.now(),
+            id=1,
+            user_id='mock',
+            date_booked_for=date.today(),
+            date_booked=date.today(),
+            channel='web',
+            meal_period='lunch',
+            order_status='booked',
+            has_rated=True,
+            menu_id=1,
+            location_id=1
+        )
         self.mock_collected_order = Order(
             is_deleted=False,
             created_at=datetime.now(),
@@ -783,3 +797,23 @@ class TestOrderController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Invalid or incorrect ' \
                 'order_id provided'
+
+    @patch('app.repositories.order_repo.OrderRepo.get')
+    def test_delete_order_when_order_is_already_deleted(
+        self,
+        mock_order_repo_get
+    ):
+        '''Test delete_order when the order is already deleted.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_order_repo_get.return_value = self.mock_deleted_order
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.delete_order(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Order has already been' \
+                ' deleted'
