@@ -441,18 +441,18 @@ class BotController(BaseController):
 
         current_date = current_time_by_zone(location.zone)
 
-        if current_date.strftime('%a') == 'Mon' and int(current_date.strftime('%H')) > 15:
+        if current_date.strftime('%a') == 'Mon' and int(current_date.strftime('%H')) >= 15:
             start_on = current_date + timedelta(days=2)
             end_on = start_on + timedelta(days=2)
 
-        elif current_date.strftime('%a') == 'Tue' and int(current_date.strftime('%H')) > 15:
+        elif current_date.strftime('%a') == 'Tue' and int(current_date.strftime('%H')) >= 15:
             start_on = current_date + timedelta(days=2)
             end_on = start_on + timedelta(days=1)
 
-        elif current_date.strftime('%a') == 'Wed' and int(current_date.strftime('%H')) > 15:
+        elif current_date.strftime('%a') == 'Wed' and int(current_date.strftime('%H')) >= 15:
             start_on = end_on = current_date + timedelta(days=2)
 
-        elif current_date.strftime('%a') == 'Thu' and int(current_date.strftime('%H')) > 15:
+        elif current_date.strftime('%a') == 'Thu' and int(current_date.strftime('%H')) >= 15:
             start_on = end_on = current_date + timedelta(days=4)
 
         else:
