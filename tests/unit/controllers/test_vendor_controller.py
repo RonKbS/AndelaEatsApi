@@ -219,3 +219,31 @@ class TestVendorController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Invalid or incorrect ' \
                 'vendor_id provided'
+
+    @patch.object(VendorController, 'request_params')
+    @patch('app.repositories.vendor_repo.VendorRepo.get')
+    def test_update_vendor_ok_response(
+        self,
+        mock_vendor_repo_get,
+        mock_request_params
+    ):
+        '''Test update_vendor OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_request_params.return_value = (
+                self.fake.name(),
+                self.fake.phone_number(),
+                self.fake.address(),
+                True,
+                self.fake.name()
+            )
+            mock_vendor_repo_get.return_value = self.mock_vendor
+            vendor_controller = VendorController(self.request_context)
+
+            # Act
+            result = vendor_controller.update_vendor(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
