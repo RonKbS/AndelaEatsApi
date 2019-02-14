@@ -39,7 +39,7 @@ class TestBotEndpoints(BaseTestCase):
 
     @patch('app.controllers.bot_controller.current_time_by_zone')
     def test_get_menu_start_end_on_after_3pm_sunday(self, mock_get):
-        mock_get.return_value = datetime.strptime('2019-02-10 16:01', '%Y-%m-%d %H:%M')
+        mock_get.return_value = datetime.strptime('2019-02-10 15:01', '%Y-%m-%d %H:%M')
 
         result = self.bot_controller.get_menu_start_end_on(LocationFactory.build())
 
@@ -60,7 +60,7 @@ class TestBotEndpoints(BaseTestCase):
 
     @patch('app.controllers.bot_controller.current_time_by_zone')
     def test_get_menu_start_end_on_after_3pm_monday(self, mock_get):
-        mock_get.return_value = datetime.strptime('2019-02-11 16:01', '%Y-%m-%d %H:%M')
+        mock_get.return_value = datetime.strptime('2019-02-11 15:01', '%Y-%m-%d %H:%M')
 
         result = self.bot_controller.get_menu_start_end_on(LocationFactory.build())
 
@@ -80,7 +80,7 @@ class TestBotEndpoints(BaseTestCase):
 
     @patch('app.controllers.bot_controller.current_time_by_zone')
     def test_get_menu_start_end_on_after_3pm_tuesday(self, mock_get):
-        mock_get.return_value = datetime.strptime('2019-02-12 16:01', '%Y-%m-%d %H:%M')
+        mock_get.return_value = datetime.strptime('2019-02-12 15:01', '%Y-%m-%d %H:%M')
 
         result = self.bot_controller.get_menu_start_end_on(LocationFactory.build())
 
@@ -100,7 +100,7 @@ class TestBotEndpoints(BaseTestCase):
 
     @patch('app.controllers.bot_controller.current_time_by_zone')
     def test_get_menu_start_end_on_after_3pm_wednesday(self, mock_get):
-        mock_get.return_value = datetime.strptime('2019-02-13 16:01', '%Y-%m-%d %H:%M')
+        mock_get.return_value = datetime.strptime('2019-02-13 15:01', '%Y-%m-%d %H:%M')
 
         result = self.bot_controller.get_menu_start_end_on(LocationFactory.build())
 
@@ -120,7 +120,7 @@ class TestBotEndpoints(BaseTestCase):
 
     @patch('app.controllers.bot_controller.current_time_by_zone')
     def test_get_menu_start_end_on_after_3pm_thursday(self, mock_get):
-        mock_get.return_value = datetime.strptime('2019-02-14 16:01', '%Y-%m-%d %H:%M')
+        mock_get.return_value = datetime.strptime('2019-02-14 15:01', '%Y-%m-%d %H:%M')
 
         result = self.bot_controller.get_menu_start_end_on(LocationFactory.build())
 
@@ -140,7 +140,7 @@ class TestBotEndpoints(BaseTestCase):
 
     @patch('app.controllers.bot_controller.current_time_by_zone')
     def test_get_menu_start_end_on_saturday(self, mock_get):
-        mock_get.return_value = datetime.strptime('2019-02-16 16:01', '%Y-%m-%d %H:%M')
+        mock_get.return_value = datetime.strptime('2019-02-16 15:01', '%Y-%m-%d %H:%M')
 
         result = self.bot_controller.get_menu_start_end_on(LocationFactory.build())
 
