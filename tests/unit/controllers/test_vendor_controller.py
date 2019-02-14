@@ -122,3 +122,23 @@ class TestVendorController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch('app.repositories.vendor_repo.VendorRepo.get')
+    def test_get_vendor_when_vendor_doesnot_exist(
+        self,
+        mock_vendor_repo_get
+    ):
+        '''Test get_vendor when the vendor doesnot exist.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_repo_get.return_value = None
+            vendor_controller = VendorController(self.request_context)
+
+            # Act
+            result = vendor_controller.get_vendor(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Bad Request - Invalid or ' \
+                'Missing vendor_id'
