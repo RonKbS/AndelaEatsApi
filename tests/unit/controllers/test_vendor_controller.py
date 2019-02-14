@@ -60,3 +60,34 @@ class TestVendorController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch('app.utils.auth.Auth.get_location')
+    @patch('app.repositories.vendor_repo.VendorRepo.filter_by')
+    @patch.object(VendorController, 'pagination_meta')
+    def test_list_deleted_vendors_ok_response(
+        self,
+        mock_pagination_meta,
+        mock_filter_by,
+        mock_get_location
+    ):
+        '''Test list_deleted_vendors OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_pagination_meta.return_value = {
+                'total_rows': 1,
+                'total_pages': 1,
+                'current_page': 1,
+                'next_page': 1,
+                'prev_page': 1
+            }
+            mock_filter_by.return_value.items = [self.mock_vendor, ]
+            mock_get_location.return_value = 1
+            vendor_controller = VendorController(self.request_context)
+
+            # Act
+            result = vendor_controller.list_deleted_vendors()
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
