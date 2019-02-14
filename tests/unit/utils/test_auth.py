@@ -1,8 +1,7 @@
 from tests.base_test_case import BaseTestCase
-from app.utils.auth import Auth
-from factories.role_factory import RoleFactory
-from factories.user_role_factory import UserRoleFactory
-from factories.permission_factory import PermissionFactory
+from app.utils.auth import Auth, jwt
+from unittest.mock import patch
+
 
 class TestAuth(BaseTestCase):
 
@@ -88,21 +87,47 @@ class TestAuth(BaseTestCase):
                                                    headers=self.headers_without_token()) as request:
             self.assertRaises(Exception)
 
+    def test_get_token_method_checks_no_authorization(self):
 
-    # def test_has_permission_checks_valid_permissions(self):
-    # 	'''To test the has_permission method, We need to create a mock role, user role maping and role-permission mapping '''
-    #
-    #
-    # 	with self.app.test_request_context(path='/api/v1/vendors', method='GET', headers=self.headers()) as request:
-    # 		user_id = Auth.user('id')
-    #
-    # 		role = RoleFactory(id=1)
-    # 		user_role = UserRoleFactory(role_id=role.id, user_id=user_id)
-    # 		perm = PermissionFactory(id=1, role_id=role.id, keyword='login')
-    #
-    # 		r = Auth.has_permission('create_account')
-    #
-    #
-    # 		# print(user_id, role.id, role.name, user_role.role_id, user_role.user_id, perm.role_id, r.data.decode('utf-8'))
-    #
-    # 		assert False
+        with self.assertRaises(Exception) as e:
+
+            class requestObject:
+                headers = {}
+
+            Auth.get_token(request_obj=requestObject)
+
+        self.assertEqual(e.exception.args[0], 'Authorization Header is Expected')
+
+    def test_user_method_raises_expection_when_not_auth_provided(self):
+
+        with self.assertRaises(Exception) as e:
+             Auth.user()
+
+        self.assertEqual(e.exception.args[0], 'Authorization Header is Expected')
+
+    @patch('app.utils.auth.Auth.get_token')
+    def test_user_method_raises_expection_with_an_invalid_token(self, mock_get_token):
+
+        with self.assertRaises(Exception) as e:
+            mock_get_token.return_val = 'invalid_token'
+            Auth.user()
+
+        self.assertEqual(e.exception.args[0], 'Error Decoding')
+
+    @patch('app.utils.auth.jwt.decode')
+    def test_decode_token_method_raises_expection_with_an_expired_token(self, mock_jwt_decode):
+
+        with self.assertRaises(Exception) as e:
+            mock_jwt_decode.side_effect = jwt.ExpiredSignature()
+            Auth.decode_token('tdtddyd')
+
+        self.assertEqual(e.exception.args[0], 'Token is Expired')
+
+    @patch('app.utils.auth.Auth.user')
+    def test_has_permission_method_handles_missing_user_id(self, mock_auth_user):
+
+        mock_auth_user.return_value = None
+
+        response = Auth.has_permission('permission')('permission')()
+
+        self.assertEqual(response[0].get_json()['msg'], 'Missing User ID in token')
