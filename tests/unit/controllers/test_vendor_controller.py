@@ -161,3 +161,32 @@ class TestVendorController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch('app.utils.auth.Auth.get_location')
+    @patch.object(VendorController, 'request_params')
+    @patch('app.repositories.vendor_repo.VendorRepo.new_vendor')
+    def test_creat_vendor_ok_response(
+        self,
+        mock_new_vendor,
+        mock_request_params,
+        mock_get_location
+    ):
+        '''Test create_vendor OK response.
+        '''
+        mock_get_location.return_value = 1
+        mock_request_params.return_value = (
+            self.fake.name(),
+            self.fake.phone_number(),
+            self.fake.address(),
+            True,
+            self.fake.name()
+        )
+        mock_new_vendor.return_value = self.mock_vendor
+        vendor_controller = VendorController(self.request_context)
+
+        # Act
+        result = vendor_controller.create_vendor()
+
+        # Assert
+        assert result.status_code == 201
+        assert result.get_json()['msg'] == 'OK'
