@@ -25,8 +25,6 @@ def create_app(config_name):
     scheduler = BackgroundScheduler()
     # in your case you could change seconds to hours
     scheduler.add_job(cron.run_24_hourly, trigger='interval', hours=24)
-    scheduler.add_job(cron.run_12_hourly, trigger='interval', hours=12)
-    scheduler.add_job(cron.run_6_hourly, trigger='interval', hours=6)
     scheduler.start()
 
     from . import models

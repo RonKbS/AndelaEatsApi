@@ -10,15 +10,7 @@ class Cron:
 	def run_24_hourly(self):
 		self.update_engagement_status()
 
-	def run_12_hourly(self):
-		pass
-
-	def run_6_hourly(self):
-		pass
-
-	
 	def update_engagement_status(self):
-
 		'''A cron job that periodically update an engagement status'''
 		with self.app.app_context():
 			active_engagements = VendorEngagement.query.filter_by(status=1)
