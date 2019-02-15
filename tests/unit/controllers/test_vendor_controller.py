@@ -26,6 +26,18 @@ class TestVendorController(BaseTestCase):
             is_active=True,
             location_id=1
         )
+        self.mock_deleted_vendor = Vendor(
+            id=1,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
+            is_deleted=True,
+            name=self.fake.name(),
+            address=self.fake.address(),
+            tel=self.fake.phone_number(),
+            contact_person=self.fake.name(),
+            is_active=True,
+            location_id=1
+        )
 
     @patch('app.utils.auth.Auth.get_location')
     @patch('app.repositories.vendor_repo.VendorRepo.filter_by')
@@ -351,3 +363,23 @@ class TestVendorController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Invalid or incorrect ' \
                 'vendor_id provided'
+
+    @patch('app.repositories.vendor_repo.VendorRepo.get')
+    def test_delete_vendor_when_vendor_is_already_deleted(
+        self,
+        mock_vendor_repo_get
+    ):
+        '''Test delete_vendor when vendor is already deleted.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_repo_get.return_value = self.mock_deleted_vendor
+            vendor_controller = VendorController(self.request_context)
+
+            # Act
+            result = vendor_controller.delete_vendor(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Vendor has already ' \
+                'been deleted'
