@@ -1,5 +1,6 @@
 from tests.base_test_case import BaseTestCase
 from datetime import datetime
+from unittest.mock import Mock, patch
 from app.utils import daterange, current_time_by_zone, check_date_current_vs_date_for
 
 
@@ -16,19 +17,21 @@ class TestAuth(BaseTestCase):
 
         self.assertEqual(len(datelist), 5)
 
-    def test_current_time_by_time_zone_positive_timezone(self):
+    @patch('app.utils.datetime')
+    def test_current_time_by_time_zone_positive_timezone(self, mock_current_time):
+        mock_current_time.utcnow = Mock(
+            return_value=datetime(2019, 2, 15, 6, 0, 0))
         res = current_time_by_zone('+3')
 
-        raw_utc = datetime.utcnow().hour + 3
-        result = raw_utc if raw_utc < 24 else raw_utc - 24
-        self.assertEqual(res.hour, result)
+        self.assertEqual(res.hour, 9)
 
-    def test_current_time_by_time_zone_negative_timezone(self):
+    @patch('app.utils.datetime')
+    def test_current_time_by_time_zone_negative_timezone(self, mock_current_time):
+        mock_current_time.utcnow = Mock(
+             return_value=datetime(2019, 2, 15, 6, 0, 0))
         resp = current_time_by_zone('-4')
 
-        raw_utc = datetime.utcnow().hour - 4
-        result = raw_utc if raw_utc > -1 else raw_utc + 24
-        self.assertEqual(resp.hour, result)
+        self.assertEqual(resp.hour, 2)
 
     def test_check_date_current_vs_date_for_invalid(self):
         d1 = datetime.strptime('2019-01-01', '%Y-%m-%d')
