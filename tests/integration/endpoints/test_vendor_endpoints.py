@@ -37,7 +37,25 @@ class TestVendorEndpoints(BaseTestCase):
 		self.assert200(response)
 		self.assertEqual(len(payload['vendors']), 3)
 		self.assertJSONKeysPresent(payload['vendors'][0], 'name', 'tel', 'id', 'address', 'contactPerson','timestamps')
-		
+
+	def test_list_vendors_endpoint_returns_data_sorted_by_name(self):
+		location = LocationFactory(id=self.headers()['X-Location'])
+		# Create Three Dummy Vendors
+		vendors = VendorFactory.create_batch(3, location_id=location.id)
+
+		response = self.client().get(self.make_url('/vendors/'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+		payload = response_json['payload']
+
+		sorted_vendor_names = sorted([vendor.name for vendor in vendors])
+		vendors = payload['vendors']
+
+		self.assert200(response)
+		self.assertEqual(len(payload['vendors']), 3)
+		self.assertEqual(sorted_vendor_names[0], vendors[0].get('name'))
+		self.assertEqual(sorted_vendor_names[1], vendors[1].get('name'))
+		self.assertEqual(sorted_vendor_names[2], vendors[2].get('name'))
+
 	def test_get_specific_vendor_enpoint(self):
 		vendor = VendorFactory.create()
 		response = self.client().get(self.make_url('/vendors/{}'.format(vendor.id)), headers=self.headers())
