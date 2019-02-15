@@ -6,6 +6,8 @@ from faker import Faker
 
 from app.controllers.vendor_controller import VendorController
 from app.models.vendor import Vendor
+from app.models.vendor_rating import VendorRating
+from app.models.vendor_engagement import VendorEngagement
 from tests.base_test_case import BaseTestCase
 
 
@@ -14,6 +16,45 @@ class TestVendorController(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
         self.fake = Faker()
+        self.mock_vendor_engagement = VendorEngagement(
+            id=1,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
+            vendor_id=1,
+            location_id=1,
+            start_date=datetime.now(),
+            end_date=datetime.now(),
+            status=1,
+            termination_reason=self.fake.text()
+        )
+        self.mock_rating = VendorRating(
+            id=1,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
+            vendor_id=1,
+            user_id=1,
+            comment=self.fake.text(),
+            service_date=datetime.now(),
+            rating=1.2,
+            channel='web',
+            type_id=1,
+            engagement_id=1,
+            main_meal_id=1
+        )
+        self.mock_vendor_with_dependants = Vendor(
+            id=1,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
+            is_deleted=False,
+            name=self.fake.name(),
+            address=self.fake.address(),
+            tel=self.fake.phone_number(),
+            contact_person=self.fake.name(),
+            is_active=True,
+            location_id=1,
+            ratings=[self.mock_rating, ],
+            engagements=[self.mock_vendor_engagement, ]
+        )
         self.mock_vendor = Vendor(
             id=1,
             created_at=datetime.now(),
@@ -383,3 +424,50 @@ class TestVendorController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Vendor has already ' \
                 'been deleted'
+
+    @patch('app.repositories.vendor_repo.VendorRepo.get')
+    def test_delete_vendor_when_vendor_has_dependants(
+        self,
+        mock_vendor_repo_get
+    ):
+        '''Test delete_vendor when vendor has dependants.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_repo_get.return_value = \
+                self.mock_vendor_with_dependants
+            vendor_controller = VendorController(self.request_context)
+
+            # Act
+            result = vendor_controller.delete_vendor(1)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Vendor cannot be deleted ' \
+                'because it has a child object'
+
+    @patch('app.repositories.vendor_repo.VendorRepo.get')
+    @patch('app.repositories.vendor_repo.VendorRepo.update')
+    @patch('app.repositories.vendor_engagement_repo'
+           '.VendorEngagementRepo.filter_by')
+    def test_delete_vendor_ok_response(
+        self,
+        mock_filter_by,
+        mock_vendor_repo_update,
+        mock_vendor_repo_get
+    ):
+        '''Test delete_vendor OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_repo_get.return_value = self.mock_vendor
+            mock_vendor_repo_update.return_value = self.mock_vendor
+            mock_filter_by.return_value.items = [self.mock_vendor_engagement, ]
+            vendor_controller = VendorController(self.request_context)
+
+            # Act
+            result = vendor_controller.delete_vendor(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'Vendor deleted'
