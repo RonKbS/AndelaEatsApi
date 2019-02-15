@@ -267,3 +267,25 @@ class TestVendorController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Invalid or incorrect ' \
                 'vendor_id provided'
+
+    @patch('app.repositories.vendor_repo.VendorRepo.get')
+    @patch('app.repositories.vendor_repo.VendorRepo.update')
+    def test_suspend_vendor_ok_response(
+        self,
+        mock_vendor_repo_update,
+        mock_vendor_repo_get
+    ):
+        '''Test suspend_vendor OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_repo_get.return_value = self.mock_vendor
+            mock_vendor_repo_update.return_value = self.mock_vendor
+            vendor_controller = VendorController(self.request_context)
+
+            # Act
+            result = vendor_controller.suspend_vendor(1)
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
