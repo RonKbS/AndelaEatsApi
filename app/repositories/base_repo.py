@@ -60,7 +60,16 @@ class BaseRepo:
 	def get_unpaginated(self, **kwargs):
 		"""Query and filter the data of the model."""
 		return self._model.query.filter_by(**kwargs).all()
-	
+
+	def get_unpaginated_asc(self, *args, **kwargs):
+		"""Query and filter the data of the model in ascending order."""
+		return self._model.query.filter_by(**kwargs).order_by(asc(*args)) \
+			.all()
+
+	def get_unpaginated_desc(self, *args, **kwargs):
+		"""Query and filter the data of the model in ascending order."""
+		return self._model.query.filter_by(**kwargs).order_by(desc(*args)) \
+			.all()
 	
 	def find_first(self, **kwargs):
 		"""Query and filter the data of a model, returning the first result."""

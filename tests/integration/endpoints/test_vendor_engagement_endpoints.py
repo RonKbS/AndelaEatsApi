@@ -152,12 +152,11 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='delete_engagement', role_id=100)
+		permission = PermissionFactory.create(keyword='delete_engagement', role_id=1000)
 		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		response = self.client().delete(self.make_url(f'/engagements/{engagement.id}'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
-
 		self.assert400(response)
 		self.assertEqual(response_json['msg'], 'Access Error - No Permission Granted')
 
