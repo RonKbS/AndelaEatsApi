@@ -17,6 +17,31 @@ class TestBaseRepository(BaseTestCase):
 		self.assertEqual(vendor.id, vendor_.id)
 		self.assertEqual(vendor.tel, vendor_.tel)
 		self.assertEqual(vendor.address, vendor_.address)
+
+	def test_get_unpaginated_asc_orders_ascending(self):
+		vendor_1 = VendorFactory.create()
+		vendor_2 = VendorFactory.create()
+
+		vendor_names = sorted([vendor.name for vendor in [vendor_1, vendor_2]])
+
+		results = self.repo.get_unpaginated_asc(Vendor.name)
+
+		self.assertEqual(vendor_names[0], results[0].name)
+		self.assertEqual(vendor_names[1], results[1].name)
+
+	def test_get_unpaginated_desc_orders_ascending(self):
+		vendor_1 = VendorFactory.create()
+		vendor_2 = VendorFactory.create()
+
+		vendor_names = sorted(
+			[vendor.name for vendor in [vendor_1, vendor_2]],
+			reverse=True
+		)
+
+		results = self.repo.get_unpaginated_desc(Vendor.name)
+
+		self.assertEqual(vendor_names[0], results[0].name)
+		self.assertEqual(vendor_names[1], results[1].name)
 		
 	def test_update_method_updates_model_values(self):
 		vendor = VendorFactory()

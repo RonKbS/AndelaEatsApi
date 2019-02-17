@@ -139,6 +139,32 @@ class TestMealItemEndpoints(BaseTestCase):
 		self.assertEqual(len(payload['mealItems']), 3)
 		self.assertJSONKeysPresent(payload['mealItems'][0], 'name', 'description', 'mealType', 'image')
 
+	def test_list_meal_item_endpoint_correct_sort_order(self):
+		# Create Three Dummy Vendors
+		meals = MealItemFactory.create_batch(3)
+
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		PermissionFactory.create(keyword='view_meal_item', role_id=role.id)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+		response = self.client().get(self.make_url('/meal-items/'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+		payload = response_json['payload']
+
+		meals_sorted_by_name = sorted(
+			[meal.name for meal in meals]
+		)
+
+		meals_returned = [meal.get("name") for meal in payload['mealItems']]
+
+		self.assert200(response)
+		self.assertEqual(len(payload['mealItems']), 3)
+		self.assertJSONKeysPresent(payload['mealItems'][0], 'name', 'description', 'mealType', 'image')
+		self.assertEqual(meals_returned[0], meals_sorted_by_name[0])
+		self.assertEqual(meals_returned[1], meals_sorted_by_name[1])
+		self.assertEqual(meals_returned[2], meals_sorted_by_name[2])
+
 	def test_list_meal_item_endpoint_wrong_permission(self):
 		# Create Three Dummy Vendors
 		meals = MealItemFactory.create_batch(3)
