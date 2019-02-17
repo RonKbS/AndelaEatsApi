@@ -16,7 +16,11 @@ class VendorController(BaseController):
 
 	def list_vendors(self):
 		location = Auth.get_location()
-		vendors = self.vendor_repo.filter_by(is_deleted=False, is_active=True, location_id=location)
+		vendors = self.vendor_repo.filter_by_asc(
+			self.vendor_repo._model.name,
+			is_deleted=False,
+			is_active=True,
+			location_id=location)
 		vendors_list = [vendor.serialize() for vendor in vendors.items]
 		return self.handle_response('OK', payload={'vendors': vendors_list, 'meta': self.pagination_meta(vendors)})
 
