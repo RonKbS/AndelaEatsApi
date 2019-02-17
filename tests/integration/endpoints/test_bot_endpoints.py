@@ -1,10 +1,16 @@
-import json
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from datetime import datetime
 from tests.base_test_case import BaseTestCase
 from app.controllers import BotController
 from factories import LocationFactory, MenuFactory
-from tests.mock import center_selected
+from tests.mock import (
+    center_selected,
+    date_selected,
+    period_selected,
+    action_selected_menu,
+    action_selected_order,
+    menu_list_rate,
+)
 
 
 class TestBotEndpoints(BaseTestCase):
@@ -16,7 +22,7 @@ class TestBotEndpoints(BaseTestCase):
 
     def test_bot(self):
         with self.app.app_context():
-            response = self.bot_controller.bot()
+            response = self.client().post(self.make_url(f'/bot/'), headers=self.headers())
 
             response_json = self.decode_from_json_string(response.data.decode('utf-8'))
             self.assert200(response)
@@ -25,6 +31,76 @@ class TestBotEndpoints(BaseTestCase):
             self.assertEqual(response_json['attachments'][0]['callback_id'], 'center_selector')
             self.assertEqual(response_json['attachments'][0]['attachment_type'], 'default')
             self.assertEqual(len(response_json['attachments'][0]['actions']), 0)
+
+    @patch('app.controllers.bot_controller.LocationRepo')
+    @patch('app.controllers.bot_controller.json.loads')
+    @patch('app.controllers.bot_controller.BotController.get_menu_start_end_on')
+    def test_interactions_after_selecting_location(self, mock_get_menu_start_end_on, mock_json_loads, mock_locationrepo_get):
+        mock_json_loads.return_value = center_selected
+        mock_get_menu_start_end_on.return_value = (datetime(2019, 2, 15), datetime(2019, 2, 15))
+        mock_locationrepo_get.get.return_value = LocationFactory.create(id=1)
+
+        response = self.client().post(self.make_url(f'/bot/interactions/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assert200(response)
+        self.assertEqual(response_json['type'], 'interactive_message')
+        self.assertEqual(type(response_json['actions']), list)
+
+    @patch('app.controllers.bot_controller.json.loads')
+    def test_interactions_after_selecting_date(self, mock_json_loads):
+        mock_json_loads.return_value = date_selected
+
+        response = self.client().post(self.make_url(f'/bot/interactions/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assert200(response)
+        self.assertEqual(response_json['type'], 'interactive_message')
+        self.assertEqual(type(response_json['actions']), list)
+
+    @patch('app.controllers.bot_controller.json.loads')
+    def test_interactions_after_selecting_period(self, mock_json_loads):
+        mock_json_loads.return_value = period_selected
+
+        response = self.client().post(self.make_url(f'/bot/interactions/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assert200(response)
+        self.assertEqual(response_json['type'], 'interactive_message')
+        self.assertEqual(type(response_json['actions']), list)
+
+    @patch('app.controllers.bot_controller.json.loads')
+    def test_interactions_after_selecting_action_menu_list(self, mock_json_loads):
+        mock_json_loads.return_value = action_selected_menu
+
+        response = self.client().post(self.make_url(f'/bot/interactions/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assert200(response)
+        self.assertEqual(response_json['type'], 'interactive_message')
+        self.assertEqual(type(response_json['actions']), list)
+
+    @patch('app.controllers.bot_controller.json.loads')
+    def test_interactions_after_selecting_action_order(self, mock_json_loads):
+        mock_json_loads.return_value = action_selected_order
+
+        response = self.client().post(self.make_url(f'/bot/interactions/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assert200(response)
+        self.assertEqual(response_json['type'], 'interactive_message')
+        self.assertEqual(type(response_json['actions']), list)
+
+    @patch('app.controllers.bot_controller.json.loads')
+    def test_interactions_after_selecting_menulist_rate(self, mock_json_loads):
+        mock_json_loads.return_value = menu_list_rate
+
+        response = self.client().post(self.make_url(f'/bot/interactions/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assert200(response)
+        self.assertEqual(response_json['type'], 'interactive_message')
+        self.assertEqual(type(response_json['actions']), list)
 
     @patch('app.controllers.bot_controller.current_time_by_zone')
     def test_get_menu_start_end_on_before_3pm_sunday(self, mock_get):
