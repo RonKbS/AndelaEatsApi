@@ -35,4 +35,4 @@ class MenuRepo(BaseRepo):
         return Menu.query.filter(
             Menu.date >= start_date, Menu.date <= end_date, Menu.meal_period == meal_period, Menu.is_deleted.is_(False),
             Menu.location_id == location_id
-        ).order_by(Menu.date.asc()).paginate(error_out=False)
+        ).order_by(Menu.date.desc()).paginate(error_out=False)
