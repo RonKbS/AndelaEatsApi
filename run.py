@@ -43,7 +43,7 @@ def drop_db():
     help='The Resource name you want to seed.',
     type=click.Choice(SEED_OPTIONS)
 )
-def seed_database(table_name):
+def seed_database(table_name=None):
 	seed_db(table_name)
 
 
