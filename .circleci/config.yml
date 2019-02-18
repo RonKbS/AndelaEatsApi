@@ -12,6 +12,9 @@ jobs:
           REDIS_DB: 0
           ANDELA_API_TOKEN: "89S07r4pQ1yTQIQTxfyvHhwPyfDpFg"
           API_AUTH_URL: http://api-staging.andela.com/api/v1
+          FLASK_APP: run
+          FLASK_ENV: development
+          APP_ENV: testing
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images

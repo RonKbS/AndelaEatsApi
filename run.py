@@ -3,8 +3,9 @@ from config import get_env
 from app import create_app
 from flask_script import Manager
 from app.utils.auth import Auth
-from app.utils.seed_data import seed_db
+from app.utils.seeders.seed_database import seed_db, SEED_OPTIONS
 from flask_migrate import Migrate, MigrateCommand
+import click
 
 app = create_app(get_env('APP_ENV'))
 migrate = Migrate(app, db)
@@ -35,9 +36,15 @@ def drop_db():
 
 
 # seeds database
-@manager.command
-def seed_all():
-	seed_db()
+@app.cli.command(context_settings=dict(token_normalize_func=str.lower))
+@click.argument('table_name', required=False)
+@click.option(
+    '--table_name',
+    help='The Resource name you want to seed.',
+    type=click.Choice(SEED_OPTIONS)
+)
+def seed_database(table_name):
+	seed_db(table_name)
 
 
 @manager.command
