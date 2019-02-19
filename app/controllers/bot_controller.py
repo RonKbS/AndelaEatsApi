@@ -309,7 +309,7 @@ class BotController(BaseController):
                     slack_data = {'text': 'You already have an order for this meal period.'}
                     requests.post(webhook_url, data=json.dumps(slack_data),
                                   headers={'Content-Type': 'application/json'})
-                    return
+                    return self.handle_response(status_code=400)
                 trigger_id = payload['trigger_id']
 
                 side_items_list = menu.side_items.split(',')
