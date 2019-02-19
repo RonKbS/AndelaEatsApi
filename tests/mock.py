@@ -93,3 +93,75 @@ menu_list_rate = {
         'response_url': 'https://hooks.slack.com/actions/T02R3LKBA/552154971185/E9rKlt4e2pEpaI9QtoYBB0Zh',
         'trigger_id': '554159184566.2853699384.109e7d47f9800294ccf30c3d4d1c0201'
 }
+
+meal_to_book = {
+        'type': 'interactive_message',
+        'actions': [{'name': 'main_meal', 'type': 'button', 'value': '7_breakfast_2019-02-19_order_1_1'}],
+        'callback_id': 'meal_action_selector',
+        'team': {'id': 'T02R3LKBA', 'domain': 'andela'},
+        'channel': {'id': 'D88KHH37V', 'name': 'directmessage'},
+        'user': {'id': 'U882C5UC8', 'name': 'victor.adukwu'},
+        'action_ts': '1550491702.965015',
+        'message_ts': '1550491641.008000',
+        'attachment_id': '1',
+        'token': 'g1Cry9evBQwCkCLEUxZKA0QH',
+        'is_app_unfurl': False,
+        'response_url': 'https://hooks.slack.com/actions/T02R3LKBA/554103071989/6jNpGBwjoLjFVEORKVxjQWyv',
+        'trigger_id': '553207761761.2853699384.d9f8b287d8d5b2067b754a510098acb5'
+}
+
+
+final_selection = {
+        'type': 'dialog_submission',
+        'token': 'g1Cry9evBQwCkCLEUxZKA0QH',
+        'action_ts': '1550489752.583813',
+        'team': {'id': 'T02R3LKBA', 'domain': 'andela'},
+        'user': {'id': 'U882C5UC8', 'name': 'victor.adukwu'},
+        'channel': {'id': 'D88KHH37V', 'name': 'directmessage'},
+        'submission': {'side_1': '13', 'protein_1': '13'},
+        'callback_id': 'final_selection',
+        'response_url': 'https://hooks.slack.com/app/T02R3LKBA/553185145713/DkDJSPSpCMlAxPGPGhZ8LXps',
+        'state': '7_breakfast_2019-02-19_order_1_1'
+}
+
+final_selection_invalid = {
+        'type': 'dialog_submission',
+        'token': 'g1Cry9evBQwCkCLEUxZKA0QH',
+        'action_ts': '1550489752.583813',
+        'team': {'id': 'T02R3LKBA', 'domain': 'andela'},
+        'user': {'id': 'U882C5UC8', 'name': 'victor.adukwu'},
+        'channel': {'id': 'D88KHH37V', 'name': 'directmessage'},
+        # 'submission': {'side_1': '13', 'protein_1': '13'},
+        'callback_id': 'final_selection',
+        'response_url': 'https://hooks.slack.com/app/T02R3LKBA/553185145713/DkDJSPSpCMlAxPGPGhZ8LXps',
+        'state': '7_breakfast_2019-02-19_order_1_1'
+}
+
+rating_selector = {
+        'type': 'interactive_message',
+        'actions': [{'name': 'main_meal', 'type': 'button', 'value': '7_breakfast_2019-02-20_rate_1_1'}],
+        'callback_id': 'rating_selector',
+        'team': {'id': 'T02R3LKBA', 'domain': 'andela'},
+        'channel': {'id': 'D88KHH37V', 'name': 'directmessage'},
+        'user': {'id': 'U882C5UC8', 'name': 'victor.adukwu'},
+        'action_ts': '1550527333.836668',
+        'message_ts': '1550526751.008200',
+        'attachment_id': '1',
+        'token': 'g1Cry9evBQwCkCLEUxZKA0QH',
+        'is_app_unfurl': False,
+        'response_url': 'https://hooks.slack.com/actions/T02R3LKBA/554243423410/TjaH6eImHVWT0LzjdKI2ptbi',
+        'trigger_id': '555310992407.2853699384.3076067024b166443b15c8b9e4e191f7'
+}
+
+submit_rating = {
+        'type': 'dialog_submission',
+        'token': 'g1Cry9evBQwCkCLEUxZKA0QH',
+        'action_ts': '1550527598.156108',
+        'team': {'id': 'T02R3LKBA', 'domain': 'andela'},
+        'user': {'id': 'U882C5UC8', 'name': 'victor.adukwu'},
+        'channel': {'id': 'D88KHH37V', 'name': 'directmessage'},
+        'submission': {'rating value': '4', 'comment': 'Cool'},
+        'callback_id': 'submit_rating',
+        'response_url': 'https://hooks.slack.com/app/T02R3LKBA/553672885921/SF8yNuOiNWbKNqZhtikd77wt',
+        'state': '7_breakfast_2019-02-20_rate_1_1'
+}
