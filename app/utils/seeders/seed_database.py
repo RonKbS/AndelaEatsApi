@@ -20,28 +20,22 @@ model_mapper = OrderedDict({
 
 def check_start_insert_condition(start_insert, table_name, name):
 
-    if not start_insert:
-        start_insert = True if table_name == name else False
+    if start_insert:
+        start_insert = False if table_name == name else True
 
     return start_insert
 
 
-def truncate_db(table_name=None):
-
-    stop_truncate = False
+def truncate_db():
 
     for table in reversed(model_mapper):
+        try:
+            query = 'TRUNCATE table {} CASCADE'.format(model_mapper.get(table).get('model').__tablename__)
+            db.engine.execute(text(query))
 
-        if not stop_truncate:
-            try:
-                query = 'TRUNCATE table {} CASCADE'.format(model_mapper.get(table).get('model').__tablename__)
-                db.engine.execute(text(query))
-
-            except OperationalError:
-                query = 'DELETE FROM {}'.format(model_mapper.get(table).get('model').__tablename__)
-                db.engine.execute(text(query))
-
-        stop_truncate = check_start_insert_condition(stop_truncate, table_name, table)
+        except OperationalError:
+            query = 'DELETE FROM {}'.format(model_mapper.get(table).get('model').__tablename__)
+            db.engine.execute(text(query))
 
 
 
@@ -58,13 +52,14 @@ def bulk_insert(model, data):
 
 def seed_db(table_name):
 
-    start_insert = False if table_name else True
+    start_insert = True
 
-    truncate_db(table_name)
+    truncate_db()
 
     for name, model in model_mapper.items():
 
-        start_insert = check_start_insert_condition(start_insert, table_name, name)
-
         if start_insert:
             bulk_insert(**model)
+
+        start_insert = check_start_insert_condition(start_insert, table_name, name)
+
