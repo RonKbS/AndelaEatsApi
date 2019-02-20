@@ -1,23 +1,54 @@
+from os import getenv
+import jwt
 import json
 from app import create_app
 from app.utils import db
 from app.utils.auth import Auth
 from flask_testing import TestCase
-from flask import current_app
+from faker import Faker
 
+fake = Faker()
 
 class BaseTestCase(TestCase):
-	
+
+	VALID_TOKEN = None
+
 	def BaseSetUp(self):
 		"""Define test variables and initialize app"""
 		self.app = self.create_app()
 		self.client = self.app.test_client
-		
+
 		self.migrate()
+
+	@staticmethod
+	def generate_token(exp=None):
+		"""
+        Generates jwt tokens for testing purpose
+
+        params:
+            exp: Token Expiration. This could be datetime object or an integer
+        result:
+            token: This is the bearer token in this format 'Bearer token'
+        """
+
+		secret_key = getenv('JWT_SECRET_KEY')
+		payload = {
+			'UserInfo': User().to_dict(),
+			'iss': 'accounts.andela.com',
+			'aud': 'andela.com',
+		}
+		payload.__setitem__('exp', exp) if exp is not None else ''
+
+		token = jwt.encode(payload, secret_key, algorithm='RS256').decode('utf-8')
+		return token
 		
 	@staticmethod
 	def get_valid_token():
-		return 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySW5mbyI6eyJpZCI6Ii1MR19fODhzb3pPMU9HcnFkYTJ6IiwiZmlyc3RfbmFtZSI6IkVubyIsImxhc3RfbmFtZSI6IkJhc3NleSIsImZpcnN0TmFtZSI6IkVubyIsImxhc3ROYW1lIjoiQmFzc2V5IiwiZW1haWwiOiJlbm8uYmFzc2V5QGFuZGVsYS5jb20iLCJuYW1lIjoiRW5vIEJhc3NleSIsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vLWJvM3RJS3NMYXVBL0FBQUFBQUFBQUFJL0FBQUFBQUFBQUFjL1pXSGhuT2ZLbmJNL3Bob3RvLmpwZz9zej01MCIsInJvbGVzIjp7IlRlY2hub2xvZ3kiOiItS1hIN2lNRTRlYk1FWEFFYzdIUCIsIkFuZGVsYW4iOiItS2lpaGZab3NlUWVxQzZiV1RhdSJ9fSwiaWF0IjoxNTQ2OTM4NDk4LCJleHAiOjE1NDk1MzA0OTgsImF1ZCI6ImFuZGVsYS5jb20iLCJpc3MiOiJhY2NvdW50cy5hbmRlbGEuY29tIn0.Z6zQ8dtIW1OXD8OdW2QtfHcwPvpwFzCg12zp0l6lfNv4NxIZPmM9kdzXPcTXO0y7g56HwmD-xo0wLy3AoJbfCYyZILmvrOiPMXwQyKBQPnY3XGG9p5kttTP8VWJ_4fQsRtlFJuhb5Q-nlBudiuyh2iCEdQ2_i-OGLyVqDMBse5g'
+
+		if not BaseTestCase.VALID_TOKEN:
+			BaseTestCase.VALID_TOKEN = BaseTestCase.generate_token()
+
+		return BaseTestCase.VALID_TOKEN
 
 	@staticmethod
 	def user_id():
@@ -133,3 +164,40 @@ class BaseTestCase(TestCase):
 				return self.json_data
 
 		return MockResponseClass(json_data, status_code)
+
+
+class User:
+	"""Class for creating user mocks"""
+
+	def __init__(self):
+		self.first_name = fake.first_name()
+		self.id = "-LG__88sozO1OGrqda2z"
+		self.last_name = fake.last_name()
+		self.firstName = self.first_name
+		self.lastName = self.last_name
+		self.email = fake.email()
+		self.name = f'{self.first_name} {self.last_name}'
+		self.picture = fake.image_url(height=None, width=None)
+		self.roles = {
+			"Technology": "-KXH7iME4ebMEXAEc7HP",
+			"Andelan": "-KiihfZoseQeqC6bWTau"
+		}
+
+	def to_dict(self):
+		"""Converts the instance of this class to a dict.
+
+        Returns:
+            dict : User data dictionary.
+        """
+		return {
+				"id": self.id,
+				"first_name": self.first_name,
+				"last_name": self.last_name,
+				"firstName": self.firstName,
+				"lastName": self.lastName,
+				"email": self.email,
+				"name": self.name,
+				"picture": self.picture,
+				"roles": self.roles
+			}
+

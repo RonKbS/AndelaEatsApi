@@ -1,4 +1,6 @@
 import jwt
+from os import getenv
+from base64 import b64decode
 from functools import wraps
 from flask import request, jsonify, make_response
 from app.repositories.permission_repo import PermissionRepo
@@ -50,6 +52,31 @@ class Auth:
             raise e
 
     @staticmethod
+    def _get_jwt_public_key():
+
+        decode_public_key = lambda key_64: b64decode(key_64).decode('utf-8')
+
+        jwt_env_mapper = {
+            'testing': 'JWT_PUBLIC_KEY_TEST',
+            'production': 'JWT_PUBLIC_KEY',
+            'development': 'JWT_PUBLIC_KEY_TEST'
+        }
+
+        public_key_mapper = {
+            'testing': lambda key_64: key_64,
+            'development': lambda key_64: key_64,
+            'production': decode_public_key,
+        }
+        flask_env = getenv('FLASK_ENV', 'production')
+
+        public_key_64 = getenv(jwt_env_mapper.get(flask_env, 'JWT_PUBLIC_KEY_STAGING'))
+
+        public_key = public_key_mapper.get(
+            flask_env, decode_public_key)(public_key_64)
+
+        return public_key
+
+    @staticmethod
     def user(*keys):
         user = Auth._get_user()
         if keys:
@@ -82,9 +109,21 @@ class Auth:
         raise Exception('Internal Application Error')
 
     @staticmethod
-    def decode_token(token, jwtsecret=''):
+    def decode_token(token):
+
+        public_key = Auth._get_jwt_public_key()
+
         try:
-            decoded = jwt.decode(token, jwtsecret, verify=False)
+            decoded = jwt.decode(
+                token,
+                public_key,
+                algorithms=['RS256'],
+                audience='andela.com',
+                issuer="accounts.andela.com",
+                options={
+                    'verify_signature': True,
+                    'verify_exp': True
+                })
             return decoded
         except jwt.ExpiredSignature:
             raise Exception('Token is Expired')
