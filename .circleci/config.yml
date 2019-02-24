@@ -68,6 +68,20 @@ jobs:
             git config --global user.email "eno.bassey@andela.com"
             git config --global user.name "Eno Bassey"
             git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git develop:master
+
+  deploy_staging: # Deploy application to GCP staging
+    docker:
+      - image: circleci/node:10.15.0
+        environment:
+          GOOGLE_PROJECT_ID: bench-projects
+          GOOGLE_COMPUTE_ZONE: us-central1-a
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and deploy application to staging
+          command: chmod +x scripts/deploy.sh && scripts/deploy.sh
+
       
 
 workflows:
@@ -81,3 +95,6 @@ workflows:
           filters:
             branches:
               only: develop
+      - deploy_staging:
+          requires:
+            - build
