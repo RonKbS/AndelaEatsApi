@@ -21,8 +21,8 @@ FROM dependencies AS build
 WORKDIR /usr/src/app 
 COPY . /usr/src/app
 
-# ----- EXPOSE port 8000 to allow communication to/from server -----
-EXPOSE 8000
+# ----- EXPOSE port 4070 to allow communication to/from server -----
+EXPOSE 4070
 
 # Build / Compile if required
 
@@ -39,4 +39,4 @@ COPY --from=dependencies /root/.cache /root/.cache
 RUN pip install -r requirements.txt
 COPY --from=build /usr/src/app/ ./
 
-CMD ["gunicorn","run:app", "-b", "0.0.0.0:8000"]
+CMD ["gunicorn","run:app", "-b", "0.0.0.0:4070", "--timeout", "90"]
