@@ -1,0 +1,44 @@
+Get All Admin users
+---
+tags:
+  - Users
+summary: Get all Admin Users
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of the user
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: bearer token value
+definitions:
+  AdminUserListPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          AdminUsers:
+            type: array
+            items:
+              type: object
+              properties:
+                Id:
+                  type: string
+                Email:
+                  type: string
+                Name:
+                  type: string
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/AdminUserListPayload'

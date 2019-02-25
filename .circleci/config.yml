@@ -15,6 +15,7 @@ jobs:
           FLASK_APP: run
           FLASK_ENV: development
           APP_ENV: testing
+          DATABASE_TEST_URL: 'sqlite:///andelaeats.db'
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
