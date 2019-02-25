@@ -53,26 +53,27 @@ class Auth:
 
     @staticmethod
     def _get_jwt_public_key():
-
         decode_public_key = lambda key_64: b64decode(key_64).decode('utf-8')
 
         jwt_env_mapper = {
             'testing': 'JWT_PUBLIC_KEY_TEST',
             'production': 'JWT_PUBLIC_KEY',
-            'development': 'JWT_PUBLIC_KEY_TEST'
+            'development': 'JWT_PUBLIC_KEY',
+            'staging': 'JWT_PUBLIC_KEY'
         }
 
         public_key_mapper = {
             'testing': lambda key_64: key_64,
-            'development': lambda key_64: key_64,
+            'development': decode_public_key,
             'production': decode_public_key,
+            'staging': decode_public_key,
         }
-        flask_env = getenv('FLASK_ENV', 'production')
 
-        public_key_64 = getenv(jwt_env_mapper.get(flask_env, 'JWT_PUBLIC_KEY_STAGING'))
+        app_env = getenv('APP_ENV', 'production')
 
-        public_key = public_key_mapper.get(
-            flask_env, decode_public_key)(public_key_64)
+        public_key_64 = getenv(jwt_env_mapper.get(app_env, 'JWT_PUBLIC_KEY'))
+
+        public_key = public_key_mapper.get(app_env, decode_public_key)(public_key_64)
 
         return public_key
 
