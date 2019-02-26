@@ -81,6 +81,19 @@ jobs:
       - run:
           name: Build and deploy application to staging
           command: chmod +x scripts/deploy.sh && scripts/deploy.sh
+  
+  deploy_production: # Deploy application to  GCP production
+    docker:
+      - image: circleci/node:10.15.0
+        environment:
+          GOOGLE_PROJECT_ID: bench-projects
+          GOOGLE_COMPUTE_ZONE: europe-west1-b
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and deploy application to deploy_production
+          command: chmod +x scripts/deploy.sh && scripts/deploy.sh
 
       
 
@@ -101,3 +114,7 @@ workflows:
           filters:
             branches:
               only: develop
+      - deploy_production:
+          requires:
+            - build
+      
