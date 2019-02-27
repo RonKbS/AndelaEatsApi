@@ -45,6 +45,10 @@ class OrderController(BaseController):
 					for item in meal_items
 				]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				order_item['user_rating'] = rating
+
 				order_list.append(order_item)
 
 		return self.handle_response('OK', payload={'orders': order_list, 'meta': self.pagination_meta(orders)})
@@ -73,6 +77,10 @@ class OrderController(BaseController):
 					item.to_dict(only=OrderController.default_meal_item_return_fields)
 					for item in meal_items]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				order_item['user_rating'] = rating
+
 				order_list.append(order_item)
 		return self.handle_response('OK', payload={'orders': order_list})
 
@@ -98,6 +106,10 @@ class OrderController(BaseController):
 					item.to_dict(only=OrderController.default_meal_item_return_fields)
 					for item in meal_items]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				order_item['user_rating'] = rating
+
 				order_list.append(order_item)
 		return self.handle_response('OK', payload={'orders': order_list})
 
@@ -116,6 +128,9 @@ class OrderController(BaseController):
 
 			user = self.andela_service.get_user_by_email_or_id(order.user_id)
 			order_serialized['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+
+			rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+			order_serialized['user_rating'] = rating
 
 			return self.handle_response('OK', payload={'order': order_serialized})
 		return self.handle_response('Order not found', status_code=400)
@@ -137,6 +152,10 @@ class OrderController(BaseController):
 					item.to_dict(only=OrderController.default_meal_item_return_fields)
 					for item in meal_items]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				order_item['user_rating'] = rating
+
 				orders_list.append(order_item)
 		return self.handle_response('OK', payload={'orders': orders_list})
 
@@ -160,6 +179,10 @@ class OrderController(BaseController):
 					for item in meal_items
 				]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				order_item['user_rating'] = rating
+
 				order_list.append(order_item)
 		return self.handle_response('OK', payload={'orders': order_list})
 

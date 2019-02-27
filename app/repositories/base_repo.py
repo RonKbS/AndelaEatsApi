@@ -1,4 +1,5 @@
 from sqlalchemy import desc, asc
+from app.models import VendorRating
 
 class BaseRepo:
 	
@@ -94,4 +95,10 @@ class BaseRepo:
 	def filter(self, *args):
 		"""Query and filter the data of the model."""
 		return self._model.query.filter(*args).paginate(error_out=False)
+
+	def get_rating(self, user_id, rating_type, type_id):
+
+		rating = VendorRating.query.filter_by(user_id=user_id, rating_type=rating_type, type_id=type_id).first()
+
+		return rating.rating if rating else None
 
