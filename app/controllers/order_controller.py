@@ -13,6 +13,9 @@ from app.utils import current_time_by_zone, check_date_current_vs_date_for
 
 
 class OrderController(BaseController):
+
+	default_meal_item_return_fields = ['name', 'image', 'id', 'meal_type']
+
 	def __init__(self, request):
 		BaseController.__init__(self, request)
 		self.order_repo = OrderRepo()
@@ -37,8 +40,15 @@ class OrderController(BaseController):
 				user = self.andela_service.get_user_by_email_or_id(order.user_id)
 
 				order_item = order.serialize()
-				order_item['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
+				order_item['mealItems'] = [
+					item.to_dict(only=OrderController.default_meal_item_return_fields)
+					for item in meal_items
+				]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				order_item['user_rating'] = rating
+
 				order_list.append(order_item)
 
 		return self.handle_response('OK', payload={'orders': order_list, 'meta': self.pagination_meta(orders)})
@@ -63,8 +73,14 @@ class OrderController(BaseController):
 				meal_items = self.order_repo.get(order.id).meal_item_orders
 				user = self.andela_service.get_user_by_email_or_id(order.user_id)
 				order_item = order.serialize()
-				order_item['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
+				order_item['mealItems'] = [
+					item.to_dict(only=OrderController.default_meal_item_return_fields)
+					for item in meal_items]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				order_item['user_rating'] = rating
+
 				order_list.append(order_item)
 		return self.handle_response('OK', payload={'orders': order_list})
 
@@ -86,8 +102,14 @@ class OrderController(BaseController):
 				meal_items = self.order_repo.get(order.id).meal_item_orders
 				user = self.andela_service.get_user_by_email_or_id(order.user_id)
 				order_item = order.serialize()
-				order_item['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
+				order_item['mealItems'] = [
+					item.to_dict(only=OrderController.default_meal_item_return_fields)
+					for item in meal_items]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				order_item['user_rating'] = rating
+
 				order_list.append(order_item)
 		return self.handle_response('OK', payload={'orders': order_list})
 
@@ -100,10 +122,15 @@ class OrderController(BaseController):
 		order = self.order_repo.get(order_id)
 		if order:
 			order_serialized = order.serialize()
-			order_serialized['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in order.meal_item_orders]
+			order_serialized['mealItems'] = [
+				item.to_dict(only=OrderController.default_meal_item_return_fields)
+				for item in order.meal_item_orders]
 
 			user = self.andela_service.get_user_by_email_or_id(order.user_id)
 			order_serialized['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+
+			rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+			order_serialized['user_rating'] = rating
 
 			return self.handle_response('OK', payload={'order': order_serialized})
 		return self.handle_response('Order not found', status_code=400)
@@ -121,8 +148,14 @@ class OrderController(BaseController):
 				meal_items = self.order_repo.get(order.id).meal_item_orders
 				user = self.andela_service.get_user_by_email_or_id(order.user_id)
 				order_item = order.serialize()
-				order_item['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
+				order_item['mealItems'] = [
+					item.to_dict(only=OrderController.default_meal_item_return_fields)
+					for item in meal_items]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				order_item['user_rating'] = rating
+
 				orders_list.append(order_item)
 		return self.handle_response('OK', payload={'orders': orders_list})
 
@@ -141,8 +174,15 @@ class OrderController(BaseController):
 				meal_items = self.order_repo.get(order.id).meal_item_orders
 				user = self.andela_service.get_user_by_email_or_id(order.user_id)
 				order_item = order.serialize()
-				order_item['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
+				order_item['mealItems'] = [
+					item.to_dict(only=OrderController.default_meal_item_return_fields)
+					for item in meal_items
+				]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				order_item['user_rating'] = rating
+
 				order_list.append(order_item)
 		return self.handle_response('OK', payload={'orders': order_list})
 
@@ -175,7 +215,10 @@ class OrderController(BaseController):
 		new_order = self.order_repo.create_order(
 			user_id, date_booked_for, meal_object_items, location_id, menu_id, channel, meal_period).serialize()
 		
-		new_order['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_object_items]
+		new_order['mealItems'] = [
+			item.to_dict(only=OrderController.default_meal_item_return_fields)
+			for item in meal_object_items
+		]
 		return self.handle_response('OK', payload={'order': new_order}, status_code=201)
 
 	def update_order(self, order_id):
@@ -209,7 +252,10 @@ class OrderController(BaseController):
 				updates['meal_item_orders'] = meal_object_items
 
 			updated_order = self.order_repo.update(order, **updates).serialize()
-			updated_order['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in order.meal_item_orders]
+			updated_order['mealItems'] = [
+				item.to_dict(only=OrderController.default_meal_item_return_fields)
+				for item in order.meal_item_orders
+			]
 			return self.handle_response('OK', payload={'order': updated_order})
 
 		return self.handle_response('Invalid or incorrect order_id provided', status_code=400)
