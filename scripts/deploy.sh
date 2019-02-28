@@ -29,6 +29,8 @@ BRANCH_NAME=$CIRCLE_BRANCH
 
 # Explicitly set environment as production
 export ENVIRONMENT=production
+export GOOGLE_CLUSTER_NAME=bench-production
+export GOOGLE_COMPUTE_ZONE=europe-west1-b
 
 # ensure its an allowed deployment environment
 isAllowedDeployEnvironment $ENVIRONMENT
