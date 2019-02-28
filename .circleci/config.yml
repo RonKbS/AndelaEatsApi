@@ -102,4 +102,4 @@ workflows:
             branches:
               only: 
               - develop
-              - master
+              - mast
