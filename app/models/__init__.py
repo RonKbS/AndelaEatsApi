@@ -9,8 +9,4 @@ from .menu import Menu
 from .meal_item import MealItem
 from .order import Order
 from .activity import Activity
-
-
-# from .order import Order
-# from .user import User
-# from .meal import MealItem, MealPeriod, MealType
+from .faq import Faq

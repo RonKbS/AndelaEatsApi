@@ -58,3 +58,12 @@ class ActionType(str, enum.Enum):
     @classmethod
     def has_value(cls, value):
         return any(value == item.value for item in cls)
+
+
+class FaqCategoryType(str, enum.Enum):
+    user_faq = 'user_faq'
+    admin_faq = 'admin_faq'
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
