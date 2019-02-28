@@ -25,7 +25,11 @@ require 'GCLOUD_SERVICE_KEY' $GCLOUD_SERVICE_KEY
 
 BRANCH_NAME=$CIRCLE_BRANCH
 # set deployment environment
-setEnvironment $BRANCH_NAME
+# setEnvironment $BRANCH_NAME
+
+# Explicitly set environment as production
+export ENVIRONMENT=production
+
 # ensure its an allowed deployment environment
 isAllowedDeployEnvironment $ENVIRONMENT
 # get K8s deployment name
