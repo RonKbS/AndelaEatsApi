@@ -92,6 +92,8 @@ class VendorRatingController(BaseController):
                 return self.handle_response('This order has been rated', status_code=400)
 
         else:
+            if (datetime.now() - datetime.strptime(service_date, '%Y-%m-%d')).days < 1:
+                return self.handle_response('You can only rate meals of past days.', status_code=400)
             rating_type = RatingType.meal
             type_id = main_meal_id
             user_meal_rating = self.vendor_rating_repo.get_unpaginated(user_id=user_id, type_id=type_id, rating_type='meal')
