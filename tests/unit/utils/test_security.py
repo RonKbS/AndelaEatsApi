@@ -1,5 +1,6 @@
 from tests.base_test_case import BaseTestCase
 from app.utils.security import Security
+from app.models import Faq
 from unittest.mock import patch
 
 
@@ -322,3 +323,29 @@ class TestSecurity(BaseTestCase):
 
         self.assertEqual(
             response[0].get_json()['msg'], 'Bad Request - [not an int] in list must be integer')
+
+    def test_validate_query_params_validates_model_fields(self):
+
+        class MockRequest:
+            args = {'unknown': 46}
+
+        with patch('app.utils.security.request', new_callable=MockRequest):
+
+            response = Security.validate_query_params(Faq)(lambda *args, **kwargs: ('test',))()
+
+        self.assertEqual(
+            response[0].get_json()['msg'],
+            "Invalid keys ['unknown']. The supported keys are "
+            "['Id', 'IsDeleted', 'CreatedAt', 'UpdatedAt', 'Category', 'Question', 'Answer']"
+        )
+
+    def test_validate_query_params_succeeds_with_enpty_args(self):
+
+        class MockRequest:
+            args = {}
+
+        with patch('app.utils.security.request', new_callable=MockRequest):
+
+            response = Security.validate_query_params(Faq)(lambda *args, **kwargs: ('test',))()
+
+        self.assertEqual(response, ('test',))

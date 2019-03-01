@@ -1,6 +1,7 @@
 from functools import wraps
 from datetime import datetime
 from flask import request, make_response, jsonify
+from app.utils.snake_case import SnakeCaseConversion
 
 
 class Security:
@@ -269,3 +270,35 @@ class Security:
 			return decorated
 
 		return real_validate_request
+
+	@staticmethod
+	def validate_query_params(model):
+		model_columns = model.get_columns()
+
+		model_fields = [column for column in model_columns]
+
+		model_fields_camel = list(map(SnakeCaseConversion.snake_to_camel, model_fields))
+
+
+		def validator(f):
+
+			@wraps(f)
+			def decorated(*args, **kwargs):
+				queries = request.args
+				invalid_query_keys = []
+
+				for key in queries:
+					if SnakeCaseConversion.camel_to_snake(key) not in model_fields:
+						invalid_query_keys.append(key)
+
+				if invalid_query_keys:
+					return make_response(
+						jsonify({'msg': 'Invalid keys {}. The supported keys are {}'
+								.format(invalid_query_keys, model_fields_camel)})), 400
+
+				return f(*args, **kwargs)
+
+			return decorated
+
+		return validator
+

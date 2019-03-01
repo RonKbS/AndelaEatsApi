@@ -54,3 +54,12 @@ class BaseModel(db.Model):
             return dict_obj
 
         return _to_dict(self, predicate)
+
+    @classmethod
+    def get_columns(cls):
+        fields = {}
+
+        for column in cls.__table__.columns:
+                fields.__setitem__(column.name, column.type)
+
+        return fields
