@@ -1,8 +1,8 @@
-Create a Order Rating
+Create Order or menu Rating
 ---
 tags:
   - Vendor Ratings
-summary: Creates a new order rating.
+summary: Creates a new order rating. Also create menu rating for the previous day.
 consumes:
   - application/json
 parameters:
@@ -19,14 +19,9 @@ parameters:
     description: Bearer Token Value
   - in: body
     name: menu
-    description: Creation of an order Rating
+    description: Creation of an order rating  or menu rating
     schema:
       type: object
-      required:
-        - orderId or mainMealId
-        - comment
-        - rating
-        - channel
       properties:
         orderId:
           type: integer
@@ -35,7 +30,7 @@ parameters:
           type: integer
           required: true
         serviceDate:
-          descrition: The day the meal or order was served
+          description: The day the meal or order was served
           type: date
           required: true
         comment:
@@ -44,9 +39,13 @@ parameters:
         rating:
           type: number
           required: true
+        engagementId:
+          type: number
+          description: the id of the vendor engagement
+          required: true
         channel:
           type: string
-          required: true
+          required: optional
 definitions:
   VendorRatingPayload:
     type: object
