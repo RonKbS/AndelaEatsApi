@@ -15,28 +15,16 @@ from .order import Order
 from .activity import Activity
 from .faq import Faq
 
-from .listener_helpers import add_activity
+from .listener_helpers import attach_listen_type
 
-tables = [Vendor]
+tables_logged_after_every_insert = [Vendor, VendorEngagement, MealItem, Menu, Faq,
+                                    Role, Permission, UserRole, Location]
+tables_logged_after_every_update = [Vendor, VendorEngagement, MealItem, Menu, Faq,
+                                    Role, Permission, UserRole, Location, VendorRating]
+tables_logged_after_every_delete = [Vendor, VendorEngagement, MealItem, Menu, Faq,
+                                    Role, Permission, UserRole, Location, VendorRating]
 
-
-def after_insert_listener(mapper, connection, target):
-    add_activity(target)
-
-
-def after_update_listener(mapper, connection, target):
-    add_activity(target, listener_type="update")
-
-
-def after_delete_listener(mapper, connection, target):
-    add_activity(target, listener_type="delete")
-
-
-# Add after_insert, after_update, after_delete listeners to models
-for table in tables:
-   event.listen(table, 'after_insert', after_insert_listener)
-   event.listen(table, 'after_update', after_update_listener)
-   event.listen(table, 'after_delete', after_delete_listener)
-
-
-
+# attach all listeners to each admin table
+attach_listen_type(tables_logged_after_every_insert, 'after_insert')
+attach_listen_type(tables_logged_after_every_update, 'after_update')
+attach_listen_type(tables_logged_after_every_delete, 'after_delete')
