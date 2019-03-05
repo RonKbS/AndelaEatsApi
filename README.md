@@ -23,7 +23,13 @@ Navigate into the cloned project directory.
 
 Edit the `env-sample` file with your gmail credentials and save it as `.env`
 
-Change the parameters in there to your own settings e.g SEND GRID KEY
+Change the parameters in there to your own settings.
+
+The key ```FLASK_APP``` must be set to ```run```. The value of the`APP_ENV` between 
+
+`development` and `testing` in order to run the application `development` or `testing` 
+
+mode respectively.
 
 On the prompt execute the following 
 ```
@@ -39,6 +45,12 @@ python install -r requirements.txt
 Execute the following code to migrate all data tables/object
 ```
 python run.py db migrate
+```
+
+
+Execute the following code to seed the database
+```
+flask seed_database
 ```
 
 

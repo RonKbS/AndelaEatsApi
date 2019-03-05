@@ -1,5 +1,6 @@
 from app.utils.auth import Auth
 from flask import jsonify, make_response
+from app.utils.snake_case import SnakeCaseConversion
 
 class BaseController:
 	
@@ -14,7 +15,7 @@ class BaseController:
 		if keys:
 			values = list()
 			for key in keys:
-				values.append(_json[key]) if key in _json else values.append(None)
+				values.append(_json.get(key))
 			return values
 		
 		return _json
@@ -30,6 +31,13 @@ class BaseController:
 		for key in keys:
 			values.append(self.request.args.get(key))
 		return values
+
+	def get_params_dict(self):
+		args = {}
+		for key in self.request.args:
+			args.__setitem__(SnakeCaseConversion.camel_to_snake(key), self.request.args.get(key))
+
+		return args
 	
 	def get_json(self):
 		return self.request.get_json()

@@ -26,6 +26,7 @@ class BaseBlueprint:
 		from app.blueprints.vendor_engagement_blueprint import engagement_blueprint
 		from app.blueprints.bot_blueprint import bot_blueprint
 		from app.blueprints.user_blueprint import user_blueprint
+		from app.blueprints.faq_blueprint import faq_blueprint
 		
 		self.app.register_blueprint(meal_item_blueprint)
 		self.app.register_blueprint(vendor_blueprint)
@@ -38,4 +39,5 @@ class BaseBlueprint:
 		self.app.register_blueprint(order_blueprint)
 		self.app.register_blueprint(bot_blueprint)
 		self.app.register_blueprint(user_blueprint)
+		self.app.register_blueprint(faq_blueprint)
 
