@@ -227,8 +227,8 @@ class OrderController(BaseController):
 		:param order_id:
 		:return:
 		"""
+		date_booked_for, channel, meal_items, menu_id = self.request_params('dateBookedFor', 'channel', 'mealItems', 'menuId')
 
-		date_booked_for, channel, meal_items = self.request_params('dateBookedFor', 'channel', 'mealItems')
 		meal_object_items = []
 		for meal_item_id in meal_items:
 			meal_item = self.meal_item_repo.get(meal_item_id)
@@ -246,6 +246,10 @@ class OrderController(BaseController):
 				if order_date_midnight - current_time < timedelta('hours' == 7):
 					return self.handle_response('It is too late to book meal for the selected date ', status_code=400)
 				updates['date_booked_for'] = datetime.strptime(date_booked_for, '%Y-%m-%d')
+
+			if menu_id:
+				updates['menu_id'] = menu_id
+
 			if channel:
 				updates['channel'] = channel
 			if meal_items:
