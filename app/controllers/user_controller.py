@@ -42,8 +42,8 @@ class UserController(BaseController):
         ).items
 
         admin_users_list = []
-        admin_user_profile = {}
         for user_role in user_roles:
+            admin_user_profile = {}
             andela_user_profile = self.andela_service.get_user_by_email_or_id(
                 user_role.user_id
             )
