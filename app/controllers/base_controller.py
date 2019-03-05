@@ -15,7 +15,7 @@ class BaseController:
 		if keys:
 			values = list()
 			for key in keys:
-				values.append(_json[key]) if key in _json else values.append(None)
+				values.append(_json.get(key))
 			return values
 		
 		return _json
