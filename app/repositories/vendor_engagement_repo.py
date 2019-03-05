@@ -1,7 +1,7 @@
 from app.repositories.base_repo import BaseRepo
 from app.models.vendor_engagement import VendorEngagement
 from datetime import datetime
-from sqlalchemy import or_, and_
+from sqlalchemy import or_
 
 class VendorEngagementRepo(BaseRepo):
 	
@@ -29,3 +29,8 @@ class VendorEngagementRepo(BaseRepo):
 			VendorEngagement.end_date >= start_date,
 			VendorEngagement.is_deleted.is_(False)
 		).count()
+
+	@staticmethod
+	def vendor_of_the_day(date):
+		vendor = VendorEngagement.query.filter(or_(VendorEngagement.start_date <= date, date <= VendorEngagement.end_date)).first().vendor
+		return {'name': vendor.name, 'id': vendor.id}
