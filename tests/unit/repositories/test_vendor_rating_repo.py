@@ -1,4 +1,5 @@
 '''A module of tests for vendor rating repository'''
+from datetime import datetime
 from tests.base_test_case import BaseTestCase
 from app.models.vendor_rating import VendorRating
 from app.repositories.vendor_rating_repo import VendorRatingRepo
@@ -34,4 +35,10 @@ class TestVendorRatingRepo(BaseTestCase):
 		average_rating = self.repo.meal_average(new_vendor_rating.main_meal_id, new_vendor_rating.service_date)
 
 		self.assertEqual(average_rating, 4)
+
+	def test_daily_average_rating(self):
+		VendorRatingFactory.create_batch(3, rating=4, service_date=datetime.now().date())
+
+		resp = self.repo.daily_average_rating(datetime.now().date())
+		self.assertEqual(resp, 4)
 
