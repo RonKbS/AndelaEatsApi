@@ -20,7 +20,7 @@ from .listener_helpers import attach_listen_type
 tables_logged_after_every_insert = [Vendor, VendorEngagement, MealItem, Menu, Faq,
                                     Role, Permission, UserRole, Location]
 tables_logged_after_every_update = [Vendor, VendorEngagement, MealItem, Menu, Faq,
-                                    Role, Permission, UserRole, Location, VendorRating]
+                                    Role, Permission, UserRole, Location]
 tables_logged_after_every_delete = [Vendor, VendorEngagement, MealItem, Menu, Faq,
                                     Role, Permission, UserRole, Location, VendorRating]
 
