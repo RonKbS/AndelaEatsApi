@@ -525,7 +525,7 @@ class TestOrderController(BaseTestCase):
         # Arrange
         with self.app.app_context():
             mock_request_params.return_value = (
-                '2019-02-12', 'web', []
+                '2019-02-12', 'web', [], None
             )
             mock_meal_item_repo_get.return_value = Mock()
             mock_order_repo_get.return_value = None
@@ -553,7 +553,7 @@ class TestOrderController(BaseTestCase):
         # Arrange
         with self.app.app_context():
             mock_request_params.return_value = (
-                '2019-02-12', 'web', []
+                '2019-02-12', 'web', [], None
             )
             mock_meal_item_repo_get.return_value = Mock()
             mock_order_repo_get.return_value.is_deleted = True
@@ -588,7 +588,7 @@ class TestOrderController(BaseTestCase):
                 return_value=datetime(2019, 2, 12, 15, 45, 0)
             )
             mock_request_params.return_value = (
-                '2019-02-12', 'web', []
+                '2019-02-12', 'web', [], None
             )
             mock_meal_item_repo_get.return_value = [self.mock_meal_item, ]
             mock_order_repo_get.return_value = self.mock_order
@@ -627,7 +627,7 @@ class TestOrderController(BaseTestCase):
             )
             mock_date_booked = Mock()
             mock_request_params.return_value = (
-                mock_date_booked, 'web', [self.mock_meal_item, ]
+                mock_date_booked, 'web', [self.mock_meal_item, ], '1'
             )
             mock_meal_item_repo_get.return_value = [self.mock_meal_item, ]
             mock_order_repo_get.return_value = self.mock_order

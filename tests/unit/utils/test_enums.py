@@ -1,6 +1,6 @@
 from tests.base_test_case import BaseTestCase
 
-from app.utils.enums import (MealTypes, Channels, MealPeriods, OrderStatus, RatingType, ActionType )
+from app.utils.enums import (MealTypes, Channels, MealPeriods, OrderStatus, RatingType, ActionType, FaqCategoryType)
 
 class TestEnums(BaseTestCase):
 
@@ -54,3 +54,15 @@ class TestEnums(BaseTestCase):
             result = ActionType.has_value(value)
 
             self.assertTrue(result)
+
+    def test_faq_category_enums(self):
+        values = ['user_faq', 'admin_faq']
+
+        for value in values:
+            result = FaqCategoryType.has_value(value)
+
+            self.assertTrue(result)
+
+
+
+
