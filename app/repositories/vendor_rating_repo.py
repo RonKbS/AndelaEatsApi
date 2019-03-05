@@ -21,3 +21,13 @@ class VendorRatingRepo(BaseRepo):
     def meal_average(self, main_meal_id, date):
         meal_ratings = self.get_unpaginated(main_meal_id=main_meal_id, service_date=date)
         return mean([meal_rating.rating for meal_rating in meal_ratings])
+
+    @staticmethod
+    def daily_average_rating(date):
+
+        daily_ratings = VendorRating.query.filter_by(service_date=date).all()
+        if daily_ratings:
+            rating_values = [rating.rating for rating in daily_ratings]
+            rating_sum = sum(rating_values)
+            return round(rating_sum/len(rating_values), 1)
+        return None
