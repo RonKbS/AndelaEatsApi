@@ -17,7 +17,6 @@ def list_activities_date_range():
 
 
 @activity_blueprint.route('/action_range', methods=['GET'])
-@Security.url_validator(['action_type|required:exists:', 'date_range|required:range'])
+@Security.url_validator(['action_type|required:enum_options', 'date_range|required:range'])
 def list_activities_action_type_date_range():
-    import pdb;pdb.set_trace()
     return activity_controller.list_by_action_type_and_date_range()

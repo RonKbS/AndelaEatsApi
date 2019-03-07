@@ -3,7 +3,7 @@ from functools import wraps
 from datetime import datetime
 from flask import request, make_response, jsonify
 from app.utils.snake_case import SnakeCaseConversion
-
+from app.utils.enums import ActionType, Channels
 
 class Security:
 
@@ -99,6 +99,26 @@ class Security:
 									return make_response(
 										jsonify({'msg': 'Bad Request - {} can only have a len of {}'.format(
 											request_key, length_value)})), 400
+
+							if validator == 'enum_options':
+								mapper = {
+									'action_type': ActionType,
+									'channels': Channels
+								}
+
+								if not mapper.get(request_key, None):
+									return make_response(
+										jsonify({'msg': 'Bad Request - Invalid search field {}'.format(
+											request_key)})), 400
+
+								if not mapper.get(request_key).has_value(arguments[request_key]):
+									return make_response(
+										jsonify({'msg': 'Bad Request - {} can only have options: {}'.format(
+											request_key,
+											str([item.name for item in mapper.get(request_key)]).strip('[]')
+										)}
+										)
+									), 400
 
 							if validator == 'exists':
 								import importlib

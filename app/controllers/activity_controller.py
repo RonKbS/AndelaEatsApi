@@ -30,8 +30,6 @@ class ActivityController(BaseController):
         dates = self.request.args['date_range'].split(":")
         start_date, end_date = dates[0], dates[1]
 
-        import pdb;pdb.set_trace()
-
         activities = self.activity_repo.get_range_action_paginated_options(
             action_type=action_type, start_date=start_date, end_date=end_date
         )
