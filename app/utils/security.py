@@ -3,7 +3,8 @@ from functools import wraps
 from datetime import datetime
 from flask import request, make_response, jsonify
 from app.utils.snake_case import SnakeCaseConversion
-from app.utils.enums import ActionType, Channels
+from app.utils.enums import ActionType, Channels, FaqCategoryType
+
 
 class Security:
 
@@ -302,6 +303,12 @@ class Security:
 										return make_response(jsonify(
 											{'msg': 'Bad Request - [{}] in list must be integer'.format(val)})), 400
 
+
+							# Validate enums
+							if Security.validate_enums(validator, request_key, payload[request_key]):
+								return Security.validate_enums(validator, request_key, payload[request_key])
+
+
 				return f(*args, **kwargs)
 
 			return decorated
@@ -338,4 +345,26 @@ class Security:
 			return decorated
 
 		return validator
+
+
+	@staticmethod
+	def validate_enums(validator, key, value):
+
+		split_validator = validator.split('_')
+
+		enum_mapper = {
+			'FaqCategoryType': [value.value for value in FaqCategoryType.__members__.values()]
+		}
+
+		if split_validator[0] == 'enum':
+
+			enum_values = enum_mapper.get(split_validator[1])
+
+			if value not in enum_values:
+
+				return make_response(jsonify(
+					{'msg': "Bad Request - '{}' is not a valid value for key '{}'. "
+							"values must be any of the following {}".format(value, key, enum_values)})), 400
+
+
 

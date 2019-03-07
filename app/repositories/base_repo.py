@@ -102,3 +102,10 @@ class BaseRepo:
 
 		return rating.rating if rating else None
 
+	def exists(self, **kwargs):
+
+		if self._model.query.filter_by(**kwargs).first():
+			return True
+
+		return False
+

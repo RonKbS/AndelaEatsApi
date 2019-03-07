@@ -324,6 +324,25 @@ class TestSecurity(BaseTestCase):
         self.assertEqual(
             response[0].get_json()['msg'], 'Bad Request - [not an int] in list must be integer')
 
+    def test_validator_validates_enums(self):
+        class MockRequest:
+            json = {
+                'category': 'user_faqs'
+            }
+
+            @classmethod
+            def get_json(cls):
+                return cls.json
+
+        with patch('app.utils.security.request', new_callable=MockRequest):
+            response = Security.validator(['category|required:enum_FaqCategoryType'])(lambda *args, **kwargs: ('test',))()
+
+        self.assertEqual(
+            response[0].get_json()['msg'],
+            "Bad Request - 'user_faqs' is not a valid value for key 'category'. "
+            "values must be any of the following ['user_faq', 'admin_faq']"
+        )
+
     def test_validate_query_params_validates_model_fields(self):
 
         class MockRequest:
@@ -349,6 +368,16 @@ class TestSecurity(BaseTestCase):
             response = Security.validate_query_params(Faq)(lambda *args, **kwargs: ('test',))()
 
         self.assertEqual(response, ('test',))
+
+    def test_validate_enums_validates_enum_values(self):
+
+        response = Security.validate_enums('enum_FaqCategoryType', 'category', 'user_faqs')
+
+        self.assertEqual(
+            response[0].get_json()['msg'],
+            "Bad Request - 'user_faqs' is not a valid value for key 'category'. "
+            "values must be any of the following ['user_faq', 'admin_faq']"
+        )
 
     def test_validator_validates_for_non_enum_required_and_non_existing_enum(self):
         class MockRequest:

@@ -31,3 +31,13 @@ class FaqController(BaseController):
             return self.handle_response(f'Category should be one of these values {enum_values}', status_code=400)
 
         return self.handle_response('OK', payload={'FAQs': faqs_list, 'meta': self.pagination_meta(faqs)})
+
+    def create_faq(self):
+
+        category, question, answer = self.request_params('category', 'question', 'answer')
+
+        if self.faq_repo.exists(question=question):
+            return self.handle_response(f"Question '{question}' already exists", status_code=400)
+
+        faq = self.faq_repo.new_faq(category=category, question=question, answer=answer)
+        return self.handle_response('OK', payload={'FAQ': faq.serialize()}, status_code=201)
