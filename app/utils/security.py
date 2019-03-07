@@ -1,3 +1,4 @@
+from itertools import zip_longest
 from functools import wraps
 from datetime import datetime
 from flask import request, make_response, jsonify
@@ -42,9 +43,25 @@ class Security:
 									jsonify({'msg': 'Bad Request - {} must be integer'.format(request_key)})), 400
 
 							if validator == 'range':
-								elements_compare = arguments[request_key].split(':')
-								first_date = datetime.strptime(str(elements_compare[0]), '%Y-%m-%d')
-								second_date = datetime.strptime(str(elements_compare[1]), '%Y-%m-%d')
+								if ':' in arguments[request_key]:
+									elements_compare = arguments[request_key].split(':')
+								else:
+									return make_response(
+										jsonify(
+											{'msg': 'Bad Request - There must be a `:` separating the dates'}
+										)), 400
+
+								try:
+									first_date = datetime.strptime(str(elements_compare[0]), '%Y-%m-%d')
+									second_date = datetime.strptime(str(elements_compare[1]), '%Y-%m-%d')
+								except Exception as e:
+									return make_response(
+										jsonify({'msg': 'Bad Request - dates {} and {} should be valid dates.\
+											Format: YYYY-MM-DD'.format(
+											str(elements_compare[0]),
+											str(elements_compare[1]))
+										}
+										)), 400
 								if first_date > second_date:
 									return make_response(
 										jsonify({'msg': 'Bad Request - Start Date [{}] must be less than End Date[{}]'
