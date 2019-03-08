@@ -10,12 +10,10 @@ class ActivityController(BaseController):
         self.activity_repo = ActivityRepo()
 
     def list_by_date_range(self):
-        dates = self.request.args['date_range'].split(":")
-
-        start_date, end_date = dates[0], dates[1]
+        date_ranges = self.get_params('date_range')[0].split(":")
 
         activities = self.activity_repo.get_range_paginated_options(
-            start_date=start_date, end_date=end_date
+            start_date=date_ranges[0], end_date=date_ranges[1]
         )
 
         return self.handle_response(
@@ -25,13 +23,15 @@ class ActivityController(BaseController):
             }
         )
 
-    def list_by_action_type_and_date_range(self,):
-        action_type = self.request.args['action_type']
-        dates = self.request.args['date_range'].split(":")
-        start_date, end_date = dates[0], dates[1]
+    def list_by_action_type_and_date_range(self):
+
+        query_params = self.get_params_dict()
+
+        date_ranges = query_params.get('date_range').split(":")
+        action_type = query_params.get('action_type')
 
         activities = self.activity_repo.get_range_action_paginated_options(
-            action_type=action_type, start_date=start_date, end_date=end_date
+            action_type=action_type, start_date=date_ranges[0], end_date=date_ranges[1]
         )
 
         return self.handle_response(
