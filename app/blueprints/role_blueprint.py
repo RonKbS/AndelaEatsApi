@@ -69,7 +69,7 @@ def delete_user_role(user_role_id):
 
 
 @role_blueprint.route('/user/disable/', methods=['POST'])
-@Security.validator(['userRoleId|required'])
+@Security.validator(['roleId|required:int', 'userId|required'])
 @Auth.has_permission('delete_user_roles')
 @swag_from('documentation/disable_user_roles.yml')
 def disable_user_role():
