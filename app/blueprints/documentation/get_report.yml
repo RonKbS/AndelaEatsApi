@@ -1,0 +1,67 @@
+
+Get Dashboard Report
+---
+tags:
+  - Reports
+summary: Get reports for the dashboard
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: period
+    in: path
+    type: integer
+    required: false
+    description: the number of days the report should span
+    default: 14
+definitions:
+  ReportPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: array
+        items:
+          type: object
+          properties:
+            datetime:
+              type: string
+              format: date
+              example: Mon, 18 Feb 2019 00:00:00 GMT
+            collectedOrders:
+              type: integer
+              example: 10
+            uncollectedOrders:
+              type: integer
+              example: 1
+            cancellededOrders:
+              type: integer
+              example: 2
+            averageRating:
+              type: float
+              example: 4.7
+            vendor:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Finger Licking
+                id:
+                  type: integer
+
+
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/ReportPayload'

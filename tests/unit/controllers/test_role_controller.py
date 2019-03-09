@@ -500,18 +500,18 @@ class TestRoleController(BaseTestCase):
             assert result.get_json()['msg'] == 'user_role deleted for user'
 
     @patch.object(RoleController, 'request_params')
-    @patch.object(UserRoleRepo, 'get')
+    @patch.object(UserRoleRepo, 'get_unpaginated')
     def test_disable_user_role_when_role_doesnot_exist(
         self,
-        mock_user_role_repo_get,
+        mock_user_role_repo_get_unpaginated,
         mock_role_controller_request_params
     ):
         '''Test disable_user_role when the role doesnot exist.
         '''
         # Arrange
         with self.app.app_context():
-            mock_role_controller_request_params.return_value = 1
-            mock_user_role_repo_get.return_value = None
+            mock_role_controller_request_params.return_value = {'userId': '1', 'roleId': 1}
+            mock_user_role_repo_get_unpaginated.return_value = [None]
             role_controler = RoleController(self.request_context)
 
             # Act
@@ -524,10 +524,10 @@ class TestRoleController(BaseTestCase):
 
     @patch.object(UserRoleRepo, 'update')
     @patch.object(RoleController, 'request_params')
-    @patch.object(UserRoleRepo, 'get')
+    @patch.object(UserRoleRepo, 'get_unpaginated')
     def test_disable_user_role_ok_response(
         self,
-        mock_user_role_repo_get,
+        mock_user_role_repo_get_unpaginated,
         mock_role_controller_request_params,
         mock_user_role_repo_update
     ):
@@ -535,8 +535,8 @@ class TestRoleController(BaseTestCase):
         '''
         # Arrange
         with self.app.app_context():
-            mock_role_controller_request_params.return_value = 1
-            mock_user_role_repo_get.return_value = self.mock_user_role
+            mock_role_controller_request_params.return_value = {'userId': '1', 'roleId': 1}
+            mock_user_role_repo_get_unpaginated.return_value = [self.mock_user_role]
             mock_user_role_repo_update.return_value = self.mock_user_role
             role_controler = RoleController(self.request_context)
 

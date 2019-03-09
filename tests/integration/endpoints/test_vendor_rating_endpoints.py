@@ -237,5 +237,19 @@ class TestVendorRatingEndpoints(BaseTestCase):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response_json['msg'], 'Rating created')
-        self.assertEqual(response_json['payload']['rating']['id'], engagement_rating.id)
+        self.assertEqual(response_json['payload']['rating']['id'], 1)
+
+    def test_rating_today_meal_fails(self):
+        vendor = VendorFactory.create()
+
+        engagement = VendorEngagementFactory.create(vendor=vendor)
+        engagement_rating = VendorRatingFactory.build(engagement_id=engagement.id)
+
+        rating_data = {'rating': engagement_rating.rating, 'engagementId': engagement_rating.engagement_id,
+                       'serviceDate': datetime.strftime(datetime.now().date(), '%Y-%m-%d'), 'mainMealId': MealItemFactory.create().id}
+
+        response = self.client().post(self.make_url(f'/ratings/order/'), data=self.encode_to_json_string(rating_data),
+                                      headers=self.headers())
+
+        self.assertEqual(response.status_code, 400)
 
