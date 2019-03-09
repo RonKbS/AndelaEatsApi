@@ -1,0 +1,73 @@
+Get All Actvities between two dates
+---
+tags:
+  - Activities
+summary: Get all Activities by Date range
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: date_range
+    in: path
+    type: string
+    required: true
+    description: a range of dates
+    default: "2019-01-01:2019-12-31"
+definitions:
+  GetActivitiesPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          activities:
+            type: array
+            items:
+              type: object
+              properties:
+                moduleName:
+                  type: string
+                ipAddress:
+                  type: string
+                userId:
+                  type: string
+                actionType:
+                  type: string
+                actionDetails:
+                  type: string
+                channel:
+                  type: string
+                id:
+                  type: integer
+                isDeleted:
+                  type: boolean
+                timestamps:
+                  type: object
+                  properties:
+                    created_at:
+                      type: string
+                      format: date
+                      example: 2018-10-22
+                    updated_at:
+                      type: string
+                      format: date
+                      example: 2018-10-22
+
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/GetActivitiesPayload'
