@@ -99,8 +99,8 @@ class RoleController(BaseController):
 		)
 
 	def disable_user_role(self):
-		user_role_id = self.request_params('userRoleId')
-		user_role = self.user_role_repo.get(user_role_id)
+		user_id, role_id = self.request_params('userId', 'roleId')
+		user_role = self.user_role_repo.get_unpaginated(user_id=user_id, role_id=role_id)[0]
 		if user_role:
 			updates = {}
 			updates['is_active'] = False
