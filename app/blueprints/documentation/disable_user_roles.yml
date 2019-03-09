@@ -17,12 +17,16 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
-  - name: userRoleId
-    in: path
+  - name: userId
+    in: body
+    type: string
+    required: true
+    description: Id of the user to be denied access to the role
+  - name: roleId
+    in: body
     type: integer
     required: true
-    description: Id of the record to be disabled from the user
-    default: 1
+    description: Id of the role to from which to remove the user
 responses:
   200:
     description: Ok

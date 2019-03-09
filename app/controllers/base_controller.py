@@ -69,3 +69,25 @@ class BaseController:
 	def prettify_response_dates(self, created_at, updated_at=None):
 		return {'created_at': created_at, 'updated_at': updated_at,
 				'date_pretty_short': created_at.strftime('%b %d, %Y'), 'date_pretty': created_at.strftime('%B %d, %Y')}
+
+	@staticmethod
+	def return_transformed_enum_items(enums, items):
+		"""Transform enum types to strings of returned paginated items
+
+			: param1 target(tuple): A tuple of keys corresponding to dictionary values that are enum types
+			: param2 items(list): A list of items in a paginator
+
+			: return(list): list of transformed items
+		"""
+		transformed_items = []
+
+		for activity in items:
+
+			activity_item = activity.serialize()
+
+			for each_enum in enums:
+				activity_item[each_enum] = activity_item[each_enum].value
+
+			transformed_items.append(activity_item)
+
+		return transformed_items

@@ -349,3 +349,15 @@ class TestSecurity(BaseTestCase):
             response = Security.validate_query_params(Faq)(lambda *args, **kwargs: ('test',))()
 
         self.assertEqual(response, ('test',))
+
+    def test_validator_validates_for_non_enum_required_and_non_existing_enum(self):
+        class MockRequest:
+            args = {
+                'action_typ': 'create'
+            }
+
+        with patch('app.utils.security.request', new_callable=MockRequest):
+            response = Security.url_validator(['action_typ|enum_options'])(lambda *args, **kwargs: ('test',))()
+
+        self.assertIn(
+            'Bad Request - Invalid search field', response[0].get_json()['msg'])

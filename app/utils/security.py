@@ -1,8 +1,9 @@
+from itertools import zip_longest
 from functools import wraps
 from datetime import datetime
 from flask import request, make_response, jsonify
 from app.utils.snake_case import SnakeCaseConversion
-
+from app.utils.enums import ActionType, Channels
 
 class Security:
 
@@ -42,9 +43,25 @@ class Security:
 									jsonify({'msg': 'Bad Request - {} must be integer'.format(request_key)})), 400
 
 							if validator == 'range':
-								elements_compare = arguments[request_key].split(':')
-								first_date = datetime.strptime(str(elements_compare[0]), '%Y-%m-%d')
-								second_date = datetime.strptime(str(elements_compare[1]), '%Y-%m-%d')
+								if ':' in arguments[request_key]:
+									elements_compare = arguments[request_key].split(':')
+								else:
+									return make_response(
+										jsonify(
+											{'msg': 'Bad Request - There must be a `:` separating the dates'}
+										)), 400
+
+								try:
+									first_date = datetime.strptime(str(elements_compare[0]), '%Y-%m-%d')
+									second_date = datetime.strptime(str(elements_compare[1]), '%Y-%m-%d')
+								except Exception as e:
+									return make_response(
+										jsonify({'msg': 'Bad Request - dates {} and {} should be valid dates.\
+											Format: YYYY-MM-DD'.format(
+											str(elements_compare[0]),
+											str(elements_compare[1]))
+										}
+										)), 400
 								if first_date > second_date:
 									return make_response(
 										jsonify({'msg': 'Bad Request - Start Date [{}] must be less than End Date[{}]'
@@ -82,6 +99,26 @@ class Security:
 									return make_response(
 										jsonify({'msg': 'Bad Request - {} can only have a len of {}'.format(
 											request_key, length_value)})), 400
+
+							if validator == 'enum_options':
+								mapper = {
+									'action_type': ActionType,
+									'channels': Channels
+								}
+
+								if not mapper.get(request_key, None):
+									return make_response(
+										jsonify({'msg': 'Bad Request - Invalid search field {}'.format(
+											request_key)})), 400
+
+								if not mapper.get(request_key).has_value(arguments[request_key]):
+									return make_response(
+										jsonify({'msg': 'Bad Request - {} can only have options: {}'.format(
+											request_key,
+											str([item.name for item in mapper.get(request_key)]).strip('[]')
+										)}
+										)
+									), 400
 
 							if validator == 'exists':
 								import importlib

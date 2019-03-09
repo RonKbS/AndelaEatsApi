@@ -180,7 +180,7 @@ class TestRoleEndpoints(BaseTestCase):
 
 		new_role, _ = create_user_role('test_role')
 
-		user_role_data = {'userRoleId': new_role.id}
+		user_role_data = {'roleId': new_role.role_id, 'userId': new_role.user_id}
 
 		response = self.client().post(self.make_url(f'/roles/user/disable/'), data=self.encode_to_json_string(user_role_data),
 									  headers=self.headers())
