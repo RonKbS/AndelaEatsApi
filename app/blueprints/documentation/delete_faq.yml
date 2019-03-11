@@ -1,0 +1,60 @@
+Delete Single FAQ
+---
+tags:
+  - FAQs
+summary: Deletes FAQs.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+
+definitions:
+  FAQPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          FAQ:
+            type: object
+            properties:
+              category:
+                type: string
+              question:
+                type: string
+              answer:
+                type: string
+              id:
+                type: integer
+              isDeleted:
+                type: boolean
+              timestamps:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+                  updated_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+
+responses:
+  201:
+    description: Ok
+    schema:
+          $ref: '#/definitions/FAQPayload'

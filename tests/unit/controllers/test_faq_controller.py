@@ -121,3 +121,25 @@ class TestFaqController(BaseTestCase):
 
             self.assertEqual(response.status_code, 404)
             self.assertEqual(response.get_json()['msg'], 'FAQ Not Found')
+
+    def test_delete_faq_method_succeeds(self):
+        with self.app.app_context():
+            faq = FaqFactory()
+
+            faq_controller = FaqController(self.request_context)
+
+            response = faq_controller.delete_faq(faq.id)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual( response.get_json()['msg'], 'FAQ deleted successfully')
+
+    def test_delete_faq_method_handles_not_found(self):
+        with self.app.app_context():
+            faq = FaqFactory.create(is_deleted=True)
+
+            faq_controller = FaqController(self.request_context)
+
+            response = faq_controller.delete_faq(faq.id)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertEqual( response.get_json()['msg'], 'FAQ Not Found')
