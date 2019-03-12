@@ -38,13 +38,6 @@ authorize_docker() {
     docker login -u _json_key -p "$(cat ${HOME}/gcloud-service-key.json)" https://gcr.io
 }
 
-deploy_image() {
-    make release
-
-    make tag $IMAGE_TAG
-
-    make publish
-}
 
 install_google_cloud_sdk(){
     echo "====> Installing google cloud sdk"
@@ -82,7 +75,6 @@ deploy_to_kubernetes(){
 main() {
     set_variables
     authorize_docker
-    deploy_image
     install_google_cloud_sdk
     configure_google_cloud_sdk
     deploy_to_kubernetes
