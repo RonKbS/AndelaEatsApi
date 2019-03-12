@@ -1,5 +1,7 @@
 from tests.base_test_case import BaseTestCase
 from factories.faq_factory import FaqFactory
+from factories.role_factory import RoleFactory
+from factories.user_role_factory import UserRoleFactory
 
 
 class TestFaqEndpoints(BaseTestCase):
@@ -16,8 +18,26 @@ class TestFaqEndpoints(BaseTestCase):
 
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
-
-        print('response', response_json)
         self.assert200(response)
         self.assertEqual(response_json['msg'], 'OK')
         self.assertEqual(response_json['payload']['FAQs'][0]['id'], new_faq.id)
+
+    def test_create_faq_succeeds(self):
+
+        new_role = RoleFactory.create(name='Administrator')
+
+        new_user_role = UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
+        faq = FaqFactory.build()
+
+        faq_data = dict(category=faq.category, question=faq.question, answer=faq.answer)
+
+        response = self.client().post(self.make_url("/faqs/"), headers=self.headers(),
+                                      data=self.encode_to_json_string(faq_data))
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response_json['msg'], 'OK')
+        self.assertEqual(response_json['payload']['FAQ']['question'], faq.question)
+        self.assertEqual(response_json['payload']['FAQ']['answer'], faq.answer)

@@ -8,5 +8,5 @@ class Faq(BaseModel):
     __tablename__ = 'faqs'
 
     category = db.Column(db.Enum(FaqCategoryType), nullable=False, default='user_faq')
-    question = db.Column(db.String(2000), nullable=False)
+    question = db.Column(db.String(2000), unique=True, nullable=False)
     answer = db.Column(db.String(2000), nullable=False)

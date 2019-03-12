@@ -53,3 +53,40 @@ class TestFaqController(BaseTestCase):
             self.assertEqual(
                 response.get_json()['msg'], "Category should be one of these values ['user_faq', 'admin_faq']"
             )
+
+    @patch.object(FaqController, 'request_params')
+    def test_create_faq_method_succeeds(self, mock_request_params):
+        with self.app.app_context():
+            faq = FaqFactory.build()
+
+            mock_request_params.return_value = [faq.category, faq.question, faq.answer]
+
+            faq_controller = FaqController(self.request_context)
+
+            response = faq_controller.create_faq()
+
+            self.assertEqual(response.status_code, 201)
+            self.assertEqual(response.get_json()['msg'], 'OK')
+            self.assertEqual(
+                response.get_json()['payload']['FAQ']['question'], faq.question
+            )
+            self.assertEqual(
+                response.get_json()['payload']['FAQ']['answer'], faq.answer
+            )
+
+    @patch.object(FaqController, 'request_params')
+    def test_create_faq_method_handles_duplicate_faq_creation(self, mock_request_params):
+        with self.app.app_context():
+            faq = FaqFactory()
+
+            mock_request_params.return_value = [faq.category, faq.question, faq.answer]
+
+            faq_controller = FaqController(self.request_context)
+
+            response = faq_controller.create_faq()
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(
+                response.get_json()['msg'],
+                "Question '{}' already exists".format(faq.question)
+            )
