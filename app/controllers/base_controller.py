@@ -19,6 +19,20 @@ class BaseController:
 			return values
 		
 		return _json
+
+	def request_params_dict(self, *keys):
+		params = {}
+
+		for key in keys:
+			value = self.get_json().get(key)
+			params.__setitem__(SnakeCaseConversion.camel_to_snake(key), value) if value else None
+
+		if not keys:
+			for key, value in self.get_json().items():
+				params.__setitem__(SnakeCaseConversion.camel_to_snake(key), value)
+
+		return params
+
 	
 	def post_params(self, *keys):
 		values = list()
