@@ -37,6 +37,15 @@ definitions:
                   type: string
                 Name:
                   type: string
+                Roles:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
 responses:
   200:
     description: Ok

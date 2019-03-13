@@ -1,6 +1,7 @@
 from tests.base_test_case import BaseTestCase
 from app.utils.auth import Auth, jwt
 from unittest.mock import patch
+from collections import namedtuple
 
 
 class TestAuth(BaseTestCase):
@@ -131,3 +132,65 @@ class TestAuth(BaseTestCase):
         response = Auth.has_permission('permission')('permission')()
 
         self.assertEqual(response[0].get_json()['msg'], 'Missing User ID in token')
+
+    @patch('app.repositories.role_repo.RoleRepo.get')
+    @patch('app.repositories.user_role_repo.UserRoleRepo.find_first')
+    @patch('app.utils.auth.Auth.user')
+    def test_has_role_method_handles_succeeds(self, mock_auth_user, mock_find_first, mock_role_repo):
+
+        def mock_get(*args):
+            get_obj = namedtuple('mock', 'name')
+
+            return get_obj('admin')
+
+        class MockRole:
+            role_id = 1
+
+        mock_auth_user.return_value = {'id': 1}
+        mock_find_first.return_value = MockRole
+        mock_role_repo.return_value = mock_get()
+
+        response = Auth.has_role('admin')(lambda n: n)('test')
+
+        self.assertEqual(response, 'test')
+
+    @patch('app.utils.auth.Auth.user')
+    def test_has_role_method_handles_user_not_found(self, mock_auth_user):
+
+        mock_auth_user.return_value = None
+
+        response = Auth.has_role('admin')(lambda n: n)('test')
+
+        self.assertEqual(response[0].get_json()['msg'], 'Missing User ID in token')
+
+    @patch('app.repositories.user_role_repo.UserRoleRepo.find_first')
+    @patch('app.utils.auth.Auth.user')
+    def test_has_role_method_handles_role_not_fond(self, mock_auth_user, mock_find_first):
+
+        mock_auth_user.return_value = {'id': 1}
+        mock_find_first.return_value = None
+
+        response = Auth.has_role('admin')(lambda n: n)('test')
+
+        self.assertEqual(response[0].get_json()['msg'], 'Access Error - No Role Granted')
+
+    @patch('app.repositories.role_repo.RoleRepo.get')
+    @patch('app.repositories.user_role_repo.UserRoleRepo.find_first')
+    @patch('app.utils.auth.Auth.user')
+    def test_has_role_method_handles_unmatching_roles(self, mock_auth_user, mock_find_first, mock_role_repo):
+
+        def mock_get(*args):
+            get_obj = namedtuple('mock', 'name')
+
+            return get_obj('user')
+
+        class MockRole:
+            role_id = 1
+
+        mock_auth_user.return_value = {'id': 1}
+        mock_find_first.return_value = MockRole
+        mock_role_repo.return_value = mock_get()
+
+        response = Auth.has_role('admin')(lambda n: n)('test')
+
+        self.assertEqual(response[0].get_json()['msg'], 'Access Error - This role does not have the access rights')

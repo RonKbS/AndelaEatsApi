@@ -56,9 +56,11 @@ definitions:
             items:
               type: object
               properties:
-                help:
+                category:
                   type: string
-                name:
+                question:
+                  type: string
+                answer:
                   type: string
                 id:
                   type: integer
