@@ -69,9 +69,6 @@ jobs:
   deploy_gcp: # Deploy application to GCP staging
     docker:
       - image: circleci/node:10.15.0
-        environment:
-          GOOGLE_PROJECT_ID: bench-projects
-          GOOGLE_COMPUTE_ZONE: us-central1-a
     steps:
       - checkout
       - setup_remote_docker
@@ -98,4 +95,4 @@ workflows:
               only:
                 - develop
                 - master
-                - ch-deploy-andelaeats-production-164241992
+              
