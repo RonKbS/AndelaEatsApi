@@ -38,3 +38,11 @@ def update_faq(faq_id):
 
     return faq_controller.update_faq(faq_id)
 
+
+@faq_blueprint.route('/<int:faq_id>', methods=['DELETE'])
+@Auth.has_role('Administrator')
+@swag_from('documentation/delete_faq.yml')
+def delete_faq(faq_id):
+
+    return faq_controller.delete_faq(faq_id)
+

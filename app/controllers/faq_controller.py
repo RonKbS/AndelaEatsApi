@@ -53,3 +53,13 @@ class FaqController(BaseController):
             return self.handle_response('OK', payload={'faq': faq.serialize()}, status_code=201)
 
         return self.handle_response('FAQ Not Found', status_code=404)
+
+    def delete_faq(self, faq_id):
+        faq = self.faq_repo.get(faq_id)
+
+        if faq and not faq.is_deleted:
+            faq = self.faq_repo.update(faq, **dict(is_deleted=True))
+            return self.handle_response('FAQ deleted successfully', payload={'faq': faq.serialize()},
+                                        status_code=200)
+
+        return self.handle_response('FAQ Not Found', status_code=404)
