@@ -7,3 +7,5 @@ from .menu_controller import MenuController
 from .order_controller import OrderController
 from .role_controller import RoleController
 from .vendor_controller import VendorController
+from .vendor_rating_controller import VendorRatingController
+from .reports_controller import ReportsController

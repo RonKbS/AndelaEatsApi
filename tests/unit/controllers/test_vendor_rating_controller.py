@@ -527,8 +527,9 @@ class TestVendorRatingController(BaseTestCase):
                 engagement_id=1,
                 main_meal_id=1
             )
+            service_date = datetime.strftime((datetime.now() - timedelta(1)).date(), '%Y-%m-%d')
             mock_vendor_rating_controller_request_params.return_value = (
-                None, None, None, None, 3, None, None
+                None, None, None, None, 3, service_date, None
             )
             mock_auth_user.return_value = 1
             mock_meal_item_repo_get.return_value = mock_meal_item

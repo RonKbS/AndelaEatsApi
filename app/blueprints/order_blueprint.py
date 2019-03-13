@@ -73,7 +73,7 @@ def create_order():
 
 @order_blueprint.route('/<int:order_id>', methods=['PUT'])
 @Security.validator([
-	'dateBookedFor|required:date', 'channel|string',
+	'dateBookedFor|required:date', 'channel|string', 'menuId|optional:int',
 	'mealPeriod|required:string', 'mealItems|required:list_int'])
 @swag_from('documentation/update_order.yml')
 def update_order(order_id):
