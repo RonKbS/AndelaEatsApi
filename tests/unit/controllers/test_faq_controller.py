@@ -37,7 +37,7 @@ class TestFaqController(BaseTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.get_json()['msg'], 'OK')
             self.assertEqual(
-                response.get_json()['payload']['FAQs'][0]['id'], new_faq.id
+                response.get_json()['payload']['faqs'][0]['id'], new_faq.id
             )
 
     @patch.object(FaqRepo, 'filter_by')
@@ -68,10 +68,10 @@ class TestFaqController(BaseTestCase):
             self.assertEqual(response.status_code, 201)
             self.assertEqual(response.get_json()['msg'], 'OK')
             self.assertEqual(
-                response.get_json()['payload']['FAQ']['question'], faq.question
+                response.get_json()['payload']['faq']['question'], faq.question
             )
             self.assertEqual(
-                response.get_json()['payload']['FAQ']['answer'], faq.answer
+                response.get_json()['payload']['faq']['answer'], faq.answer
             )
 
     @patch.object(FaqController, 'request_params')
@@ -90,3 +90,56 @@ class TestFaqController(BaseTestCase):
                 response.get_json()['msg'],
                 "Question '{}' already exists".format(faq.question)
             )
+
+    @patch.object(FaqController, 'request_params_dict')
+    def test_update_faq_method_succeeds(self, mock_request_params_dict):
+        with self.app.app_context():
+            faq = FaqFactory()
+            update_faq_info = FaqFactory.build()
+
+            mock_request_params_dict.return_value = {'question': update_faq_info.question}
+
+            faq_controller = FaqController(self.request_context)
+
+            response = faq_controller.update_faq(faq.id)
+
+            self.assertEqual(response.status_code, 201)
+            self.assertEqual(response.get_json()['msg'], 'OK')
+            self.assertEqual(response.get_json()['payload']['faq']['question'], update_faq_info.question)
+
+    @patch.object(FaqController, 'request_params_dict')
+    def test_update_faq_method_handle_not_found(self, mock_request_params_dict):
+        with self.app.app_context():
+            faq = FaqFactory()
+            update_faq_info = FaqFactory.build()
+
+            mock_request_params_dict.return_value = {'question': update_faq_info.question}
+
+            faq_controller = FaqController(self.request_context)
+
+            response = faq_controller.update_faq(1000)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertEqual(response.get_json()['msg'], 'FAQ Not Found')
+
+    def test_delete_faq_method_succeeds(self):
+        with self.app.app_context():
+            faq = FaqFactory()
+
+            faq_controller = FaqController(self.request_context)
+
+            response = faq_controller.delete_faq(faq.id)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual( response.get_json()['msg'], 'FAQ deleted successfully')
+
+    def test_delete_faq_method_handles_not_found(self):
+        with self.app.app_context():
+            faq = FaqFactory.create(is_deleted=True)
+
+            faq_controller = FaqController(self.request_context)
+
+            response = faq_controller.delete_faq(faq.id)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertEqual( response.get_json()['msg'], 'FAQ Not Found')

@@ -20,7 +20,7 @@ class TestFaqEndpoints(BaseTestCase):
 
         self.assert200(response)
         self.assertEqual(response_json['msg'], 'OK')
-        self.assertEqual(response_json['payload']['FAQs'][0]['id'], new_faq.id)
+        self.assertEqual(response_json['payload']['faqs'][0]['id'], new_faq.id)
 
     def test_create_faq_succeeds(self):
 
@@ -39,5 +39,44 @@ class TestFaqEndpoints(BaseTestCase):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response_json['msg'], 'OK')
-        self.assertEqual(response_json['payload']['FAQ']['question'], faq.question)
-        self.assertEqual(response_json['payload']['FAQ']['answer'], faq.answer)
+        self.assertEqual(response_json['payload']['faq']['question'], faq.question)
+        self.assertEqual(response_json['payload']['faq']['answer'], faq.answer)
+
+    def test_update_faq_succeeds(self):
+        new_role = RoleFactory.create(name='Administrator')
+
+        new_user_role = UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
+        faq = FaqFactory()
+        update_faq_info = FaqFactory.build()
+
+        faq_data = dict(question=update_faq_info.question, answer=update_faq_info.answer)
+
+        response = self.client().patch(self.make_url(f"/faqs/{faq.id}"), headers=self.headers(),
+                                      data=self.encode_to_json_string(faq_data))
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response_json['msg'], 'OK')
+        self.assertEqual(response_json['payload']['faq']['question'], update_faq_info.question)
+        self.assertEqual(response_json['payload']['faq']['answer'], update_faq_info.answer)
+
+
+        self.assertEqual(response_json['payload']['faq']['question'], faq.question)
+        self.assertEqual(response_json['payload']['faq']['answer'], faq.answer)
+
+    def test_delete_faq_succeeds(self):
+
+        new_role = RoleFactory.create(name='Administrator')
+
+        new_user_role = UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
+        faq = FaqFactory()
+
+        response = self.client().delete(self.make_url(f"/faqs/{faq.id}"), headers=self.headers())
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_json['msg'], 'FAQ deleted successfully')
