@@ -11,6 +11,7 @@ class TestAboutEndpoint(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
         self.html_data = dict(data="<html><head <meta charset=\"UTF-8\"></head></html>")
+        self.html_data_wrong_key = dict(datas="<html><head <meta charset=\"UTF-8\"></head></html>")
         self.html_data_update = dict(data="<html><head <meta charset=\"UTF-8\"></head><body></body></html>")
 
     def test_create_about_details_succeeds(self):
@@ -87,3 +88,19 @@ class TestAboutEndpoint(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_json['msg'], 'OK')
         self.assertEqual(response_json['payload']['data'], {})
+
+    def test_create_about_endpoint_rejects_invalid_data(self):
+        """
+        Test that the endpoint '/about/create_or_update' rejects json request without data field
+        :return: None
+        """
+        response = self.client().post(
+            self.make_url("/about/create_or_update"), headers=self.headers(),
+            data=self.encode_to_json_string(self.html_data_wrong_key)
+        )
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response_json['msg'], 'Bad Request - data is required')
+
