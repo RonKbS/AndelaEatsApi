@@ -90,3 +90,30 @@ class TestBaseController(BaseTestCase):
             return_value = base_controller.request_params()
 
             assert return_value is None
+
+    def test_request_params_dict_returns_dictionary(self):
+
+        class MockRequest:
+
+            def get_json(self):
+                return {'test_key': 'test_value'}
+
+        with self.app.app_context():
+            base_controller = BaseController(MockRequest())
+
+            return_value = base_controller.request_params_dict()
+
+            self.assertEqual(return_value, MockRequest().get_json())
+
+    def test_request_params_dict_queries_specific_keys(self):
+        class MockRequest:
+
+            def get_json(self):
+                return {'test_key': 'test_value', 'test_key_2': 'test_value'}
+
+        with self.app.app_context():
+            base_controller = BaseController(MockRequest())
+
+            return_value = base_controller.request_params_dict('test_key')
+
+            self.assertEqual(return_value, {'test_key': 'test_value'})

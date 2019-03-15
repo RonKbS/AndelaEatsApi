@@ -1,5 +1,5 @@
 '''A module of FAQ blueprint'''
-from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, request
+from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, request, Auth
 from app.controllers.faq_controller import FaqController
 from app.utils.security import Security
 from app.models import Faq
@@ -19,4 +19,30 @@ def list_faqs():
     kwargs = faq_controller.get_params_dict()
 
     return faq_controller.list_faqs(**kwargs)
+
+
+@faq_blueprint.route('/', methods=['POST'])
+@Auth.has_role('Administrator')
+@Security.validator(['category|required:enum_FaqCategoryType', 'question|required', 'answer|required'])
+@swag_from('documentation/create_faq.yml')
+def create_faq():
+
+    return faq_controller.create_faq()
+
+
+@faq_blueprint.route('/<int:faq_id>', methods=['PUT', 'PATCH'])
+@Auth.has_role('Administrator')
+@Security.validator(['category|optional:enum_FaqCategoryType', 'question|optional', 'answer|optional'])
+@swag_from('documentation/update_faq.yml')
+def update_faq(faq_id):
+
+    return faq_controller.update_faq(faq_id)
+
+
+@faq_blueprint.route('/<int:faq_id>', methods=['DELETE'])
+@Auth.has_role('Administrator')
+@swag_from('documentation/delete_faq.yml')
+def delete_faq(faq_id):
+
+    return faq_controller.delete_faq(faq_id)
 
