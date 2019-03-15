@@ -13,7 +13,7 @@ class TestAboutEndpoint(BaseTestCase):
     def test_create_about_details_succeeds(self):
 
         response = self.client().post(
-            self.make_url("/about/"), headers=self.headers(),
+            self.make_url("/about/create_or_update"), headers=self.headers(),
             data=self.encode_to_json_string(self.html_data)
         )
 
@@ -29,7 +29,7 @@ class TestAboutEndpoint(BaseTestCase):
         )
 
         response = self.client().patch(
-            self.make_url("/about/"), headers=self.headers(),
+            self.make_url("/about/create_or_update"), headers=self.headers(),
             data=self.encode_to_json_string(self.html_data_update)
         )
 
@@ -45,7 +45,7 @@ class TestAboutEndpoint(BaseTestCase):
         )
 
         response = self.client().get(
-            self.make_url("/about/"), headers=self.headers()
+            self.make_url("/about/view"), headers=self.headers()
         )
 
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -57,7 +57,7 @@ class TestAboutEndpoint(BaseTestCase):
     def test_get_about_details_succeeds_for_non_existing_about_page(self):
 
         response = self.client().get(
-            self.make_url("/about/"), headers=self.headers()
+            self.make_url("/about/view"), headers=self.headers()
         )
 
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
