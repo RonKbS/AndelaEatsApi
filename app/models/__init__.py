@@ -14,6 +14,7 @@ from .meal_item import MealItem
 from .order import Order
 from .activity import Activity
 from .faq import Faq
+from .about import About
 
 from .listener_helpers import attach_listen_type
 
