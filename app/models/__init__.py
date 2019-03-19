@@ -15,6 +15,7 @@ from .order import Order
 from .activity import Activity
 from .faq import Faq
 from .about import About
+from .user import User
 
 from .listener_helpers import attach_listen_type
 
