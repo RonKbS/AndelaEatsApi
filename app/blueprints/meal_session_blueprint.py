@@ -19,6 +19,6 @@ meal_session_controller = MealSessionController(request)
     'start_time|time',
     'stop_time|time']
 )
-@swag_from('documentation/create_meal_session.yml')
+# @swag_from('documentation/create_meal_session.yml')
 def create():
     return meal_session_controller.create_session()
