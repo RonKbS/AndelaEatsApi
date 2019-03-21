@@ -67,3 +67,11 @@ class FaqCategoryType(str, enum.Enum):
     @classmethod
     def has_value(cls, value):
         return any(value == item.value for item in cls)
+
+class MealSessionNames(str, enum.Enum):
+    breakfast = 'breakfast'
+    lunch = 'lunch'
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)

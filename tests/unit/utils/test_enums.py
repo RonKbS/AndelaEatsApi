@@ -1,6 +1,7 @@
 from tests.base_test_case import BaseTestCase
 
-from app.utils.enums import (MealTypes, Channels, MealPeriods, OrderStatus, RatingType, ActionType, FaqCategoryType)
+from app.utils.enums import (MealTypes, Channels, MealPeriods, OrderStatus, RatingType, ActionType, FaqCategoryType,
+                             MealSessionNames)
 
 class TestEnums(BaseTestCase):
 
@@ -60,6 +61,14 @@ class TestEnums(BaseTestCase):
 
         for value in values:
             result = FaqCategoryType.has_value(value)
+
+            self.assertTrue(result)
+
+    def test_meal_session_names_enums(self):
+        values = ['breakfast', 'lunch']
+
+        for value in values:
+            result = MealSessionNames.has_value(value)
 
             self.assertTrue(result)
 
