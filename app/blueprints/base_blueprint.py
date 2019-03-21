@@ -29,6 +29,7 @@ class BaseBlueprint:
 		from app.blueprints.reports_blueprint import reports_blueprint
 		from app.blueprints.activity_blueprint import activity_blueprint
 		from app.blueprints.about_blueprint import about_blueprint
+		from app.blueprints.meal_session_blueprint import meal_session_blueprint
 		
 		self.app.register_blueprint(meal_item_blueprint)
 		self.app.register_blueprint(vendor_blueprint)
@@ -45,3 +46,4 @@ class BaseBlueprint:
 		self.app.register_blueprint(reports_blueprint)
 		self.app.register_blueprint(activity_blueprint)
 		self.app.register_blueprint(about_blueprint)
+		self.app.register_blueprint(meal_session_blueprint)

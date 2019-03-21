@@ -3,7 +3,7 @@ from functools import wraps
 from datetime import datetime
 from flask import request, make_response, jsonify
 from app.utils.snake_case import SnakeCaseConversion
-from app.utils.enums import ActionType, Channels, FaqCategoryType
+from app.utils.enums import ActionType, Channels, FaqCategoryType, MealSessionNames
 
 
 class Security:
@@ -282,13 +282,29 @@ class Security:
 														.format(request_key, column_name,
 																repo_name)})), 400
 
-							if validator == 'date':
+							if validator == 'date' or validator == 'time':
+
+								mapper = {
+									'date': {
+										'formatter': '%Y-%m-%d',
+										'format':  'YYYY-MM-DD',
+										'type': 'date',
+									},
+									'time': {
+										'formatter': '%Y-%m-%d',
+										'format': 'Hrs:Mins. Eg 17:59',
+										'type': 'time'
+									}
+								}
+
+								formatter = mapper.get(validator)
+
 								try:
-									datetime.strptime(payload[request_key], '%Y-%m-%d')
+									datetime.strptime(payload[request_key], formatter.get('formatter'))
 								except Exception as e:
 									return make_response(
-										jsonify({'msg': 'Bad Request - {} should be valid date. Format: YYYY-MM-DD'
-												.format(request_key)})), 400
+										jsonify({'msg': 'Bad Request - {} should be valid {}. Format: {}'
+												.format(request_key, formatter.get('type'), formatter.get('format'))})), 400
 
 							if validator == 'list' and type(payload[request_key]) is not list:
 								return make_response(
@@ -353,7 +369,8 @@ class Security:
 		split_validator = validator.split('_')
 
 		enum_mapper = {
-			'FaqCategoryType': [value.value for value in FaqCategoryType.__members__.values()]
+			'FaqCategoryType': [value.value for value in FaqCategoryType.__members__.values()],
+			'MealSessionNames': [value.value for value in MealSessionNames.__members__.values()],
 		}
 
 		if split_validator[0] == 'enum':
