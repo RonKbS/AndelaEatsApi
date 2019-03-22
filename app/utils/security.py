@@ -291,7 +291,7 @@ class Security:
 										'type': 'date',
 									},
 									'time': {
-										'formatter': '%Y-%m-%d',
+										'formatter': '%H:%M',
 										'format': 'Hrs:Mins. Eg 17:59',
 										'type': 'time'
 									}

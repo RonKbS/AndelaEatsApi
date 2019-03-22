@@ -15,9 +15,9 @@ meal_session_controller = MealSessionController(request)
 @meal_session_blueprint.route('/session', methods=['POST'])
 @Security.validator([
     'name|required:enum_MealSessionNames',
-    'date|date',
-    'start_time|time',
-    'stop_time|time']
+    'date|required:date',
+    'start_time|required:time',
+    'end_time|required:time']
 )
 # @swag_from('documentation/create_meal_session.yml')
 def create():
