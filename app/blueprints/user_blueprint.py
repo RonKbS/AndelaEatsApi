@@ -9,5 +9,12 @@ user_controller = UserController(request)
 @user_blueprint.route('/admin', methods=['GET'])
 @Auth.has_permission('create_user_roles')
 @swag_from('documentation/get_all_admin_users.yml')
-def list_users():
+def list_admin_users():
     return user_controller.list_admin_users()
+
+
+@user_blueprint.route('/', methods=['GET'])
+@Auth.has_permission('view_users')
+@swag_from('documentation/get_all_users.yml')
+def list_all_users():
+    return user_controller.list_all_users()

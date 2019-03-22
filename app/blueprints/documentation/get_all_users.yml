@@ -1,0 +1,92 @@
+Get All Users
+---
+tags:
+  - Users
+summary: Returns paginated user records
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: page
+    in: path
+    type: integer
+    required: optional
+    description: the number of the page
+    default: 1
+  - name: per_page
+    in: path
+    type: integer
+    required: optional
+    description: The number of records per page
+    default: 1
+definitions:
+  UserListPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          users:
+            type: array
+            items:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                slackId:
+                  type: string
+                imageUrl:
+                  type: string
+                email:
+                  type: string
+                id:
+                  type: integer
+                userRoleId:
+                  type: integer
+                isDeleted:
+                  type: boolean
+                timestamps:
+                  type: object
+                  properties:
+                    created_at:
+                      type: string
+                      format: date
+                      example: 2018-10-22
+                    updated_at:
+                      type: string
+                      format: date
+                      example: 2018-10-22
+          meta:
+            type: object
+            properties:
+              current_page:
+                type: integer
+              next_page:
+                type: integer
+              prev_page:
+                type: integer
+              total_pages:
+                type: integer
+              total_rows:
+                type: integer
+
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/UserListPayload'
