@@ -1,6 +1,8 @@
 import base64
 from tests.base_test_case import BaseTestCase
 from factories.about_factory import AboutFactory
+from factories.role_factory import RoleFactory
+from factories.user_role_factory import UserRoleFactory
 
 
 class TestAboutEndpoint(BaseTestCase):
@@ -20,6 +22,10 @@ class TestAboutEndpoint(BaseTestCase):
         made in case details do not already exist in the database
         :return: None
         """
+        new_role = RoleFactory.create(name='admin')
+
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
         response = self.client().post(
             self.make_url("/about/create_or_update"), headers=self.headers(),
             data=self.encode_to_json_string(self.html_data)
@@ -37,6 +43,10 @@ class TestAboutEndpoint(BaseTestCase):
         made.
         :return: None
         """
+        new_role = RoleFactory.create(name='admin')
+
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
         AboutFactory.create(
             details=base64.b64encode(self.html_data['data'].encode('utf-8'))
         )
@@ -94,6 +104,10 @@ class TestAboutEndpoint(BaseTestCase):
         Test that the endpoint '/about/create_or_update' rejects json request without data field
         :return: None
         """
+        new_role = RoleFactory.create(name='admin')
+
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
         response = self.client().post(
             self.make_url("/about/create_or_update"), headers=self.headers(),
             data=self.encode_to_json_string(self.html_data_wrong_key)

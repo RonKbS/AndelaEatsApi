@@ -24,7 +24,7 @@ class TestFaqEndpoints(BaseTestCase):
 
     def test_create_faq_succeeds(self):
 
-        new_role = RoleFactory.create(name='Administrator')
+        new_role = RoleFactory.create(name='admin')
 
         new_user_role = UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
 
@@ -43,7 +43,7 @@ class TestFaqEndpoints(BaseTestCase):
         self.assertEqual(response_json['payload']['faq']['answer'], faq.answer)
 
     def test_update_faq_succeeds(self):
-        new_role = RoleFactory.create(name='Administrator')
+        new_role = RoleFactory.create(name='admin')
 
         new_user_role = UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
 
@@ -68,7 +68,7 @@ class TestFaqEndpoints(BaseTestCase):
 
     def test_delete_faq_succeeds(self):
 
-        new_role = RoleFactory.create(name='Administrator')
+        new_role = RoleFactory.create(name='admin')
 
         new_user_role = UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
 

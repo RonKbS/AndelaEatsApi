@@ -3,7 +3,7 @@ Module to deal with the about page
 """
 from flasgger import swag_from
 
-from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, request
+from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, request, Auth
 from app.controllers.about_controller import AboutController
 from app.utils.security import Security
 
@@ -19,6 +19,7 @@ def get_about_page():
 
 
 @about_blueprint.route('/create_or_update', methods=['POST', 'PATCH'])
+@Auth.has_role('admin')
 @Security.validator(['data|required'])
 @swag_from('documentation/create_about.yml')
 def create_about_page():
