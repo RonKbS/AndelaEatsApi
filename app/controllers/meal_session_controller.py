@@ -23,20 +23,24 @@ class MealSessionController(BaseController):
         start_time = time(hour=int(start_time_split[0]), minute=int(start_time_split[1]))
         end_time = time(hour=int(end_time_split[0]), minute=int(end_time_split[1]))
 
-        if start_time > end_time:
+        if self.meal_session_repo.check_two_values_are_greater(
+            start_time,
+            end_time,
+        ):
             return make_response(
-                        jsonify({'msg': 'start time cannot  be after end time'}
-                                ), 400)
+                jsonify({'msg': 'start time cannot  be after end time'}
+                        ), 400)
 
         date_sent = datetime(year=int(date_split[0]), month=int(date_split[1]), day=int(date_split[2]))
-
         current_date = datetime.now()
-        if date_sent < datetime(year=current_date.year,
-                           month=current_date.month,
-                           day=current_date.day):
+
+        if self.meal_session_repo.check_two_values_are_greater(
+            datetime(year=current_date.year, month=current_date.month,day=current_date.day),
+            date_sent
+        ):
             return make_response(
-                        jsonify({'msg': 'date provided cannot be one before the current date'}
-                                ), 400)
+                jsonify({'msg': 'date provided cannot be one before the current date'}
+                        ), 400)
 
         if self.meal_session_repo.filter_by(name=name, start_time=start_time, stop_time=end_time,
                                             date=date, location_id=location_id).items:
@@ -44,22 +48,32 @@ class MealSessionController(BaseController):
                 jsonify({'msg': 'This exact meal session already exists'}
                         ), 400)
 
-        if MealSession.query.filter(
-                MealSession.name==name,
-                MealSession.date==date_sent,
-                MealSession.location_id==location_id,
-                MealSession.start_time <= start_time,
-                MealSession.stop_time >= start_time).paginate(error_out=False).items \
-                or \
-            MealSession.query.filter(
-                MealSession.name == name,
-                MealSession.date == date_sent,
-                MealSession.location_id == location_id,
-                MealSession.start_time <= end_time,
-                MealSession.stop_time >= end_time):
-
+        if self.meal_session_repo.check_meal_session_exists_in_specified_time(
+            **{
+                "name": name,
+                "date_sent": date_sent,
+                "location_id": location_id,
+                "start_time": start_time,
+                "end_time": end_time,
+            }
+        ):
             return make_response(
                 jsonify({'msg': 'This exact meal session already exists between the specified start and stop times'}
+                        ), 400)
+
+        if self.meal_session_repo.check_encloses_already_existing_meal_sessions(
+            **{
+                "name": name,
+                "date_sent": date_sent,
+                "location_id": location_id,
+                "start_time": start_time,
+                "end_time": end_time,
+            }
+        ):
+            return make_response(
+                jsonify({'msg': '{} meal session(s) already exist between the specified start and stop times'.format(
+                    name
+                )}
                         ), 400)
 
         new_meal_session = self.meal_session_repo.new_meal_session(
