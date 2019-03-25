@@ -3,7 +3,7 @@
 from datetime import datetime, time
 from tests.base_test_case import BaseTestCase
 from app.repositories.meal_session_repo import MealSessionRepo
-from factories import MealSessionFactory, LocationFactory
+from factories import MealSessionFactory, LocationFactory, RoleFactory, UserRoleFactory
 
 
 class TestMealSessionEndpoints(BaseTestCase):
@@ -20,6 +20,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         """
 
         new_location = LocationFactory.create(id=1, name="Lagos")
+
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
 
         meal_session_data = {
             "name": "lunch",
@@ -54,6 +57,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         :return:
         """
         new_location = LocationFactory.create(id=1, name="Lagos")
+
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
 
         meal_session_data = {
             "name": "lunch",
@@ -94,6 +100,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         """
         LocationFactory.create(id=1, name="Lagos")
 
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
         meal_session_data = {
             "name": "lunch",
             "startTime": "13:00",
@@ -122,6 +131,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         :return:
         """
         new_location = LocationFactory.create(id=1, name="Russian Republic")
+
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
 
         meal_session_data = {
             "name": "lunch",
@@ -152,6 +164,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
         meal_session_data = {
             "name": "lunch",
             "startTime": "14:00",
@@ -175,6 +190,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         :return:
         """
         new_location = LocationFactory.create(id=1, name="Lagos")
+
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
 
         import pytz
         tz = pytz.timezone('Africa/Lagos')
@@ -208,6 +226,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         :return:
         """
         new_location = LocationFactory.create(id=1, name="Lagos")
+
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
 
         # Create first meal session between 1:00PM and 2:00PM
         MealSessionFactory.create(
@@ -252,6 +273,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
         # Create first meal session between 1:00PM and 2:00PM
         MealSessionFactory.create(
             name="lunch",
@@ -295,6 +319,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
         # Create first meal session between 1:00PM and 2:00PM
         MealSessionFactory.create(
             name="lunch",
@@ -336,6 +363,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
         meal_session_data = {
             "name": "lunch",
             "startTime": "12:10",
@@ -362,6 +392,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         :return:
         """
         new_location = LocationFactory.create(id=1, name="Lagos")
+
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
 
         meal_session_data = {
             "name": "some invalid name",
@@ -395,6 +428,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
         meal_session_data = {
             "name": "lunch",
             "startTime": "90:10",
@@ -425,6 +461,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         :return:
         """
         new_location = LocationFactory.create(id=1, name="Lagos")
+
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
 
         meal_session_data = {
             "name": "lunch",
@@ -457,6 +496,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         """
         LocationFactory.create(id=1, name="Lagos")
 
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
         meal_session_data = {
             "name": "lunch",
             "startTime": "13:10",
@@ -488,6 +530,9 @@ class TestMealSessionEndpoints(BaseTestCase):
         :return:
         """
         LocationFactory.create(id=1, name="Lagos")
+
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
 
         meal_session_data = {
             "name": "lunch",
