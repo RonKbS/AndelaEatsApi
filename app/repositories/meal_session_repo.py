@@ -25,6 +25,15 @@ class MealSessionRepo(BaseRepo):
 
         return meal_session
 
+    def update_meal_session(self, meals_session_instance, **kwargs):
+        """
+        :parameter
+            kwargs: key-values pairs and the following are the required keys:
+                    {name, start_time, stop_time, date, location_id}
+
+        """
+        return self.update(meals_session_instance, **kwargs)
+
     @staticmethod
     def check_two_values_are_greater(*args):
         """
@@ -75,6 +84,44 @@ class MealSessionRepo(BaseRepo):
             return False
 
     @staticmethod
+    def check_meal_session_exists_in_other_specified_times(**kwargs):
+        """
+            Check whether a meal session other than the one with a particular
+            session_id is already taking place at the specified
+            time. Examples of possible situations are:
+            1. A start_time for lunch is specified for a lunch session that is already
+               in existence.
+            2. A stop_time is specified for the for a lunch session that is already
+               in existence.
+
+            :param kwargs:
+                   Possible keys: name, date_sent, start_time, stop_time, location_id
+
+            :return: Boolean
+        """
+        meal_sessions = MealSession.query.filter(
+            MealSession.name == kwargs.get('name'),
+            MealSession.date == kwargs.get('date_sent'),
+            MealSession.location_id == kwargs.get('location_id'),
+            MealSession.id != kwargs.get('meal_session_id')
+        )
+
+        if meal_sessions.filter(
+                MealSession.start_time <= kwargs.get('start_time'),
+                MealSession.stop_time >= kwargs.get('start_time')).paginate(error_out=False).items \
+                or \
+                MealSession.query.filter(
+                    MealSession.name == kwargs.get('name'),
+                    MealSession.date == kwargs.get('date_sent'),
+                    MealSession.location_id == kwargs.get('location_id'),
+                    MealSession.start_time <= kwargs.get('end_time'),
+                    MealSession.id != kwargs.get('meal_session_id'),
+                    MealSession.stop_time >= kwargs.get('end_time')).paginate(error_out=False).items:
+            return True
+        else:
+            return False
+
+    @staticmethod
     def check_encloses_already_existing_meal_sessions(**kwargs):
         """
         Check whether time specified encloses already existing meal sessions
@@ -90,6 +137,29 @@ class MealSessionRepo(BaseRepo):
                 MealSession.name == kwargs.get('name'),
                 MealSession.date == kwargs.get('date_sent'),
                 MealSession.location_id == kwargs.get('location_id'),
+                MealSession.start_time >= kwargs.get('start_time'),
+                MealSession.stop_time <= kwargs.get('end_time')).paginate(error_out=False).items:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def check_encloses_already_existing_in_other_meal_sessions(**kwargs):
+        """
+        Check whether time specified encloses already existing meal sessions other than a meal session specified
+        For example: a lunch meal session may already exist between 13:00hrs and 14:00hrs
+        and a user tries to create another meal session between 12:59 and 14:01hrs
+
+        :param kwargs:
+               Possible keys: name, date_sent, start_time, stop_time, location_id
+
+        :return: Boolean
+        """
+        if MealSession.query.filter(
+                MealSession.name == kwargs.get('name'),
+                MealSession.date == kwargs.get('date_sent'),
+                MealSession.location_id == kwargs.get('location_id'),
+                MealSession.id != kwargs.get('meal_session_id'),
                 MealSession.start_time >= kwargs.get('start_time'),
                 MealSession.stop_time <= kwargs.get('end_time')).paginate(error_out=False).items:
             return True
@@ -161,6 +231,25 @@ class MealSessionRepo(BaseRepo):
         else:
             return False
 
+    @staticmethod
+    def validate_meal_session_already_exists_other_than_specified(**kwargs):
+        """
+        Check whether a particular meal session already exists
+
+        :param kwargs: dict with keys name, data_sent, location_id, start_time and end_time
+        :return: boolean
+        """
+        if MealSession.query.filter(
+                MealSession.name == kwargs.get('name'),
+                MealSession.date == kwargs.get('date_sent'),
+                MealSession.location_id == kwargs.get('location_id'),
+                MealSession.start_time == kwargs.get('start_time'),
+                MealSession.stop_time == kwargs.get('end_time'),
+                MealSession.id != kwargs.get('meal_session_id')).paginate(error_out=False).items:
+            return True
+        else:
+            return False
+
     @classmethod
     def validate_meal_session_times(cls, **kwargs):
         """
@@ -174,6 +263,22 @@ class MealSessionRepo(BaseRepo):
             return "meal_session_exists_in_specified_time"
 
         if cls.check_encloses_already_existing_meal_sessions(**kwargs):
+            return "encloses_already_existing_meal_sessions"
+
+    @classmethod
+    def validate_update_meal_session_times(cls, **kwargs):
+        """
+        :param kwargs: dict with keys name, data_sent, location_id, start_time and end_time, meal_session_id
+        :return: string
+        """
+
+        if cls.validate_meal_session_already_exists_other_than_specified(**kwargs):
+            return "meal_session_already_exists"
+
+        if cls.check_meal_session_exists_in_other_specified_times(**kwargs):
+            return "meal_session_exists_in_specified_time"
+
+        if cls.check_encloses_already_existing_in_other_meal_sessions(**kwargs):
             return "encloses_already_existing_meal_sessions"
 
     @classmethod
