@@ -14,10 +14,6 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.current_date = datetime.now()
 
     def test_create_non_existing_meal_session_succeeds(self):
-        """
-
-        :return:
-        """
 
         new_location = LocationFactory.create(id=1, name="Lagos")
 
@@ -52,10 +48,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.assertEqual(response_json['payload']['mealSession']['locationId'], meal_session_data['locationId'])
 
     def test_create_already_existing_meal_session_fails(self):
-        """
 
-        :return:
-        """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
@@ -94,10 +87,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.assertEqual(response_json['msg'], 'This exact meal session already exists')
 
     def test_create_meal_session_using_no_existing_location_id_fails(self):
-        """
 
-        :return:
-        """
         LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
@@ -126,10 +116,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.assertEqual(response_json['msg'], 'The location specified does not exist')
 
     def test_create_meal_session_using_location_id_with_incorrect_timezone_name_fails(self):
-        """
 
-        :return:
-        """
         new_location = LocationFactory.create(id=1, name="Russian Republic")
 
         new_role = RoleFactory.create(name='admin')
@@ -158,10 +145,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.assertEqual(response_json['msg'], 'The location specified is in an unknown time zone')
 
     def test_create_meal_session_with_start_time_after_end_time_fails(self):
-        """
 
-        :return:
-        """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
@@ -185,10 +169,7 @@ class TestMealSessionEndpoints(BaseTestCase):
                                       headers=self.headers())
 
     def test_create_meal_session_having_date_sent_before_present_date_fails(self):
-        """
 
-        :return:
-        """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
@@ -221,10 +202,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.assertEqual(response_json['msg'], 'Date provided cannot be one before the current date')
 
     def test_create_meal_session_with_start_time_beginning_in_an_existing_session_fails(self):
-        """
 
-        :return:
-        """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
@@ -267,10 +245,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         )
 
     def test_create_meal_session_with_stop_time_ending_in_an_existing_session_fails(self):
-        """
 
-        :return:
-        """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
@@ -313,10 +288,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         )
 
     def test_create_meal_session_with_start_time_and_stop_time_in_enclosing_an_existing_session_fails(self):
-        """
 
-        :return:
-        """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
@@ -357,10 +329,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         )
 
     def test_create_meal_session_with_invalid_date_fails(self):
-        """
 
-        :return:
-        """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
@@ -387,10 +356,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         )
 
     def test_create_meal_session_with_invalid_name_fails(self):
-        """
 
-        :return:
-        """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
@@ -422,10 +388,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         )
 
     def test_create_meal_session_with_invalid_start_time_fails(self):
-        """
 
-        :return:
-        """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
@@ -456,10 +419,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         )
 
     def test_create_meal_session_with_invalid_stop_time_fails(self):
-        """
 
-        :return:
-        """
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
@@ -490,10 +450,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         )
 
     def test_create_meal_session_with_non_integer_location_id_fails(self):
-        """
 
-        :return:
-        """
         LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
@@ -525,10 +482,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         )
 
     def test_create_meal_session_falls_back_to_location_id_in_header_when_non_sent(self):
-        """
 
-        :return:
-        """
         LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')

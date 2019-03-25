@@ -8,7 +8,6 @@ import pytz
 
 from app.controllers.meal_session_controller import MealSessionController
 from app.repositories.meal_session_repo import MealSessionRepo
-from factories.meal_session_factory import MealSessionFactory
 from factories.location_factory import LocationFactory
 from tests.base_test_case import BaseTestCase
 

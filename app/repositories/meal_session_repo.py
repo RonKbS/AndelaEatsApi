@@ -64,10 +64,7 @@ class MealSessionRepo(BaseRepo):
                 MealSession.start_time <= kwargs.get('start_time'),
                 MealSession.stop_time >= kwargs.get('start_time')).paginate(error_out=False).items \
                 or \
-            MealSession.query.filter(
-                MealSession.name == kwargs.get('name'),
-                MealSession.date == kwargs.get('date_sent'),
-                MealSession.location_id == kwargs.get('location_id'),
+                meal_sessions.filter(
                 MealSession.start_time <= kwargs.get('end_time'),
                 MealSession.stop_time >= kwargs.get('end_time')).paginate(error_out=False).items:
             return True
@@ -164,6 +161,12 @@ class MealSessionRepo(BaseRepo):
 
     @staticmethod
     def validate_meal_session_already_exists(**kwargs):
+        """
+        Check whether a particular meal session already exists
+
+        :param kwargs: dict with keys name, data_sent, location_id, start_time and end_time
+        :return: boolean
+        """
         if MealSession.query.filter(
             MealSession.name == kwargs.get('name'),
             MealSession.date == kwargs.get('date_sent'),
@@ -177,7 +180,7 @@ class MealSessionRepo(BaseRepo):
     @classmethod
     def validate_meal_session_times(cls, **kwargs):
         """
-        :param kwargs:
+        :param kwargs: dict with keys name, data_sent, location_id, start_time and end_time
         :return: string
         """
         if cls.validate_meal_session_already_exists(**kwargs):
@@ -192,8 +195,9 @@ class MealSessionRepo(BaseRepo):
     @classmethod
     def validate_times_and_dates_not_greater_than_each_other(cls, start_time, end_time, current_date, date_sent):
         """
+        Check whether start_time is greater than end_time or current_date is greater than date_sent
 
-        :return:
+        :return: string
         """
         if cls.check_two_values_are_greater(
             start_time,
