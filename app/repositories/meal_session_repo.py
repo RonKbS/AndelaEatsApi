@@ -1,4 +1,3 @@
-from flask import make_response, jsonify
 from app.repositories.base_repo import BaseRepo
 from app.models.meal_session import MealSession
 
@@ -88,3 +87,13 @@ class MealSessionRepo(BaseRepo):
             return True
         else:
             return False
+
+    @staticmethod
+    def format_preceding(hour_or_minute):
+        """
+        Transform an integer such as 2 to a str '02'
+
+        :param hour_or_minute: int
+        :return: formatted string: string
+        """
+        return '{:02d}'.format(hour_or_minute)

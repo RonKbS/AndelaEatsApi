@@ -1,7 +1,10 @@
+import pytz
 from flask import make_response, jsonify
 from datetime import datetime, time
+
 from app.controllers.base_controller import BaseController
-from app.repositories.meal_session_repo import MealSessionRepo, MealSession
+from app.repositories.meal_session_repo import MealSessionRepo
+from app.repositories.location_repo import LocationRepo
 from app.utils.auth import Auth
 
 
@@ -12,9 +15,32 @@ class MealSessionController(BaseController):
         self.meal_session_repo = MealSessionRepo()
 
     def create_session(self):
+        """
+        Creates a meal session if all data sent meets specified requirements
 
-        location_id = Auth.get_location()
-        name, start_time, end_time, date = self.request_params('name', 'start_time', 'end_time', 'date')
+        :return: Json Response
+        """
+
+        name, start_time, end_time, date, location_id = self.request_params(
+            'name', 'startTime', 'endTime', 'date', 'locationId'
+        )
+
+        if not location_id:
+            location_id = Auth.get_location()
+
+        location_repo = LocationRepo()
+        location = location_repo.get(location_id)
+
+        try:
+            tz = pytz.timezone('Africa/' + location.name)
+        except AttributeError:
+            return make_response(
+                jsonify({'msg': 'The location specified does not exist'}
+                        ), 400)
+        except pytz.exceptions.UnknownTimeZoneError:
+            return make_response(
+                jsonify({'msg': 'The location specified is in an unknown time zone'}
+                        ), 400)
 
         start_time_split = start_time.split(":")
         end_time_split = end_time.split(":")
@@ -28,22 +54,22 @@ class MealSessionController(BaseController):
             end_time,
         ):
             return make_response(
-                jsonify({'msg': 'start time cannot  be after end time'}
+                jsonify({'msg': 'The start time cannot be after end time'}
                         ), 400)
 
         date_sent = datetime(year=int(date_split[0]), month=int(date_split[1]), day=int(date_split[2]))
-        current_date = datetime.now()
+        current_date = datetime.now(tz)
 
         if self.meal_session_repo.check_two_values_are_greater(
             datetime(year=current_date.year, month=current_date.month,day=current_date.day),
             date_sent
         ):
             return make_response(
-                jsonify({'msg': 'date provided cannot be one before the current date'}
+                jsonify({'msg': 'Date provided cannot be one before the current date'}
                         ), 400)
 
         if self.meal_session_repo.filter_by(name=name, start_time=start_time, stop_time=end_time,
-                                            date=date, location_id=location_id).items:
+                                            date=date_sent, location_id=location_id).items:
             return make_response(
                 jsonify({'msg': 'This exact meal session already exists'}
                         ), 400)
@@ -78,15 +104,25 @@ class MealSessionController(BaseController):
 
         new_meal_session = self.meal_session_repo.new_meal_session(
             name=name, start_time=start_time, stop_time=end_time,
-            date=date, location_id=location_id
+            date=date_sent, location_id=location_id
         )
 
         new_meal_session.name = new_meal_session.name.value
 
         new_meal_session.start_time = "".join(
-            [str(new_meal_session.start_time.hour), ":", str(new_meal_session.start_time.minute)])
+            [
+                self.meal_session_repo.format_preceding(new_meal_session.start_time.hour),
+                ":",
+                self.meal_session_repo.format_preceding(new_meal_session.start_time.minute)
+             ]
+        )
         new_meal_session.stop_time = "".join(
-            [str(new_meal_session.stop_time.hour), ":", str(new_meal_session.stop_time.minute)])
+            [
+                self.meal_session_repo.format_preceding(new_meal_session.stop_time.hour),
+                ":",
+                self.meal_session_repo.format_preceding(new_meal_session.stop_time.minute)
+             ]
+        )
 
         new_meal_session.date = new_meal_session.date.strftime("%Y-%m-%d")
 

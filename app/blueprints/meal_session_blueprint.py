@@ -16,8 +16,9 @@ meal_session_controller = MealSessionController(request)
 @Security.validator([
     'name|required:enum_MealSessionNames',
     'date|required:date',
-    'start_time|required:time',
-    'end_time|required:time']
+    'startTime|required:time',
+    'endTime|required:time',
+    'locationId|int']
 )
 # @swag_from('documentation/create_meal_session.yml')
 def create():
