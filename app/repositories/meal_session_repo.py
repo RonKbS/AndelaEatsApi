@@ -1,3 +1,4 @@
+from datetime import datetime, time
 from app.repositories.base_repo import BaseRepo
 from app.models.meal_session import MealSession
 
@@ -97,3 +98,40 @@ class MealSessionRepo(BaseRepo):
         :return: formatted string: string
         """
         return '{:02d}'.format(hour_or_minute)
+
+    @classmethod
+    def get_time_as_string(cls, hour, minute):
+        """
+        Transform times provided to a string of the form 08:00
+
+        :param hour: int
+        :param minute: int
+        :return: string
+        """
+        return "".join([cls.format_preceding(hour), ":", cls.format_preceding(minute)])
+
+    @staticmethod
+    def return_as_object(type_as_string, type_sent):
+        """
+        Transform a time/date sent as a string into a native python time/datetime object
+
+        :param1 type_as_string: string
+        :param2 type_sent: string that represents that may be date or time
+        :return: time or datetime object
+        """
+
+        splitter_mapper = {
+            "time": ":",
+            "date": "-"
+        }
+
+        splitter = splitter_mapper.get(type_sent)
+
+        if splitter is not None:
+            type_split = type_as_string.split(splitter)
+
+        if type_sent is "time" and type_split:
+            return time(hour=int(type_split[0]), minute=int(type_split[1]))
+
+        if type_sent is "date" and type_split:
+            return datetime(year=int(type_split[0]), month=int(type_split[1]), day=int(type_split[2]))

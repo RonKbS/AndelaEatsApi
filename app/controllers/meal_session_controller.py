@@ -42,12 +42,8 @@ class MealSessionController(BaseController):
                 jsonify({'msg': 'The location specified is in an unknown time zone'}
                         ), 400)
 
-        start_time_split = start_time.split(":")
-        end_time_split = end_time.split(":")
-        date_split = date.split("-")
-
-        start_time = time(hour=int(start_time_split[0]), minute=int(start_time_split[1]))
-        end_time = time(hour=int(end_time_split[0]), minute=int(end_time_split[1]))
+        start_time = self.meal_session_repo.return_as_object(start_time, "time")
+        end_time = self.meal_session_repo.return_as_object(end_time, "time")
 
         if self.meal_session_repo.check_two_values_are_greater(
             start_time,
@@ -57,7 +53,7 @@ class MealSessionController(BaseController):
                 jsonify({'msg': 'The start time cannot be after end time'}
                         ), 400)
 
-        date_sent = datetime(year=int(date_split[0]), month=int(date_split[1]), day=int(date_split[2]))
+        date_sent = self.meal_session_repo.return_as_object(date, "date")
         current_date = datetime.now(tz)
 
         if self.meal_session_repo.check_two_values_are_greater(
@@ -109,19 +105,14 @@ class MealSessionController(BaseController):
 
         new_meal_session.name = new_meal_session.name.value
 
-        new_meal_session.start_time = "".join(
-            [
-                self.meal_session_repo.format_preceding(new_meal_session.start_time.hour),
-                ":",
-                self.meal_session_repo.format_preceding(new_meal_session.start_time.minute)
-             ]
+        new_meal_session.start_time = self.meal_session_repo.get_time_as_string(
+            new_meal_session.start_time.hour,
+            new_meal_session.start_time.minute
         )
-        new_meal_session.stop_time = "".join(
-            [
-                self.meal_session_repo.format_preceding(new_meal_session.stop_time.hour),
-                ":",
-                self.meal_session_repo.format_preceding(new_meal_session.stop_time.minute)
-             ]
+
+        new_meal_session.stop_time = self.meal_session_repo.get_time_as_string(
+            new_meal_session.stop_time.hour,
+            new_meal_session.stop_time.minute
         )
 
         new_meal_session.date = new_meal_session.date.strftime("%Y-%m-%d")
