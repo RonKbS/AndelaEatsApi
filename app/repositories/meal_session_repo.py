@@ -64,7 +64,10 @@ class MealSessionRepo(BaseRepo):
                 MealSession.start_time <= kwargs.get('start_time'),
                 MealSession.stop_time >= kwargs.get('start_time')).paginate(error_out=False).items \
                 or \
-                meal_sessions.filter(
+                MealSession.query.filter(
+                MealSession.name == kwargs.get('name'),
+                MealSession.date == kwargs.get('date_sent'),
+                MealSession.location_id == kwargs.get('location_id'),
                 MealSession.start_time <= kwargs.get('end_time'),
                 MealSession.stop_time >= kwargs.get('end_time')).paginate(error_out=False).items:
             return True
