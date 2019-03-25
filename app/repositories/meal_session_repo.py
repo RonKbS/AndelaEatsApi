@@ -1,7 +1,9 @@
+import pytz
 from flask import make_response, jsonify
 from datetime import datetime, time
 from app.repositories.base_repo import BaseRepo
 from app.models.meal_session import MealSession
+from app.repositories.location_repo import LocationRepo
 
 
 class MealSessionRepo(BaseRepo):
@@ -140,3 +142,22 @@ class MealSessionRepo(BaseRepo):
 
         if type_sent is "date" and type_split:
             return datetime(year=int(type_split[0]), month=int(type_split[1]), day=int(type_split[2]))
+
+    @staticmethod
+    def get_location_time_zone(location_id):
+        """
+        Get the time zone of a particular location
+
+        :param location_id: string representing location id
+        :return: timezone object
+        :raises: AttributeError, pytz.exceptions.UnknownTimeZoneError
+        """
+        location_repo = LocationRepo()
+        location = location_repo.get(location_id)
+
+        try:
+            return pytz.timezone('Africa/' + location.name)
+        except AttributeError:
+            return AttributeError
+        except pytz.exceptions.UnknownTimeZoneError:
+            return pytz.exceptions.UnknownTimeZoneError
