@@ -28,14 +28,19 @@ class MealSessionController(BaseController):
         if not location_id:
             location_id = Auth.get_location()
 
-        tz = self.meal_session_repo.get_location_time_zone(location_id)
-
-        tz_exception_message_mapper = {
+        error_message_mapper = {
             AttributeError: 'The location specified does not exist',
-            pytz.exceptions.UnknownTimeZoneError: 'The location specified is in an unknown time zone'
+            pytz.exceptions.UnknownTimeZoneError: 'The location specified is in an unknown time zone',
+            "invalid_time": 'The start time cannot be after end time',
+            "invalid_date": 'Date provided cannot be one before the current date',
+            "meal_session_exists_in_specified_time":
+                "This exact meal session already exists between the specified start and stop times",
+            "encloses_already_existing_meal_sessions":
+                "The start and stop times specified enclose one or more types of the same meal session",
         }
 
-        exception_message = tz_exception_message_mapper.get(tz)
+        tz = self.meal_session_repo.get_location_time_zone(location_id)
+        exception_message = error_message_mapper.get(tz)
 
         if exception_message:
             return make_response(jsonify({'msg': exception_message}), 400)
@@ -43,37 +48,26 @@ class MealSessionController(BaseController):
         start_time = self.meal_session_repo.return_as_object(start_time, "time")
         end_time = self.meal_session_repo.return_as_object(end_time, "time")
 
-        if self.meal_session_repo.check_two_values_are_greater(
-            start_time,
-            end_time,
-        ):
-            return make_response(
-                jsonify({'msg': 'The start time cannot be after end time'}), 400
-            )
-
         date_sent = self.meal_session_repo.return_as_object(date, "date")
         current_date = datetime.now(tz)
 
-        if self.meal_session_repo.check_two_values_are_greater(
-            datetime(year=current_date.year, month=current_date.month,day=current_date.day),
+        message = self.meal_session_repo.validate_times_and_dates_not_greater_than_each_other(
+            start_time,
+            end_time,
+            datetime(year=current_date.year, month=current_date.month, day=current_date.day),
             date_sent
-        ):
-            return make_response(
-                jsonify({'msg': 'Date provided cannot be one before the current date'}), 400
-            )
+        )
+
+        error_message = error_message_mapper.get(message)
+
+        if error_message:
+            return make_response(jsonify({'msg': error_message}), 400)
 
         if self.meal_session_repo.filter_by(name=name, start_time=start_time, stop_time=end_time,
                                             date=date_sent, location_id=location_id).items:
             return make_response(
                 jsonify({'msg': 'This exact meal session already exists'}), 400
             )
-
-        time_range_error_message_mapper = {
-            "meal_session_exists_in_specified_time":
-                "This exact meal session already exists between the specified start and stop times",
-            "encloses_already_existing_meal_sessions":
-                "The start and stop times specified enclose one or more types of the same meal session"
-        }
 
         message = self.meal_session_repo.validate_meal_session_times(
             **{
@@ -85,7 +79,7 @@ class MealSessionController(BaseController):
             }
         )
 
-        message = time_range_error_message_mapper.get(message)
+        message = error_message_mapper.get(message)
 
         if message:
             return make_response(jsonify({'msg': message}), 400)

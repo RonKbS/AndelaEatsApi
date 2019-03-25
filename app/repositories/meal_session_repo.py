@@ -165,7 +165,6 @@ class MealSessionRepo(BaseRepo):
     @classmethod
     def validate_meal_session_times(cls, **kwargs):
         """
-
         :param kwargs:
         :return: string
         """
@@ -176,3 +175,20 @@ class MealSessionRepo(BaseRepo):
         if cls.check_encloses_already_existing_meal_sessions(**kwargs):
             return "encloses_already_existing_meal_sessions"
 
+    @classmethod
+    def validate_times_and_dates_not_greater_than_each_other(cls, start_time, end_time, current_date, date_sent):
+        """
+
+        :return:
+        """
+        if cls.check_two_values_are_greater(
+            start_time,
+            end_time,
+        ):
+            return "invalid_time"
+
+        if cls.check_two_values_are_greater(
+            current_date,
+            date_sent
+        ):
+            return "invalid_date"
