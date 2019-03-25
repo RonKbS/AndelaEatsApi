@@ -162,12 +162,26 @@ class MealSessionRepo(BaseRepo):
         except pytz.exceptions.UnknownTimeZoneError:
             return pytz.exceptions.UnknownTimeZoneError
 
+    @staticmethod
+    def validate_meal_session_already_exists(**kwargs):
+        if MealSession.query.filter(
+            MealSession.name == kwargs.get('name'),
+            MealSession.date == kwargs.get('date_sent'),
+            MealSession.location_id == kwargs.get('location_id'),
+            MealSession.start_time == kwargs.get('start_time'),
+            MealSession.stop_time == kwargs.get('end_time')).paginate(error_out=False).items:
+            return True
+        else:
+            return False
+
     @classmethod
     def validate_meal_session_times(cls, **kwargs):
         """
         :param kwargs:
         :return: string
         """
+        if cls.validate_meal_session_already_exists(**kwargs):
+            return "meal_session_already_exists"
 
         if cls.check_meal_session_exists_in_specified_time(**kwargs):
             return "meal_session_exists_in_specified_time"
