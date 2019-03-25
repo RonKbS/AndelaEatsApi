@@ -353,7 +353,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response_json['msg'],
-            'lunch meal session(s) already exist between the specified start and stop times'
+            'The start and stop times specified enclose one or more types of the same meal session'
         )
 
     def test_create_meal_session_with_invalid_date_fails(self):

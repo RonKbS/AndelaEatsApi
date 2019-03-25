@@ -161,3 +161,18 @@ class MealSessionRepo(BaseRepo):
             return AttributeError
         except pytz.exceptions.UnknownTimeZoneError:
             return pytz.exceptions.UnknownTimeZoneError
+
+    @classmethod
+    def validate_meal_session_times(cls, **kwargs):
+        """
+
+        :param kwargs:
+        :return: string
+        """
+
+        if cls.check_meal_session_exists_in_specified_time(**kwargs):
+            return "meal_session_exists_in_specified_time"
+
+        if cls.check_encloses_already_existing_meal_sessions(**kwargs):
+            return "encloses_already_existing_meal_sessions"
+

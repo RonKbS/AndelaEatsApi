@@ -68,20 +68,14 @@ class MealSessionController(BaseController):
                 jsonify({'msg': 'This exact meal session already exists'}), 400
             )
 
-        if self.meal_session_repo.check_meal_session_exists_in_specified_time(
-            **{
-                "name": name,
-                "date_sent": date_sent,
-                "location_id": location_id,
-                "start_time": start_time,
-                "end_time": end_time,
-            }
-        ):
-            return make_response(
-                jsonify({'msg': 'This exact meal session already exists between the specified start and stop times'}
-                        ), 400)
+        time_range_error_message_mapper = {
+            "meal_session_exists_in_specified_time":
+                "This exact meal session already exists between the specified start and stop times",
+            "encloses_already_existing_meal_sessions":
+                "The start and stop times specified enclose one or more types of the same meal session"
+        }
 
-        if self.meal_session_repo.check_encloses_already_existing_meal_sessions(
+        message = self.meal_session_repo.validate_meal_session_times(
             **{
                 "name": name,
                 "date_sent": date_sent,
@@ -89,12 +83,12 @@ class MealSessionController(BaseController):
                 "start_time": start_time,
                 "end_time": end_time,
             }
-        ):
-            return make_response(
-                jsonify({'msg': '{} meal session(s) already exist between the specified start and stop times'.format(
-                    name
-                )}
-                        ), 400)
+        )
+
+        message = time_range_error_message_mapper.get(message)
+
+        if message:
+            return make_response(jsonify({'msg': message}), 400)
 
         new_meal_session = self.meal_session_repo.new_meal_session(
             name=name, start_time=start_time, stop_time=end_time,
