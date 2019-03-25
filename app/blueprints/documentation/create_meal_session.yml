@@ -82,4 +82,4 @@ responses:
   201:
     description: Ok
     schema:
-          $ref: '#/definitions/FAQPayload'
+          $ref: '#/definitions/MealSessionPayload'
