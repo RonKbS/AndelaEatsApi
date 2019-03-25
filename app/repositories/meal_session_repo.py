@@ -1,3 +1,4 @@
+from flask import make_response, jsonify
 from datetime import datetime, time
 from app.repositories.base_repo import BaseRepo
 from app.models.meal_session import MealSession
@@ -50,10 +51,14 @@ class MealSessionRepo(BaseRepo):
 
         :return: Boolean
         """
-        if MealSession.query.filter(
-                MealSession.name == kwargs.get('name'),
-                MealSession.date == kwargs.get('date_sent'),
-                MealSession.location_id == kwargs.get('location_id'),
+
+        meal_sessions = MealSession.query.filter(
+            MealSession.name == kwargs.get('name'),
+            MealSession.date == kwargs.get('date_sent'),
+            MealSession.location_id == kwargs.get('location_id')
+        )
+
+        if meal_sessions.filter(
                 MealSession.start_time <= kwargs.get('start_time'),
                 MealSession.stop_time >= kwargs.get('start_time')).paginate(error_out=False).items \
                 or \
