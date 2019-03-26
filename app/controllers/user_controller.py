@@ -72,5 +72,14 @@ class UserController(BaseController):
         pp = int(params.get('per_page', 10))
 
         users = self.user_repo.paginate(error_out=False, page=pg, per_page=pp)
-        user_list = [user.serialize() for user in users.items]
-        return self.handle_response('OK', payload={'users': user_list, 'meta': self.pagination_meta(users)})
+        if users.items:
+            user_list = [user.serialize() for user in users.items]
+            for user in user_list:
+                associated_roles = [user_role.role_id for user_role in
+                                    self.user_role_repo.filter_by(user_id=user['userId']).items]
+                role_objects = Role.query.filter(Role.id.in_(associated_roles)).all()
+                roles = [{'id': role.id, 'name': role.name} for role in role_objects]
+                user['userRoles'] = roles
+            return self.handle_response('OK', payload={'users': user_list, 'meta': self.pagination_meta(users)})
+        return self.handle_response('No users found', status_code=404)
+

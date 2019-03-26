@@ -16,11 +16,11 @@ class UserRepo(BaseRepo):
                   [slack_id, first_name, last_name, email, user_role_id, photo]
 
         """
-        slack_id, first_name, last_name, email, user_role_id, *image_url = args
+        slack_id, first_name, last_name, email, *image_url = args
 
         image_url = image_url[0] if image_url else None
 
         user = User(slack_id=slack_id, first_name=first_name, last_name=last_name, email=email,
-                    user_role_id=user_role_id, image_url=image_url)
+                    image_url=image_url)
         user.save()
         return user

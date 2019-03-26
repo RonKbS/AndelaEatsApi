@@ -13,7 +13,7 @@ class TestUserRoleRepo(BaseTestCase):
   def test_new_user_method_returns_new_user_object(self):
     user = UserFactory.build()
 
-    new_user = self.repo.new_user(user.slack_id, user.first_name, user.last_name, user.email, user.user_role_id, user.image_url)
+    new_user = self.repo.new_user(user.slack_id, user.first_name, user.last_name, user.email, user.image_url)
 
     self.assertIsInstance(new_user, User)
     self.assertEqual(str(new_user.slack_id), str(user.slack_id))

@@ -123,7 +123,7 @@ class TestVendorEndpoints(BaseTestCase):
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
 		self.assert400(response)
-		self.assertEqual(response_json['msg'], 'Access Error - Permission Denied')
+		self.assertEqual(response_json['msg'], 'Access Error - No Permission Granted')
 
 	def test_delete_vendor_endpoint_with_wrong_vendor_id(self):
 		vendor = VendorFactory.create()
