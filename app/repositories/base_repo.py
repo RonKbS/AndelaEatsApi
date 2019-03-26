@@ -1,5 +1,6 @@
+import pytz
 from sqlalchemy import desc, asc
-from app.models import VendorRating
+from app.models import VendorRating, Location
 
 class BaseRepo:
 	
@@ -108,4 +109,22 @@ class BaseRepo:
 			return True
 
 		return False
+
+	@staticmethod
+	def get_location_time_zone(location_id):
+		"""
+		Get the time zone of a particular location
+
+		:param location_id: string representing location id
+		:return: timezone object
+		:raises: AttributeError, pytz.exceptions.UnknownTimeZoneError
+		"""
+		location = Location.query.filter_by(id=location_id).first()
+
+		try:
+			return pytz.timezone('Africa/' + location.name)
+		except AttributeError:
+			return AttributeError
+		except pytz.exceptions.UnknownTimeZoneError:
+			return pytz.exceptions.UnknownTimeZoneError
 
