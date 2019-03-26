@@ -62,6 +62,7 @@ class VendorRatingController(BaseController):
 
             rating = self.vendor_rating_repo.new_rating(vendor_id, user_id, rating, service_date, RatingType.engagement,
                         engagement_id, engagement_id, channel, comment)
+            self.vendor_repo.update_vendor_average_rating(vendor_id)
             rtng = rating.serialize()
 
             return self.handle_response('Rating created', payload={'rating': rtng}, status_code=201)
@@ -103,6 +104,8 @@ class VendorRatingController(BaseController):
         rating = self.vendor_rating_repo.new_rating(
                     vendor_id, user_id, rating, datetime.strptime(service_date, '%Y-%m-%d'), rating_type, type_id, engagement_id, channel, comment, type_id
                 )
+
+        self.vendor_repo.update_vendor_average_rating(vendor_id)
         if rating.id and rating_type == RatingType.order:
             updates = {'has_rated': True}
             self.order_repo.update(order, **updates)
