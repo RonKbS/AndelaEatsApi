@@ -18,3 +18,10 @@ def list_admin_users():
 @swag_from('documentation/get_all_users.yml')
 def list_all_users():
     return user_controller.list_all_users()
+
+
+@user_blueprint.route('/<int:id>/', methods=['DELETE'])
+@Auth.has_permission('delete_user')
+@swag_from('documentation/delete_user.yml')
+def delete_user(id):
+    return user_controller.delete_user(id)

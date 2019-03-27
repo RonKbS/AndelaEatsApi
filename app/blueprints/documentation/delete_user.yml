@@ -1,0 +1,43 @@
+Delete a User
+---
+tags:
+  - Users
+summary: Deletes a user with a given id. The id here is the auto-incremented primary key and not the column user_id
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The id of the location
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: id
+    in: path
+    type: integer
+    required: true
+    description: Id of the user to be deleted
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/StatusPayload'
+
+definitions:
+  UserPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: user deleted
+      payload:
+        type: object
+        properties:
+          status:
+            type: string
+            default: success
