@@ -8,3 +8,4 @@ from .vendor_engagement_factory  import VendorEngagementFactory
 from .meal_item_factory import MealItemFactory
 from .order_factory import OrderFactory
 from .location_factory import LocationFactory
+from .user_factory import UserFactory

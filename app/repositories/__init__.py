@@ -10,3 +10,4 @@ from .user_role_repo import UserRoleRepo
 from .vendor_repo import VendorRepo
 from .vendor_engagement_repo import VendorEngagementRepo
 from .vendor_rating_repo import VendorRatingRepo
+from .user_repo import UserRepo
