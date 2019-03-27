@@ -5,7 +5,7 @@ location_data = [
     {'id': '4', 'name': 'Kigali', 'zone': "+3"},
 ]
 role_data = [
-    {'id': '1', 'name': 'Administrator'},
+    {'id': '1', 'name': 'admin'},
     {'id': '2', 'name': 'user'},
 ]
 

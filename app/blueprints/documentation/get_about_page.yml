@@ -1,0 +1,51 @@
+Get About page
+---
+tags:
+  - About
+summary: Gets About Page details
+consumes:
+  - application/json
+parameters:
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+definitions:
+  AboutPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        example: "Ok"
+      payload:
+        type: object
+        properties:
+          data:
+            type: object
+            properties:
+              details:
+                type: string
+                example: "<html><head></head></html>"
+              id:
+                type: integer
+                example: 1
+              isDeleted:
+                type: boolean
+              timestamps:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+                  updated_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+
+responses:
+  201:
+    description: Ok
+    schema:
+          $ref: '#/definitions/AboutPayload'

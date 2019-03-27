@@ -1,9 +1,10 @@
 
-Get Dashboard Report
+Returns statistics of collected, uncollected and cancelled orders for any number of days. It takes two dates and return report between the two days. If the dates are not specified, it returns report for the last 14 days. If the query parameter all_vendor_comparison=true is used, it returns the report on per vendor basis
 ---
 tags:
   - Reports
-summary: Get reports for the dashboard
+summary: >
+          Get reports for the dashboard.
 parameters:
   - name: X-Location
     in: header
@@ -16,12 +17,24 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
-  - name: period
+  - name: start_date
     in: path
-    type: integer
+    type: string
+    format: date
     required: false
-    description: the number of days the report should span
-    default: 14
+    description: the start date for the report
+  - name: end_date
+    in: path
+    type: string
+    format: date
+    required: false
+    description: the end date for the report
+  - name: all_vendor_comparison
+    in: path
+    type: string
+    required: false
+    description: used to indicate that report for all vendors be retrieved
+    default: true
 definitions:
   ReportPayload:
     type: object

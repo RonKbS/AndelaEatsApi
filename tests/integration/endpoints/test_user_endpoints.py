@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from tests.base_test_case import BaseTestCase
 from app.utils.auth import PermissionRepo, UserRoleRepo
+from factories import UserFactory, RoleFactory, PermissionFactory, UserRoleFactory
 
 
 class TestUserEndpoints(BaseTestCase):
@@ -39,3 +40,21 @@ class TestUserEndpoints(BaseTestCase):
 
             assert response['msg'] == 'OK'
             assert response['payload'].get('AdminUsers') == []
+
+    def test_list_users_endpoint(self):
+        role = RoleFactory.create(name='admin')
+        user_id = BaseTestCase.user_id()
+        PermissionFactory.create(keyword='view_users', role_id=role.id)
+        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+        # Create ten Dummy users
+        UserFactory.create_batch(10)
+
+        response = self.client().get(self.make_url('/users/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+        payload = response_json['payload']
+
+        self.assert200(response)
+        self.assertEqual(len(payload['users']), 10)
+        self.assertJSONKeysPresent(payload['users'][0], 'firstName', 'lastName', 'slackId', 'email')
+
