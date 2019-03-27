@@ -116,7 +116,7 @@ class TestVendorEndpoints(BaseTestCase):
 
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='delete_vendor', role_id=100)
+		permission = PermissionFactory.create(keyword='delete_vendorr', role_id=100)
 		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		response = self.client().delete(self.make_url(f'/vendors/{vendor.id}'), headers=self.headers())
