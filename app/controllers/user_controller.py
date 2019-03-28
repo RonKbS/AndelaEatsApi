@@ -83,3 +83,18 @@ class UserController(BaseController):
             return self.handle_response('OK', payload={'users': user_list, 'meta': self.pagination_meta(users)})
         return self.handle_response('No users found', status_code=404)
 
+    def delete_user(self, id):
+        user = self.user_repo.get(id)
+        if user:
+            if user.is_deleted:
+                return self.handle_response('User has already been deleted', status_code=400)
+
+            updates = {}
+            updates['is_deleted'] = True
+
+            self.user_repo.update(user, **updates)
+
+            return self.handle_response('User deleted', payload={"status": "success"})
+        return self.handle_response('Invalid or incorrect id provided', status_code=404)
+
+

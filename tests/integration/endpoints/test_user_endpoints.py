@@ -58,3 +58,45 @@ class TestUserEndpoints(BaseTestCase):
         self.assertEqual(len(payload['users']), 10)
         self.assertJSONKeysPresent(payload['users'][0], 'firstName', 'lastName', 'slackId', 'email')
 
+    def test_delete_user_endpoint_with_right_permission(self):
+        user = UserFactory.create()
+
+        role = RoleFactory.create(name='admin')
+        user_id = BaseTestCase.user_id()
+        PermissionFactory.create(keyword='delete_user', role_id=role.id)
+        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+        response = self.client().delete(self.make_url(f'/users/{user.id}/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+        payload = response_json['payload']
+
+        self.assert200(response)
+        self.assertEqual(payload['status'], 'success')
+        self.assertEqual(response_json['msg'], 'User deleted')
+
+    def test_delete_vendor_endpoint_without_right_permission(self):
+        user = UserFactory.create()
+
+        role = RoleFactory.create(name='admin')
+        user_id = BaseTestCase.user_id()
+        PermissionFactory.create(keyword='wrong_permission', role_id=100)
+        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+        response = self.client().delete(self.make_url(f'/users/{user.id}/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assert400(response)
+        self.assertEqual(response_json['msg'], 'Access Error - No Permission Granted')
+
+    def test_delete_user_endpoint_with_wrong_user_id(self):
+        user = UserFactory.create()
+
+        role = RoleFactory.create(name='admin')
+        user_id = BaseTestCase.user_id()
+        PermissionFactory.create(keyword='delete_user', role_id=role.id)
+        UserRoleFactory.create(user_id=user_id, role_id=user.id)
+
+        response = self.client().delete(self.make_url(f'/userrs/-576A/'), headers=self.headers())
+
+        self.assert404(response)
+
