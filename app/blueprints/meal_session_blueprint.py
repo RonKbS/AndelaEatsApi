@@ -36,6 +36,6 @@ def create():
     'endTime|required:time',
     'locationId|int']
 )
-# @swag_from('documentation/update_meal_session.yml')
+@swag_from('documentation/update_meal_session.yml')
 def update(meal_session_id):
     return meal_session_controller.update_session(meal_session_id)
