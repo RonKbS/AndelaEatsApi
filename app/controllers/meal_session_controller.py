@@ -28,18 +28,6 @@ class MealSessionController(BaseController):
         if not location_id:
             location_id = Auth.get_location()
 
-        # error_message_mapper = {
-        #     AttributeError: 'The location specified does not exist',
-        #     pytz.exceptions.UnknownTimeZoneError: 'The location specified is in an unknown time zone',
-        #     "invalid_time": 'The start time cannot be after end time',
-        #     "invalid_date": 'Date provided cannot be one before the current date',
-        #     "meal_session_exists_in_specified_time":
-        #         "This exact meal session already exists between the specified start and stop times",
-        #     "encloses_already_existing_meal_sessions":
-        #         "The start and stop times specified enclose one or more types of the same meal session",
-        #     "meal_session_already_exists": "This exact meal session already exists"
-        # }
-
         error_message_mapper = self.meal_session_repo.return_error_message_mapper()
 
         tz = self.meal_session_repo.get_location_time_zone(location_id)
