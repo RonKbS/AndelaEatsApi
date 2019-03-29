@@ -1,4 +1,4 @@
-from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, request, Auth
+from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, request, Auth, Security
 from app.controllers.user_controller import UserController
 from flasgger import swag_from
 
@@ -25,3 +25,13 @@ def list_all_users():
 @swag_from('documentation/delete_user.yml')
 def delete_user(id):
     return user_controller.delete_user(id)
+
+
+@user_blueprint.route('/', methods=['POST'])
+@Auth.has_permission('create_user')
+@Security.validator(
+    ['slackId|optional', 'firstName|required', 'lastName|required',
+     'userId|optional', 'imageUrl|optional:url'])
+@swag_from('documentation/create_user.yml')
+def create_user():
+    return user_controller.create_user()
