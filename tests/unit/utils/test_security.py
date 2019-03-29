@@ -390,3 +390,35 @@ class TestSecurity(BaseTestCase):
 
         self.assertIn(
             'Bad Request - Invalid search field', response[0].get_json()['msg'])
+
+    def test_validator_validates_email(self):
+        class MockRequest:
+            json = {
+                'email': 'invalid@email'
+            }
+
+            @classmethod
+            def get_json(cls):
+                return cls.json
+
+        with patch('app.utils.security.request', new_callable=MockRequest):
+            response = Security.validator(['email|required:email'])(lambda *args, **kwargs: ('test',))()
+
+        self.assertEqual(
+            response[0].get_json()['msg'], "Bad Request - 'invalid@email' is not a valid email address.")
+
+    def test_validator_validates_urls(self):
+        class MockRequest:
+            json = {
+                'imageUrl': 'invalid@url'
+            }
+
+            @classmethod
+            def get_json(cls):
+                return cls.json
+
+        with patch('app.utils.security.request', new_callable=MockRequest):
+            response = Security.validator(['imageUrl|required:url'])(lambda *args, **kwargs: ('test',))()
+
+        self.assertEqual(
+            response[0].get_json()['msg'], "Bad Request - 'invalid@url' is not a valid url.")

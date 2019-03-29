@@ -7,6 +7,7 @@ from unittest.mock import patch
 from app.controllers.user_controller import UserController
 from app.models.user_role import UserRole
 from tests.base_test_case import BaseTestCase
+from factories.user_factory import UserFactory
 
 
 class TestUserController(BaseTestCase):
@@ -54,3 +55,70 @@ class TestUserController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(UserController, 'request_params')
+    def test_create_user_succeeds(self, mock_request_params):
+
+        with self.app.app_context():
+            mock_request_params.return_value = [
+                None,
+                "Joseph",
+                "Serunjogi",
+                "-LXTuXlk2W4Gskt8KTte",
+                None
+            ]
+            user_controller = UserController(self.request_context)
+
+            # Act
+            result = user_controller.create_user()
+
+            # Assert
+            assert result.status_code == 201
+            assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(UserController, 'request_params')
+    def test_create_user_method_handles_user_creation_with_duplicate_slack_id(self, mock_request_params):
+        with self.app.app_context():
+            user = UserFactory(slack_id="-LXTuXlk2W4Gskt8KTte")
+
+            mock_request_params.return_value = [
+                user.slack_id,
+                "Joseph",
+                "Serunjogi",
+                "-LXTuXlk2W4Gskt8KTte",
+                None
+            ]
+
+            user_controller = UserController(self.request_context)
+
+            response = user_controller.create_user()
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(
+                response.get_json()['msg'],
+                "User with slackId '{}' already exists".format(user.slack_id)
+            )
+
+    @patch.object(UserController, 'request_params')
+    def test_create_user_method_handles_user_creation_with_duplicate_user_id(self, mock_request_params):
+        with self.app.app_context():
+            user = UserFactory(user_id="-LXTuXlk2W4Gskt8KTte")
+
+            mock_request_params.return_value = [
+                None,
+                "Joseph",
+                "Serunjogi",
+                user.user_id,
+                None
+            ]
+
+            user_controller = UserController(self.request_context)
+
+            response = user_controller.create_user()
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(
+                response.get_json()['msg'],
+                "User with userId '{}' already exists".format(user.user_id)
+            )
+
