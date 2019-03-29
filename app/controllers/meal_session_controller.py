@@ -152,3 +152,18 @@ class MealSessionController(BaseController):
 
         return self.handle_response('OK', payload={'mealSession': meal_session_updated.serialize()}, status_code=200)
 
+    def list_meal_sessions(self):
+        """
+        List all meal-sessions in the application, based on provided query
+        """
+        options = self.get_params_dict()
+        options['is_deleted'] = False
+        sessions = self.meal_session_repo.filter_by(**options)
+        if sessions.items:
+            session_list = [session.serialize() for session in sessions.items]
+            return self.handle_response(
+                'OK',
+                payload={'MealSessions': session_list,
+                         'meta': self.pagination_meta(sessions)})
+
+        return self.handle_response('No meal sessions found', status_code=404)

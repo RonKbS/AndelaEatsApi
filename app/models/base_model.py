@@ -24,8 +24,13 @@ class BaseModel(db.Model):
         db.session.commit()
 
     def serialize(self):
-        s = {to_camel_case(column.name): getattr(self, column.name) for column in self.__table__.columns if column.name not in ['created_at', 'updated_at']}
+        s = {to_camel_case(column.name): getattr(self, column.name) for column in self.__table__.columns if column.name not in ['created_at', 'updated_at', 'start_time', 'stop_time']}
+        if 'start_time' in self.__table__.columns:
+                s[to_camel_case('start_time')] = str(self.start_time)
+        if 'stop_time' in self.__table__.columns:
+                s[to_camel_case('stop_time')] = str(self.stop_time)
         s['timestamps'] = {'created_at': datetime.strftime(self.created_at, '%Y-%m-%d'), 'updated_at': self.updated_at}
+
         return s
 
     def to_dict(self, only=None, exclude=()):
