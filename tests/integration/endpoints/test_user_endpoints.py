@@ -56,7 +56,7 @@ class TestUserEndpoints(BaseTestCase):
 
         self.assert200(response)
         self.assertEqual(len(payload['users']), 10)
-        self.assertJSONKeysPresent(payload['users'][0], 'firstName', 'lastName', 'slackId', 'email')
+        self.assertJSONKeysPresent(payload['users'][0], 'firstName', 'lastName', 'slackId')
 
     def test_delete_user_endpoint_with_right_permission(self):
         user = UserFactory.create()
