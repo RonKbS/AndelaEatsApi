@@ -159,9 +159,9 @@ class MealSessionRepo(BaseRepo):
                 MealSession.name == kwargs.get('name'),
                 MealSession.date == kwargs.get('date_sent'),
                 MealSession.location_id == kwargs.get('location_id'),
-                MealSession.id != kwargs.get('meal_session_id'),
-                MealSession.start_time >= kwargs.get('start_time'),
-                MealSession.stop_time <= kwargs.get('end_time')).paginate(error_out=False).items:
+                MealSession.start_time <= kwargs.get('start_time'),
+                MealSession.stop_time >= kwargs.get('end_time'),
+                MealSession.id != kwargs.get('meal_session_id')).paginate(error_out=False).items:
             return True
         else:
             return False
@@ -275,11 +275,11 @@ class MealSessionRepo(BaseRepo):
         if cls.validate_meal_session_already_exists_other_than_specified(**kwargs):
             return "meal_session_already_exists"
 
-        if cls.check_meal_session_exists_in_other_specified_times(**kwargs):
-            return "meal_session_exists_in_specified_time"
-
         if cls.check_encloses_already_existing_in_other_meal_sessions(**kwargs):
             return "encloses_already_existing_meal_sessions"
+
+        if cls.check_meal_session_exists_in_other_specified_times(**kwargs):
+            return "meal_session_exists_in_specified_time"
 
     @classmethod
     def validate_times_and_dates_not_greater_than_each_other(cls, start_time, end_time, current_date, date_sent):
