@@ -1,9 +1,8 @@
 import pytz
-from flask import make_response, jsonify
 from datetime import datetime, time
+
 from app.repositories.base_repo import BaseRepo
 from app.models.meal_session import MealSession
-from app.repositories.location_repo import LocationRepo
 
 
 class MealSessionRepo(BaseRepo):
@@ -48,7 +47,41 @@ class MealSessionRepo(BaseRepo):
             return False
 
     @staticmethod
-    def check_meal_session_exists_in_specified_time(**kwargs):
+    def return_base_use_filter(**kwargs):
+        """
+        Return base filter that is common among all queries
+
+        :param kwargs: keys are name, date_sent, location_id
+        :return: filter object
+        """
+        return MealSession.query.filter(
+            MealSession.name == kwargs.get('name'),
+            MealSession.date == kwargs.get('date_sent'),
+            MealSession.location_id == kwargs.get('location_id')
+        )
+
+    @staticmethod
+    def check_start_time_or_end_time_between_certain_range(meal_sessions, **kwargs):
+        """
+        Find all meal sessions that are have a start time or end time in an existing range
+
+        :param1 meal_sessions: filter object
+        :param1 kwargs: keys are start_time, end_time
+        :return:
+        """
+        if meal_sessions.filter(
+                MealSession.start_time <= kwargs.get('start_time'),
+                MealSession.stop_time >= kwargs.get('start_time')).paginate(error_out=False).items \
+                or \
+                meal_sessions.filter(
+                MealSession.start_time <= kwargs.get('end_time'),
+                MealSession.stop_time >= kwargs.get('end_time')).paginate(error_out=False).items:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def check_meal_session_exists_in_specified_time(cls, **kwargs):
         """
         Check whether a meal session is already taking place at the specified
         time. Examples of possible situations are:
@@ -63,28 +96,12 @@ class MealSessionRepo(BaseRepo):
         :return: Boolean
         """
 
-        meal_sessions = MealSession.query.filter(
-            MealSession.name == kwargs.get('name'),
-            MealSession.date == kwargs.get('date_sent'),
-            MealSession.location_id == kwargs.get('location_id')
-        )
+        meal_sessions = cls.return_base_use_filter(**kwargs)
 
-        if meal_sessions.filter(
-                MealSession.start_time <= kwargs.get('start_time'),
-                MealSession.stop_time >= kwargs.get('start_time')).paginate(error_out=False).items \
-                or \
-                MealSession.query.filter(
-                MealSession.name == kwargs.get('name'),
-                MealSession.date == kwargs.get('date_sent'),
-                MealSession.location_id == kwargs.get('location_id'),
-                MealSession.start_time <= kwargs.get('end_time'),
-                MealSession.stop_time >= kwargs.get('end_time')).paginate(error_out=False).items:
-            return True
-        else:
-            return False
+        return cls.check_start_time_or_end_time_between_certain_range(meal_sessions, **kwargs)
 
-    @staticmethod
-    def check_meal_session_exists_in_other_specified_times(**kwargs):
+    @classmethod
+    def check_meal_session_exists_in_other_specified_times(cls, **kwargs):
         """
             Check whether a meal session other than the one with a particular
             session_id is already taking place at the specified
@@ -99,30 +116,15 @@ class MealSessionRepo(BaseRepo):
 
             :return: Boolean
         """
-        meal_sessions = MealSession.query.filter(
-            MealSession.name == kwargs.get('name'),
-            MealSession.date == kwargs.get('date_sent'),
-            MealSession.location_id == kwargs.get('location_id'),
+
+        meal_sessions = cls.return_base_use_filter(**kwargs).filter(
             MealSession.id != kwargs.get('meal_session_id')
         )
 
-        if meal_sessions.filter(
-                MealSession.start_time <= kwargs.get('start_time'),
-                MealSession.stop_time >= kwargs.get('start_time')).paginate(error_out=False).items \
-                or \
-                MealSession.query.filter(
-                    MealSession.name == kwargs.get('name'),
-                    MealSession.date == kwargs.get('date_sent'),
-                    MealSession.location_id == kwargs.get('location_id'),
-                    MealSession.start_time <= kwargs.get('end_time'),
-                    MealSession.id != kwargs.get('meal_session_id'),
-                    MealSession.stop_time >= kwargs.get('end_time')).paginate(error_out=False).items:
-            return True
-        else:
-            return False
+        return cls.check_start_time_or_end_time_between_certain_range(meal_sessions, **kwargs)
 
-    @staticmethod
-    def check_encloses_already_existing_meal_sessions(**kwargs):
+    @classmethod
+    def check_encloses_already_existing_meal_sessions(cls, **kwargs):
         """
         Check whether time specified encloses already existing meal sessions
         For example: a lunch meal session may already exist between 13:00hrs and 14:00hrs
@@ -133,18 +135,16 @@ class MealSessionRepo(BaseRepo):
 
         :return: Boolean
         """
-        if MealSession.query.filter(
-                MealSession.name == kwargs.get('name'),
-                MealSession.date == kwargs.get('date_sent'),
-                MealSession.location_id == kwargs.get('location_id'),
+
+        if cls.return_base_use_filter(**kwargs).filter(
                 MealSession.start_time >= kwargs.get('start_time'),
                 MealSession.stop_time <= kwargs.get('end_time')).paginate(error_out=False).items:
             return True
         else:
             return False
 
-    @staticmethod
-    def check_encloses_already_existing_in_other_meal_sessions(**kwargs):
+    @classmethod
+    def check_encloses_already_existing_in_other_meal_sessions(cls, **kwargs):
         """
         Check whether time specified encloses already existing meal sessions other than a meal session specified
         For example: a lunch meal session may already exist between 13:00hrs and 14:00hrs
@@ -155,10 +155,8 @@ class MealSessionRepo(BaseRepo):
 
         :return: Boolean
         """
-        if MealSession.query.filter(
-                MealSession.name == kwargs.get('name'),
-                MealSession.date == kwargs.get('date_sent'),
-                MealSession.location_id == kwargs.get('location_id'),
+
+        if cls.return_base_use_filter(**kwargs).filter(
                 MealSession.start_time <= kwargs.get('start_time'),
                 MealSession.stop_time >= kwargs.get('end_time'),
                 MealSession.id != kwargs.get('meal_session_id')).paginate(error_out=False).items:
@@ -213,36 +211,30 @@ class MealSessionRepo(BaseRepo):
         if type_sent is "date" and type_split:
             return datetime(year=int(type_split[0]), month=int(type_split[1]), day=int(type_split[2]))
 
-    @staticmethod
-    def validate_meal_session_already_exists(**kwargs):
+    @classmethod
+    def validate_meal_session_already_exists(cls, **kwargs):
         """
         Check whether a particular meal session already exists
 
         :param kwargs: dict with keys name, data_sent, location_id, start_time and end_time
         :return: boolean
         """
-        if MealSession.query.filter(
-            MealSession.name == kwargs.get('name'),
-            MealSession.date == kwargs.get('date_sent'),
-            MealSession.location_id == kwargs.get('location_id'),
+        if cls.return_base_use_filter(**kwargs).filter(
             MealSession.start_time == kwargs.get('start_time'),
             MealSession.stop_time == kwargs.get('end_time')).paginate(error_out=False).items:
             return True
         else:
             return False
 
-    @staticmethod
-    def validate_meal_session_already_exists_other_than_specified(**kwargs):
+    @classmethod
+    def validate_meal_session_already_exists_other_than_specified(cls, **kwargs):
         """
         Check whether a particular meal session already exists
 
         :param kwargs: dict with keys name, data_sent, location_id, start_time and end_time
         :return: boolean
         """
-        if MealSession.query.filter(
-                MealSession.name == kwargs.get('name'),
-                MealSession.date == kwargs.get('date_sent'),
-                MealSession.location_id == kwargs.get('location_id'),
+        if cls.return_base_use_filter(**kwargs).filter(
                 MealSession.start_time == kwargs.get('start_time'),
                 MealSession.stop_time == kwargs.get('end_time'),
                 MealSession.id != kwargs.get('meal_session_id')).paginate(error_out=False).items:
