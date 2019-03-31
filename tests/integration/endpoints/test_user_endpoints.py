@@ -5,6 +5,7 @@ from unittest.mock import patch
 from tests.base_test_case import BaseTestCase
 from app.utils.auth import PermissionRepo, UserRoleRepo
 from factories import UserFactory, RoleFactory, PermissionFactory, UserRoleFactory
+from .user_role import create_user_role
 
 
 class TestUserEndpoints(BaseTestCase):
@@ -56,7 +57,7 @@ class TestUserEndpoints(BaseTestCase):
 
         self.assert200(response)
         self.assertEqual(len(payload['users']), 10)
-        self.assertJSONKeysPresent(payload['users'][0], 'firstName', 'lastName', 'slackId', 'email')
+        self.assertJSONKeysPresent(payload['users'][0], 'firstName', 'lastName', 'slackId')
 
     def test_delete_user_endpoint_with_right_permission(self):
         user = UserFactory.create()
@@ -99,4 +100,21 @@ class TestUserEndpoints(BaseTestCase):
         response = self.client().delete(self.make_url(f'/userrs/-576A/'), headers=self.headers())
 
         self.assert404(response)
+
+    def test_create_user_endpoint_succeeds(self):
+
+        create_user_role('create_user')
+        user = UserFactory.build()
+
+        user_data = dict(firstName=user.first_name, lastName=user.last_name)
+
+        response = self.client().post(self.make_url("/users/"), headers=self.headers(),
+                                      data=self.encode_to_json_string(user_data))
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response_json['msg'], 'OK')
+        self.assertEqual(response_json['payload']['user']['firstName'], user.first_name)
+        self.assertEqual(response_json['payload']['user']['lastName'], user.last_name)
 

@@ -97,4 +97,26 @@ class UserController(BaseController):
             return self.handle_response('User deleted', payload={"status": "success"})
         return self.handle_response('Invalid or incorrect id provided', status_code=404)
 
+    def create_user(self):
+        user_info = self.request_params('slackId', 'firstName', 'lastName', 'userId', 'imageUrl')
+
+        slack_id, first_name, last_name, user_id, image_url = user_info
+
+        if self.user_repo.exists(slack_id=slack_id):
+            return self.handle_response(
+                f"User with slackId '{slack_id}' already exists",
+                status_code=400
+            )
+
+        if self.user_repo.exists(user_id=user_id) and user_id is not None:
+            return self.handle_response(
+                f"User with userId '{user_id}' already exists",
+                status_code=400
+            )
+
+        user = self.user_repo.new_user(*user_info)
+
+        return self.handle_response('OK', payload={'user': user.serialize()}, status_code=201)
+
+
 

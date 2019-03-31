@@ -1,12 +1,19 @@
 from itertools import zip_longest
 from functools import wraps
 from datetime import datetime
+import re
 from flask import request, make_response, jsonify
 from app.utils.snake_case import SnakeCaseConversion
 from app.utils.enums import ActionType, Channels, FaqCategoryType, MealSessionNames
 
 
 class Security:
+
+	EMAIL_REGEX = re.compile(
+		r"^[\-a-zA-Z0-9_]+(\.[\-a-zA-Z0-9_]+)*@[a-z]+\.com\Z", re.I | re.UNICODE)
+
+	URL_REGEX = re.compile(r"^(http(s)?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]"
+						   r"{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$")
 
 	@staticmethod
 	def url_validator(rules):
@@ -324,6 +331,15 @@ class Security:
 							if Security.validate_enums(validator, request_key, payload[request_key]):
 								return Security.validate_enums(validator, request_key, payload[request_key])
 
+							# validate emails
+							if Security.validate_email(validator, payload[request_key]):
+								return Security.validate_email(validator, payload[request_key])
+
+							# validate urls
+							if Security.validate_url(validator, payload[request_key]):
+								return Security.validate_url(validator, payload[request_key])
+
+
 
 				return f(*args, **kwargs)
 
@@ -382,6 +398,24 @@ class Security:
 				return make_response(jsonify(
 					{'msg': "Bad Request - '{}' is not a valid value for key '{}'. "
 							"values must be any of the following {}".format(value, key, enum_values)})), 400
+
+	@classmethod
+	def validate_email(cls, validator, value):
+
+		if validator == 'email':
+			if not cls.EMAIL_REGEX.match(value):
+				return make_response(jsonify(
+					{'msg': "Bad Request - '{}' is not a valid email address.".format(value)})), 400
+
+	@classmethod
+	def validate_url(cls, validator, value):
+
+		if validator == 'url':
+			if not re.match(cls.URL_REGEX, value):
+				return make_response(jsonify(
+					{'msg': "Bad Request - '{}' is not a valid url.".format(value)})), 400
+
+
 
 
 
