@@ -118,3 +118,17 @@ class TestUserEndpoints(BaseTestCase):
         self.assertEqual(response_json['payload']['user']['firstName'], user.first_name)
         self.assertEqual(response_json['payload']['user']['lastName'], user.last_name)
 
+    def test_create_user_endpoint_succeeds(self):
+
+        create_user_role('view_users')
+        user = UserFactory(slack_id="-LXTuXlk2W4Gskt8KTte")
+
+        response = self.client().get(self.make_url(f'/users/{user.slack_id}/'), headers=self.headers())
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_json['msg'], 'OK')
+        self.assertEqual(response_json['payload']['user']['firstName'], user.first_name)
+        self.assertEqual(response_json['payload']['user']['lastName'], user.last_name)
+
