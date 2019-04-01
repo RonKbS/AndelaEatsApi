@@ -53,3 +53,10 @@ def update(meal_session_id):
 def list_sessions():
     return meal_session_controller.list_meal_sessions()
 
+
+
+@meal_session_blueprint.route('/session/<int:meal_session_id>', methods=['DELETE'])
+@Auth.has_role('admin')
+@swag_from('documentation/delete_meal_session.yml')
+def delete(meal_session_id):
+    return meal_session_controller.delete_session(meal_session_id)

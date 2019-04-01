@@ -1,6 +1,7 @@
 import pytz
 from flask import make_response, jsonify
-from datetime import datetime
+from datetime import datetime, time
+
 from app.controllers.base_controller import BaseController
 from app.repositories.meal_session_repo import MealSessionRepo
 from app.repositories.meal_service_repo import MealServiceRepo
@@ -167,3 +168,32 @@ class MealSessionController(BaseController):
                          'meta': self.pagination_meta(sessions)})
 
         return self.handle_response('No meal sessions found', status_code=404)
+    def delete_session(self, meal_session_id):
+        """
+        Deletes a meal session if correct meal_session_id is sent
+
+        :return: Json Response
+        """
+        meal_session = self.meal_session_repo.get(meal_session_id)
+
+        if meal_session and not meal_session.is_deleted:
+            meal_session = self.meal_session_repo.update(meal_session, **dict(is_deleted=True))
+            meal_session.name = meal_session.name.value
+
+            meal_session.start_time = self.meal_session_repo.get_time_as_string(
+                meal_session.start_time.hour,
+                meal_session.start_time.minute
+            )
+
+            meal_session.stop_time = self.meal_session_repo.get_time_as_string(
+                meal_session.stop_time.hour,
+                meal_session.stop_time.minute
+            )
+
+            meal_session.date = meal_session.date.strftime("%Y-%m-%d")
+
+            return self.handle_response('Meal session deleted successfully',
+                                        payload={'mealSession': meal_session.serialize()},
+                                        status_code=200)
+
+        return self.handle_response('Meal Session Not Found', status_code=404)
