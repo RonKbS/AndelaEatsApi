@@ -35,3 +35,10 @@ def delete_user(id):
 @swag_from('documentation/create_user.yml')
 def create_user():
     return user_controller.create_user()
+
+
+@user_blueprint.route('/<string:slack_id>/', methods=['GET'])
+@Auth.has_permission('view_users')
+@swag_from('documentation/get_user.yml')
+def list_user(slack_id):
+    return user_controller.list_user(slack_id)
