@@ -118,5 +118,14 @@ class UserController(BaseController):
 
         return self.handle_response('OK', payload={'user': user.serialize()}, status_code=201)
 
+    def list_user(self, slack_id):
+
+        user = self.user_repo.find_first(slack_id=slack_id)
+
+        if user:
+            return self.handle_response('OK', payload={'user': user.serialize()}, status_code=200)
+
+        return self.handle_response('User not found', status_code=404)
+
 
 
