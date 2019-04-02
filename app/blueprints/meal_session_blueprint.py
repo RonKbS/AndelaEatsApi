@@ -27,7 +27,7 @@ def create():
     return meal_session_controller.create_session()
 
 
-<<<<<<< HEAD
+
 @meal_session_blueprint.route('/session/<int:meal_session_id>', methods=['PUT'])
 @Auth.has_role('admin')
 @Security.validator([
@@ -45,9 +45,9 @@ def update(meal_session_id):
 
 
 @meal_session_blueprint.route('/session', methods=['GET'])
-=======
+
 @meal_session_blueprint.route('/session/', methods=['GET'])
->>>>>>> add tests
+
 @Auth.has_role('admin')
 @swag_from('documentation/get_meal_sessions.yml')
 def list_sessions():

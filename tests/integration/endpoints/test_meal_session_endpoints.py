@@ -514,7 +514,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.assertEqual(response_json['payload']['mealSession']['date'], meal_session_data['date'])
         self.assertEqual(response_json['payload']['mealSession']['locationId'], int(self.headers().get('X-Location')))
 
-<<<<<<< HEAD
+
     def test_update_already_existing_meal_session_succeeds(self):
 
         new_location = LocationFactory.create(id=1, name="Lagos")
@@ -1229,7 +1229,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.assertEqual(response_json['payload']['mealSession']['stopTime'], meal_session_data['endTime'])
         self.assertEqual(response_json['payload']['mealSession']['date'], meal_session_data['date'])
         self.assertEqual(response_json['payload']['mealSession']['locationId'], int(self.headers().get('X-Location')))
-=======
+
     def test_list_mealsession_fails_without_right_permission(self):
 
         MealSessionFactory.create_batch(10)
@@ -1270,4 +1270,4 @@ class TestMealSessionEndpoints(BaseTestCase):
 
         self.assert404(response)
         self.assertEqual(response_json['msg'], 'No meal sessions found')
->>>>>>> add tests
+

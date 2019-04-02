@@ -13,7 +13,7 @@ class TestPermissionEndpoints(BaseTestCase):
 		permission = PermissionFactory.build()
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		PermissionFactory.create(keyword='create_permissions', role_id=role.id)
+		PermissionFactory.create(keyword='wrong_keyword', role_id=role.id)
 		UserRoleFactory.create(user_id=user_id, role_id=100)
 
 		data = {'name': permission.name, 'keyword': permission.keyword, 'role_id': role.id}
@@ -22,7 +22,7 @@ class TestPermissionEndpoints(BaseTestCase):
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 		
 		self.assert400(response)
-		self.assertEqual(response_json['msg'], 'Access Error - No Permission Granted')
+		self.assertEqual(response_json['msg'], 'Access Error - Permission Denied')
 	
 	def test_create_permission_with_right_permission(self):
 		permission = PermissionFactory.build()
