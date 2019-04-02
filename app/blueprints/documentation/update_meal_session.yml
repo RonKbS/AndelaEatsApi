@@ -1,8 +1,8 @@
-Create a Meal Session
+Update a Meal Session
 ---
 tags:
   - Meal Sessions
-summary: Creates Meal Sessions.
+summary: Updates Meal Sessions.
 consumes:
   - application/json
 parameters:
@@ -19,7 +19,7 @@ parameters:
     description: Bearer Token Value
   - name: menu
     in: body
-    description: Creation of Meal Session
+    description: Updates of Meal Session
     schema:
       type: object
       required:
@@ -83,7 +83,7 @@ definitions:
                     example: 2018-10-22
 
 responses:
-  201:
+  200:
     description: Ok
     schema:
           $ref: '#/definitions/MealSessionPayload'

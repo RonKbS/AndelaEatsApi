@@ -1,10 +1,9 @@
 import pytz
 from flask import make_response, jsonify
-from datetime import datetime, time
-
+from datetime import datetime
 from app.controllers.base_controller import BaseController
 from app.repositories.meal_session_repo import MealSessionRepo
-from app.repositories.location_repo import LocationRepo
+from app.repositories.meal_service_repo import MealServiceRepo
 from app.utils.auth import Auth
 
 
@@ -13,6 +12,7 @@ class MealSessionController(BaseController):
     def __init__(self, request):
         BaseController.__init__(self, request)
         self.meal_session_repo = MealSessionRepo()
+        self.meal_service_repo = MealServiceRepo()
 
     def create_session(self):
         """
@@ -28,17 +28,7 @@ class MealSessionController(BaseController):
         if not location_id:
             location_id = Auth.get_location()
 
-        error_message_mapper = {
-            AttributeError: 'The location specified does not exist',
-            pytz.exceptions.UnknownTimeZoneError: 'The location specified is in an unknown time zone',
-            "invalid_time": 'The start time cannot be after end time',
-            "invalid_date": 'Date provided cannot be one before the current date',
-            "meal_session_exists_in_specified_time":
-                "This exact meal session already exists between the specified start and stop times",
-            "encloses_already_existing_meal_sessions":
-                "The start and stop times specified enclose one or more types of the same meal session",
-            "meal_session_already_exists": "This exact meal session already exists"
-        }
+        error_message_mapper = self.meal_session_repo.return_error_message_mapper()
 
         tz = self.meal_session_repo.get_location_time_zone(location_id)
         exception_message = error_message_mapper.get(tz)
@@ -99,4 +89,66 @@ class MealSessionController(BaseController):
         new_meal_session.date = new_meal_session.date.strftime("%Y-%m-%d")
 
         return self.handle_response('OK', payload={'mealSession': new_meal_session.serialize()}, status_code=201)
+
+    def update_session(self, meal_session_id):
+        """
+        Updates a meal session if all data sent meets specified requirements
+
+        :return: Json Response
+        """
+        meal_session = self.meal_session_repo.get(meal_session_id)
+
+        if not meal_session:
+            return self.handle_response("Meal session Not Found", status_code=404)
+
+        name, start_time, end_time, date, location_id = self.request_params(
+            'name', 'startTime', 'endTime', 'date', 'locationId'
+        )
+
+        if not location_id:
+            location_id = Auth.get_location()
+
+        meal_session_data = {
+            "name": name,
+            "start_time": start_time,
+            "end_time": end_time,
+            "date": date,
+            "location_id": location_id,
+            "meal_session_id": meal_session.id,
+            "meal_session": meal_session,
+        }
+
+        validated_data = self.meal_session_repo.validate_update_of_meal_session(
+            **meal_session_data
+        )
+
+        error_message = validated_data.get("error_message")
+
+        if error_message:
+            return make_response(jsonify({'msg': error_message}), 400)
+
+        meal_session_updated = self.meal_session_repo.update_meal_session(
+            meal_session,
+            name=validated_data.get("name"),
+            start_time=validated_data.get("start_time"),
+            stop_time=validated_data.get("end_time"),
+            date=validated_data.get("date"),
+            location_id=validated_data.get("location_id")
+        )
+
+        meal_session_updated.name = meal_session_updated.name.value
+
+        meal_session_updated.start_time = self.meal_session_repo.get_time_as_string(
+            meal_session_updated.start_time.hour,
+            meal_session_updated.start_time.minute
+        )
+
+        meal_session_updated.stop_time = self.meal_session_repo.get_time_as_string(
+            meal_session_updated.stop_time.hour,
+            meal_session_updated.stop_time.minute
+        )
+
+        meal_session_updated.date = meal_session_updated.date.strftime("%Y-%m-%d")
+
+        return self.handle_response('OK', payload={'mealSession': meal_session_updated.serialize()}, status_code=200)
 
