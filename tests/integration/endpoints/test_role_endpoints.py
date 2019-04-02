@@ -108,8 +108,8 @@ class TestRoleEndpoints(BaseTestCase):
 
 		role1 = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='delete_roles', role_id=100)
-		user_role = UserRoleFactory.create(user_id=user_id, role_id=role1.id)
+		PermissionFactory.create(keyword='delete_roless', role_id=100)
+		UserRoleFactory.create(user_id=user_id, role_id=role1.id)
 
 		response = self.client().delete(self.make_url(f'/roles/{role.id}'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))

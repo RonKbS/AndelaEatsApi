@@ -27,6 +27,7 @@ def create():
     return meal_session_controller.create_session()
 
 
+
 @meal_session_blueprint.route('/session/<int:meal_session_id>', methods=['PUT'])
 @Auth.has_role('admin')
 @Security.validator([
@@ -36,6 +37,19 @@ def create():
     'endTime|required:time',
     'locationId|int']
 )
+
+
 @swag_from('documentation/update_meal_session.yml')
 def update(meal_session_id):
     return meal_session_controller.update_session(meal_session_id)
+
+
+@meal_session_blueprint.route('/session', methods=['GET'])
+
+@meal_session_blueprint.route('/session/', methods=['GET'])
+
+@Auth.has_role('admin')
+@swag_from('documentation/get_meal_sessions.yml')
+def list_sessions():
+    return meal_session_controller.list_meal_sessions()
+

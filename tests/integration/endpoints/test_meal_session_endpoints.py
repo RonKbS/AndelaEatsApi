@@ -3,7 +3,7 @@
 from datetime import datetime, time, timedelta
 from tests.base_test_case import BaseTestCase
 from app.repositories.meal_session_repo import MealSessionRepo
-from factories import MealSessionFactory, LocationFactory, RoleFactory, UserRoleFactory
+from factories import MealSessionFactory, LocationFactory, RoleFactory, UserRoleFactory, PermissionFactory
 
 
 class TestMealSessionEndpoints(BaseTestCase):
@@ -49,7 +49,7 @@ class TestMealSessionEndpoints(BaseTestCase):
 
     def test_create_already_existing_meal_session_fails(self):
 
-        new_location = LocationFactory.create(id=1, name="Lagos")
+        new_location = LocationFactory.create(id=1000, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
         UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
@@ -513,6 +513,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.assertEqual(response_json['payload']['mealSession']['stopTime'], meal_session_data['endTime'])
         self.assertEqual(response_json['payload']['mealSession']['date'], meal_session_data['date'])
         self.assertEqual(response_json['payload']['mealSession']['locationId'], int(self.headers().get('X-Location')))
+
 
     def test_update_already_existing_meal_session_succeeds(self):
 
@@ -1228,3 +1229,45 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.assertEqual(response_json['payload']['mealSession']['stopTime'], meal_session_data['endTime'])
         self.assertEqual(response_json['payload']['mealSession']['date'], meal_session_data['date'])
         self.assertEqual(response_json['payload']['mealSession']['locationId'], int(self.headers().get('X-Location')))
+
+    def test_list_mealsession_fails_without_right_permission(self):
+
+        MealSessionFactory.create_batch(10)
+        role1 = RoleFactory.create(name='adminn')
+        user_id = BaseTestCase.user_id()
+        PermissionFactory.create(keyword='view_sessions', role_id=role1.id)
+        UserRoleFactory.create(user_id=user_id, role_id=role1.id)
+
+        response = self.client().get(self.make_url('/meals/session/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assert400(response)
+        self.assertEqual(response_json['msg'], 'Access Error - This role does not have the access rights')
+
+    def test_list_mealsession_with_right_permission(self):
+
+        MealSessionFactory.create_batch(10)
+        role1 = RoleFactory.create(name='admin')
+        user_id = BaseTestCase.user_id()
+        PermissionFactory.create(keyword='view_sessions', role_id=role1.id)
+        UserRoleFactory.create(user_id=user_id, role_id=role1.id)
+
+        response = self.client().get(self.make_url('/meals/session/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assert200(response)
+        self.assertEqual(response_json['msg'], 'OK')
+
+    def test_list_mealsession_when_none_exists(self):
+
+        role1 = RoleFactory.create(name='admin')
+        user_id = BaseTestCase.user_id()
+        PermissionFactory.create(keyword='view_sessions', role_id=role1.id)
+        UserRoleFactory.create(user_id=user_id, role_id=role1.id)
+
+        response = self.client().get(self.make_url('/meals/session/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assert404(response)
+        self.assertEqual(response_json['msg'], 'No meal sessions found')
+
