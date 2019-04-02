@@ -49,6 +49,6 @@ def list_user(slack_id):
 @Security.validator(
     ['slackId|optional', 'firstName|required', 'lastName|required',
      'userId|optional', 'imageUrl|optional:url'])
-#@swag_from('documentation/update_user.yml')
+@swag_from('documentation/update_user.yml')
 def update_user(user_id):
     return user_controller.update_user(user_id)
