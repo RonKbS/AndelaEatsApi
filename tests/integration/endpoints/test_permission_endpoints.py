@@ -14,7 +14,7 @@ class TestPermissionEndpoints(BaseTestCase):
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
 		PermissionFactory.create(keyword='wrong_keyword', role_id=role.id)
-		UserRoleFactory.create(user_id=user_id, role_id=100)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		data = {'name': permission.name, 'keyword': permission.keyword, 'role_id': role.id}
 		response = self.client().post(self.make_url('/roles/permissions'),
