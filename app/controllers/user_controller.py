@@ -1,6 +1,6 @@
 from app.controllers.base_controller import BaseController
 from app.repositories import UserRoleRepo, RoleRepo, UserRepo
-from app.models import Role
+from app.models import Role, User
 from app.services.andela import AndelaService
 
 
@@ -83,3 +83,84 @@ class UserController(BaseController):
             return self.handle_response('OK', payload={'users': user_list, 'meta': self.pagination_meta(users)})
         return self.handle_response('No users found', status_code=404)
 
+    def delete_user(self, id):
+        user = self.user_repo.get(id)
+        if user:
+            if user.is_deleted:
+                return self.handle_response('User has already been deleted', status_code=400)
+
+            updates = {}
+            updates['is_deleted'] = True
+
+            self.user_repo.update(user, **updates)
+
+            return self.handle_response('User deleted', payload={"status": "success"})
+        return self.handle_response('Invalid or incorrect id provided', status_code=404)
+
+    def create_user(self):
+        user_info = self.request_params('slackId', 'firstName', 'lastName', 'userId', 'imageUrl')
+
+        slack_id, first_name, last_name, user_id, image_url = user_info
+
+        if self.user_repo.exists(slack_id=slack_id):
+            return self.handle_response(
+                f"User with slackId '{slack_id}' already exists",
+                status_code=400
+            )
+
+        if self.user_repo.exists(user_id=user_id) and user_id is not None:
+            return self.handle_response(
+                f"User with userId '{user_id}' already exists",
+                status_code=400
+            )
+
+        user = self.user_repo.new_user(*user_info)
+
+        return self.handle_response('OK', payload={'user': user.serialize()}, status_code=201)
+
+    def list_user(self, slack_id):
+
+        user = self.user_repo.find_first(slack_id=slack_id)
+
+        if user:
+            return self.handle_response('OK', payload={'user': user.serialize()}, status_code=200)
+
+        return self.handle_response('User not found', status_code=404)
+
+    def update_user(self, user_id):
+        user = self.user_repo.get(user_id)
+
+        if not user:
+            return self.handle_response(
+                msg="FAIL",
+                payload={'user': 'User not found'}, status_code=404
+            )
+
+        if user.is_deleted:
+            return self.handle_response(
+                msg="FAIL",
+                payload={'user': 'User already deleted'}, status_code=400
+            )
+
+        user_info = self.request_params_dict('slackId', 'firstName', 'lastName', 'userId', 'imageUrl')
+
+        slack_id = user_info.get('slack_id')
+        user_id_sent = user_info.get('user_id')
+
+        if slack_id and self.user_repo.check_exists_else_where(User, 'slack_id', slack_id, 'id', user_id):
+            return self.handle_response(
+                msg="FAIL",
+                payload={'user': 'Cannot update to the slack id of another existing user'},
+                status_code=403
+            )
+
+        if user_id_sent and self.user_repo.check_exists_else_where(User, 'user_id', user_id_sent, 'id', user_id):
+            return self.handle_response(
+                msg="FAIL",
+                payload={'user': 'Cannot update to the user id of another existing user'},
+                status_code=403
+            )
+
+        user = self.user_repo.update(user, **user_info)
+
+        return self.handle_response('OK', payload={'user': user.serialize()}, status_code=200)

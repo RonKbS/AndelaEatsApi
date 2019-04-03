@@ -1,5 +1,6 @@
 from flask import request
 from sqlalchemy import event
+from app.utils.id_generator import PushID
 
 
 from .location import Location
@@ -27,8 +28,19 @@ tables_logged_after_every_update = [Vendor, VendorEngagement, MealItem, Menu, Fa
                                     Role, Permission, UserRole, Location]
 tables_logged_after_every_delete = [Vendor, VendorEngagement, MealItem, Menu, Faq,
                                     Role, Permission, UserRole, Location, VendorRating]
+generate_id_tables = (User,)
 
 # attach all listeners to each admin table
 attach_listen_type(tables_logged_after_every_insert, 'after_insert')
 attach_listen_type(tables_logged_after_every_update, 'after_update')
 attach_listen_type(tables_logged_after_every_delete, 'after_delete')
+
+
+def model_id_generator(mapper, connection, target):
+    """A function to generate unique identifiers on insert."""
+    push_id = PushID()
+    if not target.slack_id:
+        target.slack_id = push_id.next_id()
+
+for table in generate_id_tables:
+    event.listen(table, 'before_insert', model_id_generator)

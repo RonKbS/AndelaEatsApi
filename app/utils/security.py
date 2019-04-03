@@ -1,12 +1,19 @@
 from itertools import zip_longest
 from functools import wraps
 from datetime import datetime
+import re
 from flask import request, make_response, jsonify
 from app.utils.snake_case import SnakeCaseConversion
-from app.utils.enums import ActionType, Channels, FaqCategoryType
+from app.utils.enums import ActionType, Channels, FaqCategoryType, MealSessionNames
 
 
 class Security:
+
+	EMAIL_REGEX = re.compile(
+		r"^[\-a-zA-Z0-9_]+(\.[\-a-zA-Z0-9_]+)*@[a-z]+\.com\Z", re.I | re.UNICODE)
+
+	URL_REGEX = re.compile(r"^(http(s)?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]"
+						   r"{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$")
 
 	@staticmethod
 	def url_validator(rules):
@@ -282,13 +289,29 @@ class Security:
 														.format(request_key, column_name,
 																repo_name)})), 400
 
-							if validator == 'date':
+							if validator == 'date' or validator == 'time':
+
+								mapper = {
+									'date': {
+										'formatter': '%Y-%m-%d',
+										'format':  'YYYY-MM-DD',
+										'type': 'date',
+									},
+									'time': {
+										'formatter': '%H:%M',
+										'format': 'Hrs:Mins. Eg 17:59',
+										'type': 'time'
+									}
+								}
+
+								formatter = mapper.get(validator)
+
 								try:
-									datetime.strptime(payload[request_key], '%Y-%m-%d')
+									datetime.strptime(payload[request_key], formatter.get('formatter'))
 								except Exception as e:
 									return make_response(
-										jsonify({'msg': 'Bad Request - {} should be valid date. Format: YYYY-MM-DD'
-												.format(request_key)})), 400
+										jsonify({'msg': 'Bad Request - {} should be valid {}. Format: {}'
+												.format(request_key, formatter.get('type'), formatter.get('format'))})), 400
 
 							if validator == 'list' and type(payload[request_key]) is not list:
 								return make_response(
@@ -307,6 +330,15 @@ class Security:
 							# Validate enums
 							if Security.validate_enums(validator, request_key, payload[request_key]):
 								return Security.validate_enums(validator, request_key, payload[request_key])
+
+							# validate emails
+							if Security.validate_email(validator, payload[request_key]):
+								return Security.validate_email(validator, payload[request_key])
+
+							# validate urls
+							if Security.validate_url(validator, payload[request_key]):
+								return Security.validate_url(validator, payload[request_key])
+
 
 
 				return f(*args, **kwargs)
@@ -353,7 +385,8 @@ class Security:
 		split_validator = validator.split('_')
 
 		enum_mapper = {
-			'FaqCategoryType': [value.value for value in FaqCategoryType.__members__.values()]
+			'FaqCategoryType': [value.value for value in FaqCategoryType.__members__.values()],
+			'MealSessionNames': [value.value for value in MealSessionNames.__members__.values()],
 		}
 
 		if split_validator[0] == 'enum':
@@ -365,6 +398,24 @@ class Security:
 				return make_response(jsonify(
 					{'msg': "Bad Request - '{}' is not a valid value for key '{}'. "
 							"values must be any of the following {}".format(value, key, enum_values)})), 400
+
+	@classmethod
+	def validate_email(cls, validator, value):
+
+		if validator == 'email':
+			if not cls.EMAIL_REGEX.match(value):
+				return make_response(jsonify(
+					{'msg': "Bad Request - '{}' is not a valid email address.".format(value)})), 400
+
+	@classmethod
+	def validate_url(cls, validator, value):
+
+		if validator == 'url':
+			if not re.match(cls.URL_REGEX, value):
+				return make_response(jsonify(
+					{'msg': "Bad Request - '{}' is not a valid url.".format(value)})), 400
+
+
 
 
 
