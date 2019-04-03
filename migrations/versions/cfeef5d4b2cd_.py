@@ -31,7 +31,7 @@ def upgrade():
     sa.ForeignKeyConstraint(['location_id'], ['locations.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.add_column('vendors', sa.Column('average_rating', sa.Float(), nullable=False))
+    op.add_column('vendors', sa.Column('average_rating', sa.Float(), nullable=True, default=0))
     # ### end Alembic commands ###
 
 

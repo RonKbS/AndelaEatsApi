@@ -1,0 +1,89 @@
+Update a Meal Session
+---
+tags:
+  - Meal Sessions
+summary: Updates Meal Sessions.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: menu
+    in: body
+    description: Updates of Meal Session
+    schema:
+      type: object
+      required:
+        - breakfast
+        - startTime
+        - endTime
+        - date
+      properties:
+        name:
+          type: string
+          enum: [breakfast, lunch]
+        startTime:
+          type: string
+          example: 08:00
+        endTime:
+          type: string
+          example: 09:00
+        date:
+          type: string
+          example: "2019-11-30"
+        locationId:
+          type: string
+          example: "1"
+definitions:
+  MealSessionPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          MealSession:
+            type: object
+            properties:
+              name:
+                type: string
+              startTime:
+                type: string
+              endTime:
+                type: string
+              date:
+                type: string
+              locationId:
+                type: string
+              id:
+                type: integer
+              isDeleted:
+                type: boolean
+              timestamps:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+                  updated_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/MealSessionPayload'

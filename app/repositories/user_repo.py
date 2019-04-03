@@ -13,14 +13,12 @@ class UserRepo(BaseRepo):
 
         :parameter
             args: a list containing the following positional values
-                  [slack_id, first_name, last_name, email, user_role_id, photo]
+                  [slack_id, first_name, last_name, email, user_id, photo]
 
         """
-        slack_id, first_name, last_name, email, *image_url = args
+        slack_id, first_name, last_name, user_id, image_url = args
 
-        image_url = image_url[0] if image_url else None
-
-        user = User(slack_id=slack_id, first_name=first_name, last_name=last_name, email=email,
-                    image_url=image_url)
+        user = User(slack_id=slack_id, first_name=first_name, last_name=last_name,
+                    image_url=image_url, user_id=user_id)
         user.save()
         return user

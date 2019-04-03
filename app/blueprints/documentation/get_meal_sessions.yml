@@ -1,0 +1,100 @@
+Get All MealSessions
+---
+tags:
+  - Meal Sessions
+summary: Get all mesl sessions
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: date
+    in: query
+    type: string
+    format: date
+    description: the meal session date
+  - name: startTime
+    in: query
+    type: string
+    format: time
+    description: the meal session start time
+  - name: stopTime
+    in: query
+    type: string
+    format: time
+    description: the meal session stop time
+  - name: name
+    in: query
+    type: string
+    description: meal session name. lunch or breakfast
+definitions:
+  SessionListPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          mealSessions:
+            type: array
+            items:
+              type: object
+              properties:
+                locationId:
+                  type: integer
+                name:
+                  type: string
+                id:
+                  type: integer
+                isDeleted:
+                  type: boolean
+                date:
+                  type: string
+                  format: time
+                startTime:
+                  type: string
+                  format: time
+                stopTime:
+                  type: string
+                  format: time
+                timestamps:
+                  type: object
+                  properties:
+                    created_at:
+                      type: string
+                      format: date
+                      example: 2018-10-22
+                    updated_at:
+                      type: string
+                      format: date
+                      example: 2018-10-22
+          meta:
+            type: object
+            properties:
+              current_page:
+                type: integer
+              next_page:
+                type: integer
+              prev_page:
+                type: integer
+              total_pages:
+                type: integer
+              total_rows:
+                type: integer
+
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/SessionListPayload'

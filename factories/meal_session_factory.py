@@ -15,3 +15,4 @@ class MealSessionFactory(factory.alchemy.SQLAlchemyModelFactory):
     stop_time =  time(hour=10, minute=30)
     date = datetime.now()
     location_id = factory.Sequence(lambda n: n)
+    is_deleted = False

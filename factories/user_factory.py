@@ -12,7 +12,6 @@ class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
     slack_id = factory.Sequence(lambda n: n)
     first_name = factory.Faker('name')
     last_name = factory.Faker('name')
-    email = factory.Faker('email')
     user_id = factory.Faker('word')
     image_url = factory.Faker('url')
 

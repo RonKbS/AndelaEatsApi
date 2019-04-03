@@ -182,6 +182,7 @@ class TestVendorRatingController(BaseTestCase):
             assert result.status_code == 400
             assert result.get_json()['msg'] == 'Invalid vendor_id provided'
 
+    @patch.object(VendorRepo, 'update_vendor_average_rating')
     @patch.object(VendorRatingRepo, 'new_rating')
     @patch.object(VendorEngagementRepo, 'get')
     @patch.object(VendorRatingController, 'request_params')
@@ -193,7 +194,8 @@ class TestVendorRatingController(BaseTestCase):
         mock_auth_user,
         mock_vendor_rating_controller_request_params,
         mock_vendor_engagement_repo_get,
-        mock_vendor_rating_repo_new_rating
+        mock_vendor_rating_repo_new_rating,
+        mock_vendor_rating_repo_update_vendor_average_rating
     ):
         '''Test create_vendor_rating OK response.
         '''
@@ -240,6 +242,7 @@ class TestVendorRatingController(BaseTestCase):
             vendor_rating_controller = VendorRatingController(
                 self.request_context
             )
+            mock_vendor_rating_repo_update_vendor_average_rating.return_value = None
 
             # Act
             result = vendor_rating_controller.create_vendor_rating()
@@ -550,6 +553,7 @@ class TestVendorRatingController(BaseTestCase):
             assert result.get_json()['msg'] == 'You have already rated' \
                 ' this meal'
 
+    @patch.object(VendorRepo, 'update_vendor_average_rating')
     @patch.object(OrderRepo, 'get')
     @patch.object(VendorRatingController, 'request_params')
     @patch('app.Auth.user')
@@ -561,7 +565,8 @@ class TestVendorRatingController(BaseTestCase):
         mock_meal_item_repo_get,
         mock_auth_user,
         mock_vendor_rating_controller_request_params,
-        mock_order_repo_get
+        mock_order_repo_get,
+        mock_vendor_repo_update_average_rating
     ):
         '''Test create_order_rating when order has already been rated.
         '''
@@ -613,6 +618,7 @@ class TestVendorRatingController(BaseTestCase):
             vendor_rating_controller = VendorRatingController(
                 self.request_context
             )
+            mock_vendor_repo_update_average_rating.return_value = None
 
             # Act
             result = vendor_rating_controller.create_order_rating()
