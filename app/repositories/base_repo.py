@@ -128,3 +128,25 @@ class BaseRepo:
 		except pytz.exceptions.UnknownTimeZoneError:
 			return pytz.exceptions.UnknownTimeZoneError
 
+	@staticmethod
+	def check_exists_else_where(model_class, first_attribute, first_compare_value, second_attribute, second_compare_value):
+		"""
+		Checks whether a value already exists somewhere else other than specified.
+		A typical example would be
+		User.filter(User.slack_id == 'slack_id', User.id != '01')
+
+		:param model_class:The model class for example User
+		:param first_attribute: The attribute to perform first search on
+		:param first_compare_value: The value to compare with first attribute
+		:param second_attribute: The attribute to exclude in the filter once the first comparison passes
+		:param second_compare_value: The value to compare with second attribute
+		:return list: A list of all the items found
+		:return string: A string specifying what went wrong.
+		"""
+		try:
+			return model_class.query.filter(
+				getattr(model_class, first_attribute) == first_compare_value,
+				getattr(model_class, second_attribute) != second_compare_value
+			).all()
+		except Exception as e:
+			return "An error occurred during the check: Details {}".format(str(e))
