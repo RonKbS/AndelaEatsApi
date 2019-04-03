@@ -1,0 +1,62 @@
+Delete a Meal Session
+---
+tags:
+  - Meal Sessions
+summary: Deletes Meal Sessions.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+definitions:
+  MealSessionPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Meal session deleted successfully
+      payload:
+        type: object
+        properties:
+          MealSession:
+            type: object
+            properties:
+              name:
+                type: string
+              startTime:
+                type: string
+              endTime:
+                type: string
+              date:
+                type: string
+              locationId:
+                type: string
+              id:
+                type: integer
+              isDeleted:
+                type: boolean
+              timestamps:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+                  updated_at:
+                    type: string
+                    format: date
+                    example: 2018-10-22
+responses:
+  200:
+    description: Ok
+    schema:
+          $ref: '#/definitions/MealSessionPayload'

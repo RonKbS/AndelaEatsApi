@@ -1271,3 +1271,63 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.assert404(response)
         self.assertEqual(response_json['msg'], 'No meal sessions found')
 
+
+    def test_delete_meal_session_succeds(self):
+
+        location = LocationFactory.create(id=1, name="Lagos")
+
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
+        meal_session = MealSessionFactory.create(id=1, location_id=location.id)
+
+        response = self.client().delete(self.make_url('/meals/session/'+ str(meal_session.id)),
+                                        headers=self.headers())
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_json['msg'], 'Meal session deleted successfully')
+        self.assertEqual(response_json['payload']['mealSession']['id'], meal_session.id)
+        self.assertEqual(response_json['payload']['mealSession']['name'], meal_session.name)
+        self.assertEqual(response_json['payload']['mealSession']['startTime'], meal_session.start_time)
+        self.assertEqual(response_json['payload']['mealSession']['stopTime'], meal_session.stop_time)
+        self.assertEqual(response_json['payload']['mealSession']['date'], meal_session.date)
+        self.assertEqual(response_json['payload']['mealSession']['locationId'], meal_session.location_id)
+
+    def test_delete_meal_session_for_one_already_deleted_fails(self):
+
+        location = LocationFactory.create(id=1, name="Lagos")
+
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
+        meal_session = MealSessionFactory.create(id=1, location_id=location.id, is_deleted=True)
+
+        meal_session_id = str(meal_session.id)
+
+        response = self.client().delete(self.make_url('/meals/session/' + meal_session_id),
+                                        headers=self.headers())
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response_json['msg'], 'Meal Session Not Found')
+
+    def test_delete_meal_session_for_none_existing_session_fails(self):
+        location = LocationFactory.create(id=1, name="Lagos")
+
+        new_role = RoleFactory.create(name='admin')
+        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+
+        meal_session = MealSessionFactory.create(id=1, location_id=location.id, is_deleted=True)
+
+        meal_session_id = str(meal_session.id + 1)
+
+        response = self.client().delete(self.make_url('/meals/session/' + meal_session_id),
+                                        headers=self.headers())
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response_json['msg'], 'Meal Session Not Found')
