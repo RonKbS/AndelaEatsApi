@@ -1,4 +1,4 @@
-from os import getenv
+from os import getenv, environ
 import jwt
 import json
 from app import create_app
@@ -7,6 +7,8 @@ from app.utils.auth import Auth
 from flask_testing import TestCase
 from faker import Faker
 
+config_name = 'testing'
+environ['APP_ENV'] = config_name
 fake = Faker()
 
 class BaseTestCase(TestCase):
