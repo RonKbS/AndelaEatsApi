@@ -37,7 +37,6 @@ class VendorRatingController(BaseController):
             return self.handle_response('OK', payload={'date': date, 'vendor': vendor_name, 'result': result})
         return self.handle_response('No ratings for this date', status_code=404)
 
-
     def get_vendor_rating(self, rating_id):
         """retrieves the details of a specific rating, giving the rating id"""
         rating = self.vendor_rating_repo.get(rating_id)
@@ -53,6 +52,7 @@ class VendorRatingController(BaseController):
         (comment, rating, service_date, channel, engagement_id) = self.request_params(
             'comment', 'rating', 'serviceDate', 'channel', 'engagementId'
         )
+        main_meal_id = None
         user_id = Auth.user('id')
         vendor_id = self.vendor_engagement_repo.get(engagement_id).vendor_id
 
@@ -61,7 +61,7 @@ class VendorRatingController(BaseController):
             service_date = datetime.strptime(service_date, '%Y-%m-%d')
 
             rating = self.vendor_rating_repo.new_rating(vendor_id, user_id, rating, service_date, RatingType.engagement,
-                        engagement_id, engagement_id, channel, comment)
+                        engagement_id, engagement_id, main_meal_id, channel, comment)
             self.vendor_repo.update_vendor_average_rating(vendor_id)
             rtng = rating.serialize()
 
@@ -102,7 +102,7 @@ class VendorRatingController(BaseController):
                 return self.handle_response('You have already rated this meal', status_code=400)
 
         rating = self.vendor_rating_repo.new_rating(
-                    vendor_id, user_id, rating, datetime.strptime(service_date, '%Y-%m-%d'), rating_type, type_id, engagement_id, channel, comment, type_id
+                    vendor_id, user_id, rating, datetime.strptime(service_date, '%Y-%m-%d'), rating_type, type_id, engagement_id, main_meal_id, channel, comment
                 )
 
         self.vendor_repo.update_vendor_average_rating(vendor_id)
