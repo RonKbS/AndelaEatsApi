@@ -40,7 +40,7 @@ class TestUserEndpoints(BaseTestCase):
             response = response.get_json()
 
             assert response['msg'] == 'OK'
-            assert response['payload'].get('AdminUsers') == []
+            assert response['payload'].get('adminUsers') == []
 
     def test_list_users_endpoint(self):
         role = RoleFactory.create(name='admin')
@@ -226,4 +226,15 @@ class TestUserEndpoints(BaseTestCase):
             response_json['payload']['user'],
             'User already deleted'
         )
+    
+    def test_list_users_endpoint_without_users(self):
+        role = RoleFactory.create(name='admin')
+        user_id = BaseTestCase.user_id()
+        PermissionFactory.create(keyword='view_users', role_id=role.id)
+        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+        response = self.client().get(self.make_url('/users/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 404)
 
