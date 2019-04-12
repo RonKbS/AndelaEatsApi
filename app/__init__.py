@@ -22,13 +22,22 @@ def create_app(config_name):
     blueprint.register()
 
     cron = Cron(app)
-    scheduler = BackgroundScheduler()
-    # in your case you could change seconds to hours
-    scheduler.add_job(cron.run_24_hourly, trigger='interval', hours=24)
-    scheduler.start()
+    # cron.register_cron_jobs()
+    # cron.run_meal_session_cron()
+    # scheduler = cron.
+    # a_callable = cron.generate_callable_to_schedule("One two three")
+    # scheduler.add_job(a_callable, trigger='interval', seconds=30)
+    # scheduler.start()
+    # scheduler = BackgroundScheduler()
+    # # in your case you could change seconds to hours
+    # scheduler.add_job(cron.run_24_hourly, trigger='interval', hours=24)
+    # scheduler.start()
 
     from . import models
     db.init_app(app)
+
+    cron.register_and_start_cron_jobs()
+
     swg = Swagger(app)
 
     return app
