@@ -1,8 +1,8 @@
-Create a Meal Session
+Update Single User
 ---
 tags:
-  - Meal Sessions
-summary: Creates Meal Sessions.
+  - Users
+summary: Updates users.
 consumes:
   - application/json
 parameters:
@@ -19,32 +19,25 @@ parameters:
     description: Bearer Token Value
   - name: menu
     in: body
-    description: Creation of Meal Session
+    description: Creation of an User
     schema:
       type: object
       required:
-        - breakfast
-        - startTime
-        - endTime
-        - date
+        - firstName
+        - lastName
       properties:
-        name:
+        slackId:
           type: string
-          enum: [breakfast, lunch]
-        startTime:
+        firstName:
           type: string
-          example: 08:00
-        endTime:
+        lastName:
           type: string
-          example: 09:00
-        date:
+        userId:
           type: string
-          example: "2019-11-30"
-        locationId:
+        imageUrl:
           type: string
-          example: "1"
 definitions:
-  MealSessionPayload:
+  UserPayload:
     type: object
     properties:
       msg:
@@ -53,18 +46,18 @@ definitions:
       payload:
         type: object
         properties:
-          MealSession:
+          user:
             type: object
             properties:
-              name:
+              slackId:
                 type: string
-              startTime:
+              firstName:
                 type: string
-              endTime:
+              lastName:
                 type: string
-              date:
+              userId:
                 type: string
-              locationId:
+              imageUrl:
                 type: string
               id:
                 type: integer
@@ -83,7 +76,7 @@ definitions:
                     example: 2018-10-22
 
 responses:
-  201:
+  200:
     description: Ok
     schema:
-          $ref: '#/definitions/MealSessionPayload'
+          $ref: '#/definitions/UserPayload'

@@ -35,3 +35,20 @@ def delete_user(id):
 @swag_from('documentation/create_user.yml')
 def create_user():
     return user_controller.create_user()
+
+
+@user_blueprint.route('/<string:slack_id>/', methods=['GET'])
+@Auth.has_permission('view_users')
+@swag_from('documentation/get_user.yml')
+def list_user(slack_id):
+    return user_controller.list_user(slack_id)
+
+
+@user_blueprint.route('/<int:user_id>', methods=['PUT'])
+@Auth.has_permission('update_user')
+@Security.validator(
+    ['slackId|optional', 'firstName|required', 'lastName|required',
+     'userId|optional', 'imageUrl|optional:url'])
+@swag_from('documentation/update_user.yml')
+def update_user(user_id):
+    return user_controller.update_user(user_id)

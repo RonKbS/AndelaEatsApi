@@ -122,3 +122,27 @@ class TestUserController(BaseTestCase):
                 "User with userId '{}' already exists".format(user.user_id)
             )
 
+    def test_list_user_succeeds(self):
+
+        with self.app.app_context():
+            user = UserFactory(slack_id="-LXTuXlk2W4Gskt8KTte")
+
+            user_controller = UserController(self.request_context)
+
+            response = user_controller.list_user(slack_id=user.slack_id)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.get_json()['msg'], "OK")
+            self.assertEqual(response.get_json()['payload']['user']['slackId'], user.slack_id)
+            self.assertEqual(response.get_json()['payload']['user']['firstName'], user.first_name)
+            self.assertEqual(response.get_json()['payload']['user']['lastName'], user.last_name)
+
+    def test_list_user_when_user_found_succeeds(self):
+        with self.app.app_context():
+
+            user_controller = UserController(self.request_context)
+
+            response = user_controller.list_user(slack_id="-LXTuXlk2W4Gskt8KTtedhmdydsbnyw")
+
+            self.assertEqual(response.status_code, 404)
+            self.assertEqual(response.get_json()['msg'], 'User not found')

@@ -1,6 +1,6 @@
 from app.controllers.base_controller import BaseController
 from app.repositories import UserRoleRepo, RoleRepo, UserRepo
-from app.models import Role
+from app.models import Role, User
 from app.services.andela import AndelaService
 
 
@@ -118,5 +118,49 @@ class UserController(BaseController):
 
         return self.handle_response('OK', payload={'user': user.serialize()}, status_code=201)
 
+    def list_user(self, slack_id):
 
+        user = self.user_repo.find_first(slack_id=slack_id)
 
+        if user:
+            return self.handle_response('OK', payload={'user': user.serialize()}, status_code=200)
+
+        return self.handle_response('User not found', status_code=404)
+
+    def update_user(self, user_id):
+        user = self.user_repo.get(user_id)
+
+        if not user:
+            return self.handle_response(
+                msg="FAIL",
+                payload={'user': 'User not found'}, status_code=404
+            )
+
+        if user.is_deleted:
+            return self.handle_response(
+                msg="FAIL",
+                payload={'user': 'User already deleted'}, status_code=400
+            )
+
+        user_info = self.request_params_dict('slackId', 'firstName', 'lastName', 'userId', 'imageUrl')
+
+        slack_id = user_info.get('slack_id')
+        user_id_sent = user_info.get('user_id')
+
+        if slack_id and self.user_repo.check_exists_else_where(User, 'slack_id', slack_id, 'id', user_id):
+            return self.handle_response(
+                msg="FAIL",
+                payload={'user': 'Cannot update to the slack id of another existing user'},
+                status_code=403
+            )
+
+        if user_id_sent and self.user_repo.check_exists_else_where(User, 'user_id', user_id_sent, 'id', user_id):
+            return self.handle_response(
+                msg="FAIL",
+                payload={'user': 'Cannot update to the user id of another existing user'},
+                status_code=403
+            )
+
+        user = self.user_repo.update(user, **user_info)
+
+        return self.handle_response('OK', payload={'user': user.serialize()}, status_code=200)

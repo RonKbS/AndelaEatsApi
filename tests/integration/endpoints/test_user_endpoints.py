@@ -118,3 +118,112 @@ class TestUserEndpoints(BaseTestCase):
         self.assertEqual(response_json['payload']['user']['firstName'], user.first_name)
         self.assertEqual(response_json['payload']['user']['lastName'], user.last_name)
 
+    def test_create_user_endpoint_succeeds(self):
+
+        create_user_role('view_users')
+        user = UserFactory(slack_id="-LXTuXlk2W4Gskt8KTte")
+
+        response = self.client().get(self.make_url(f'/users/{user.slack_id}/'), headers=self.headers())
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_json['msg'], 'OK')
+        self.assertEqual(response_json['payload']['user']['firstName'], user.first_name)
+        self.assertEqual(response_json['payload']['user']['lastName'], user.last_name)
+
+    def test_update_user_endpoint_succeeds(self):
+
+        create_user_role('update_user')
+        user = UserFactory.create()
+
+        user_data = dict(firstName="Andela", lastName="Eats")
+
+        response = self.client().put(self.make_url("/users/" + str(user.id)), headers=self.headers(),
+                                      data=self.encode_to_json_string(user_data))
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_json['msg'], 'OK')
+        self.assertEqual(response_json['payload']['user']['firstName'], user.first_name)
+        self.assertEqual(response_json['payload']['user']['lastName'], user.last_name)
+
+    def test_update_user_endpoint_for_another_user_with_same_slack_id_fails(self):
+
+        create_user_role('update_user')
+        UserFactory.create(slack_id="slack_id_1")
+        user = UserFactory.create(slack_id="slack_id_2")
+
+        user_data = dict(firstName="Andela", lastName="Eats", slackId="slack_id_1")
+
+        response = self.client().put(self.make_url("/users/" + str(user.id)), headers=self.headers(),
+                                      data=self.encode_to_json_string(user_data))
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response_json['msg'], 'FAIL')
+        self.assertEqual(
+            response_json['payload']['user'],
+            'Cannot update to the slack id of another existing user'
+        )
+
+    def test_update_user_endpoint_for_another_user_with_same_user_id_fails(self):
+
+        create_user_role('update_user')
+        UserFactory.create(user_id="user_id_1")
+        user = UserFactory.create(user_id="user_id_2")
+
+        user_data = dict(firstName="Andela", lastName="Eats", userId="user_id_1")
+
+        response = self.client().put(self.make_url("/users/" + str(user.id)), headers=self.headers(),
+                                      data=self.encode_to_json_string(user_data))
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response_json['msg'], "FAIL")
+        self.assertEqual(
+            response_json['payload']['user'],
+            'Cannot update to the user id of another existing user'
+        )
+
+    def test_update_user_endpoint_for_non_existing_user_id_fails(self):
+
+        create_user_role('update_user')
+        user = UserFactory.create(user_id="user_id_2")
+
+        user_data = dict(firstName="Andela", lastName="Eats", userId="user_id_1")
+
+        response = self.client().put(self.make_url("/users/" + str(user.id + 1)), headers=self.headers(),
+                                      data=self.encode_to_json_string(user_data))
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response_json['msg'], "FAIL")
+        self.assertEqual(
+            response_json['payload']['user'],
+            'User not found'
+        )
+
+    def test_update_user_endpoint_for_already_deleted_user_fails(self):
+
+        create_user_role('update_user')
+        user = UserFactory.create(user_id="user_id_2", is_deleted=True)
+
+        user_data = dict(firstName="Andela", lastName="Eats", userId="user_id_2")
+
+        response = self.client().put(self.make_url("/users/" + str(user.id)), headers=self.headers(),
+                                      data=self.encode_to_json_string(user_data))
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response_json['msg'], "FAIL")
+        self.assertEqual(
+            response_json['payload']['user'],
+            'User already deleted'
+        )
+

@@ -165,10 +165,28 @@ class TestBaseRepository(BaseTestCase):
 		self.assertEqual(vendor_names[0], results.items[0].name)
 		self.assertEqual(vendor_names[1], results.items[1].name)
 
+	def test_method_check_exists_else_where_returns_empty_list(self):
+		vendor_1 = VendorFactory.create()
 
+		results = self.repo.check_exists_else_where(Vendor, 'name', vendor_1.name, 'id', vendor_1.id)
 
+		self.assertIsInstance(results, list)
+		self.assertEqual(results, [])
 
+	def test_method_check_exists_else_where_returns_populated_list(self):
+		VendorFactory.create(name="Andela Eats")
+		vendor_1 = VendorFactory.create()
 
+		results = self.repo.check_exists_else_where(Vendor, 'name', "Andela Eats", 'id', vendor_1.id)
 
-		
-		
+		self.assertIsInstance(results, list)
+		self.assertNotEqual(results, [])
+
+	def test_method_check_exists_else_where_returns_string(self):
+		VendorFactory.create(name="Andela Eats")
+		vendor_1 = VendorFactory.create()
+
+		results = self.repo.check_exists_else_where(Vendor, 'names', "Andela Eats", 'id', vendor_1.id)
+
+		self.assertIsInstance(results, str)
+		assert "An error occurred during the check" in results

@@ -1,8 +1,8 @@
-Create a Meal Session
+Delete a Meal Session
 ---
 tags:
   - Meal Sessions
-summary: Creates Meal Sessions.
+summary: Deletes Meal Sessions.
 consumes:
   - application/json
 parameters:
@@ -17,39 +17,13 @@ parameters:
     type: string
     required: true
     description: Bearer Token Value
-  - name: menu
-    in: body
-    description: Creation of Meal Session
-    schema:
-      type: object
-      required:
-        - breakfast
-        - startTime
-        - endTime
-        - date
-      properties:
-        name:
-          type: string
-          enum: [breakfast, lunch]
-        startTime:
-          type: string
-          example: 08:00
-        endTime:
-          type: string
-          example: 09:00
-        date:
-          type: string
-          example: "2019-11-30"
-        locationId:
-          type: string
-          example: "1"
 definitions:
   MealSessionPayload:
     type: object
     properties:
       msg:
         type: string
-        default: Ok
+        default: Meal session deleted successfully
       payload:
         type: object
         properties:
@@ -81,9 +55,8 @@ definitions:
                     type: string
                     format: date
                     example: 2018-10-22
-
 responses:
-  201:
+  200:
     description: Ok
     schema:
           $ref: '#/definitions/MealSessionPayload'
