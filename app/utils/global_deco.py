@@ -11,5 +11,5 @@ def error_wrapper(f):
         except Exception, err:
 
             traceback.print_exc()
-            
+
             return make_response(jsonify({'msg': 'An error occurred while processing your request'})), 500
