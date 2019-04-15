@@ -1,10 +1,7 @@
-import pdb
-
-from sqlalchemy import and_
 from app.controllers.base_controller import BaseController
-from app.repositories import OrderRepo, LocationRepo
+from app.repositories import OrderRepo, LocationRepo, VendorRatingRepo
 from app.repositories.meal_item_repo import MealItemRepo
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 
 from app.services.andela import AndelaService
 from app.utils.enums import OrderStatus
@@ -21,6 +18,7 @@ class OrderController(BaseController):
 		self.order_repo = OrderRepo()
 		self.meal_item_repo = MealItemRepo()
 		self.andela_service = AndelaService()
+		self.rating_repo = VendorRatingRepo()
 
 	def list_orders(self):
 		"""
@@ -46,14 +44,12 @@ class OrderController(BaseController):
 				]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
 
-				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				rating = self.rating_repo.get_rating(user['id'], 'order', order.id)
 				order_item['user_rating'] = rating
 
 				order_list.append(order_item)
 
 		return self.handle_response('OK', payload={'orders': order_list, 'meta': self.pagination_meta(orders)})
-
-
 
 	def list_orders_date(self, start_date):
 		"""
@@ -63,10 +59,6 @@ class OrderController(BaseController):
 		"""
 		location_id = Auth.get_location()
 		orders = self.order_repo.get_unpaginated(is_deleted=False, date_booked_for=start_date, location_id=location_id)
-		# orders_list = [order.serialize() for order in orders]
-		# for order in orders_list:
-		# 	meal_items = self.order_repo.get(order['id']).meal_item_orders
-		# 	order['mealItems'] = [{'name': item.name, 'image': item.image, 'id': item.id} for item in meal_items]
 		order_list = []
 		if len(orders) > 0:
 			for order in orders:
@@ -78,7 +70,7 @@ class OrderController(BaseController):
 					for item in meal_items]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
 
-				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				rating = self.rating_repo.get_rating(user['id'], 'order', order.id)
 				order_item['user_rating'] = rating
 
 				order_list.append(order_item)
@@ -107,7 +99,7 @@ class OrderController(BaseController):
 					for item in meal_items]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
 
-				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				rating = self.rating_repo.get_rating(user['id'], 'order', order.id)
 				order_item['user_rating'] = rating
 
 				order_list.append(order_item)
@@ -129,7 +121,7 @@ class OrderController(BaseController):
 			user = self.andela_service.get_user_by_email_or_id(order.user_id)
 			order_serialized['user'] = '{} {}'.format(user['first_name'], user['last_name'])
 
-			rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+			rating = self.rating_repo.get_rating(user['id'], 'order', order.id)
 			order_serialized['user_rating'] = rating
 
 			return self.handle_response('OK', payload={'order': order_serialized})
@@ -153,7 +145,7 @@ class OrderController(BaseController):
 					for item in meal_items]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
 
-				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				rating = self.rating_repo.get_rating(user['id'], 'order', order.id)
 				order_item['user_rating'] = rating
 
 				orders_list.append(order_item)
@@ -180,7 +172,7 @@ class OrderController(BaseController):
 				]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
 
-				rating = self.order_repo.get_rating(user['id'], 'order', order.id)
+				rating = self.rating_repo.get_rating(user['id'], 'order', order.id)
 				order_item['user_rating'] = rating
 
 				order_list.append(order_item)
