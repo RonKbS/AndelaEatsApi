@@ -1,7 +1,6 @@
 '''A module of application cron jobs'''
-import datetime
+from datetime import datetime, time, date
 import pytz
-from apscheduler.schedulers.background import BackgroundScheduler
 from app.models import VendorEngagement, Location, MealSession
 
 
@@ -29,97 +28,69 @@ class MealSessionCron(object):
 		return {
 			'breakfast': {
 				'name': 'breakfast',
-				'start_time': datetime.time(hour=7, minute=0),
-				'stop_time': datetime.time(hour=10, minute=0)
+				'start_time': time(hour=7, minute=0),
+				'stop_time': time(hour=10, minute=0)
 			},
 			'lunch': {
 				'name': 'lunch',
-				'start_time': datetime.time(hour=12, minute=0),
-				'stop_time': datetime.time(hour=15, minute=0)
+				'start_time': time(hour=12, minute=0),
+				'stop_time': time(hour=15, minute=0)
 			}
 		}
 
 	@staticmethod
-	def _background_scheduler_with_time_zone(_timezone):
+	def _complete_meal_session_construction_and_save(meal_sessions, date_time_to_use):
 		"""
-		Return a scheduler that is time aware
+		Complete the contruction of the meal sessions
+		and save if they do not already exist
 
-		:param _timezone(string): A string representing the time zone ie. Africa/Lagos
-		:return: A background scheduler instance
+		:param meal_sessions (dict): A dictionary with incomplete meal session data
+		:param date_time_to_use (datetime): A datetime object to use
+		:return:
 		"""
-		return BackgroundScheduler(timezone=_timezone)
+		meal_session_date = date(year=date_time_to_use.year,
+								 month=date_time_to_use.month,
+								 day=date_time_to_use.day)
+		meal_sessions['breakfast']['date'] = meal_session_date
+		meal_sessions['lunch']['date'] = meal_session_date
+		for meal_session in meal_sessions.values():
+			if MealSession.query.filter_by(**meal_session).all():
+				continue
+			MealSession(**meal_session).save()
 
-	def _return_meal_sessions_with_locations(self):
+	def job_to_schedule(self):
 		"""
-		Generate Dummy meal sessions containing the existing locations
-
-		:return (List): List of meal sessions
-		"""
-		meal_sessions_with_locations = []
-		locations = self._extract_current_locations()
-		for location in locations:
-			meal_sessions = self._meal_session_static_data()
-			meal_sessions['breakfast']['location_id'] = location.id
-			meal_sessions['lunch']['location_id'] = location.id
-
-			meal_sessions_with_locations.append(meal_sessions)
-
-		return meal_sessions_with_locations
-
-	def _generate_callable_to_schedule(self, meal_sessions):
-		"""
-		Generate a closure to be used for the various cron jobs
-
-		:param meal_sessions(dict): A dictionary containing meal sessions with their current times
-		:return (closure): A function ready to be called
-		"""
-		def dynamic_callable():
-			with self.app.app_context():
-				location_name = Location.query.filter_by(id=meal_sessions.get('breakfast')['location_id']).first().name
-
-				for meal_session in meal_sessions.values():
-					current_date = datetime.datetime.now(pytz.timezone('Africa/' + location_name))
-					meal_session['date'] = current_date
-					new_meal_session = MealSession(**meal_session)
-					new_meal_session.save()
-					print("A meal session has been created")
-
-		return dynamic_callable
-
-	def run_meal_session_cron(self):
-		"""
-		Generate schedulers and start them for each meal sessions in each different location
+		Auto populate the meal session table at a specified time interval
 
 		:return (None):
 		"""
+		# def dynamic_callable():
+		with self.app.app_context():
+			scheduler_datetime = datetime.now(tz=pytz.timezone("Africa/Lagos"))
+			print("Scheduler date time ------>", str(scheduler_datetime))
+			# meal_sessions_with_locations = []
+			locations = self._extract_current_locations()
+			location_names = {location.id: location.name for location in locations}
+			for location in locations:
+				meal_sessions = self._meal_session_static_data()
+				meal_sessions['breakfast']['location_id'] = location.id
+				meal_sessions['lunch']['location_id'] = location.id
+				location_name = location_names.get(location.id)
+				location_datetime = datetime.now(tz=pytz.timezone("Africa/"+ location_name))
+				if any([scheduler_datetime.year > location_datetime.year,
+					   scheduler_datetime.month > location_datetime.month,
+					   scheduler_datetime.day > location_datetime.day]):
+					self._complete_meal_session_construction_and_save(meal_sessions, scheduler_datetime)
+				else:
+					self._complete_meal_session_construction_and_save(meal_sessions, location_datetime)
 
-		un_started_schedulers = []
-		meal_sessions = self._return_meal_sessions_with_locations()
-		locations = {location.id: location.name for location in self._extract_current_locations()}
-
-		for meal_session in meal_sessions:
-			location_name = locations.get(meal_session.get('breakfast').get('location_id'))
-
-			job = self._generate_callable_to_schedule(meal_session)
-
-			try:
-				scheduler = self._background_scheduler_with_time_zone("Africa/" + location_name)
-			except Exception:
-				scheduler = BackgroundScheduler()
-			scheduler.add_job(job, trigger='interval', seconds=40)
-
-			# attach schedulers
-			un_started_schedulers.append(scheduler)
-
-		# Start Schedulers
-		for scheduler in un_started_schedulers:
-			scheduler.start()
 
 
 class Cron:
 
 	def __init__(self, app):
 		self.app = app
+		self.meal_session_cron = MealSessionCron(app)
 
 	def run_24_hourly(self):
 		self.update_engagement_status()
@@ -133,13 +104,3 @@ class Cron:
 				if engagement.end_date < datetime.now().date():
 					engagement.status = 0
 					engagement.save()
-
-	def register_and_start_cron_jobs(self):
-		scheduler = BackgroundScheduler()
-		# in your case you could change seconds to hours
-		scheduler.add_job(self.update_engagement_status, trigger='interval', hours=24)
-		scheduler.start()
-
-		meal_session_cron = MealSessionCron(self.app)
-
-		meal_session_cron.run_meal_session_cron()
