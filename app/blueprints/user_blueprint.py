@@ -30,8 +30,8 @@ def delete_user(id):
 @user_blueprint.route('/', methods=['POST'])
 @Auth.has_permission('create_user')
 @Security.validator(
-    ['slackId|optional', 'firstName|required', 'lastName|required',
-     'userId|optional', 'imageUrl|optional:url'])
+    ['slackId|optional', 'userTypeId|required', 'firstName|required', 'lastName|required',
+     'userId|optional', 'imageUrl|optional:url', ])
 @swag_from('documentation/create_user.yml')
 def create_user():
     return user_controller.create_user()

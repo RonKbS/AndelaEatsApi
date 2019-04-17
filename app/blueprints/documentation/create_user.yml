@@ -25,10 +25,13 @@ parameters:
       required:
         - firstName
         - lastName
+        - userTypeId
       properties:
         slackId:
           type: string
         firstName:
+          type: string
+        userTypeId:
           type: string
         lastName:
           type: string
@@ -74,6 +77,19 @@ definitions:
                     type: string
                     format: date
                     example: 2018-10-22
+              userType:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: 2
+                  name:
+                    type: string
+                    example: user
+                  help:
+                    type: string
+                    example: None
+
 
 responses:
   201:

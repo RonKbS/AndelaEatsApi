@@ -2,6 +2,8 @@ from app.controllers.base_controller import BaseController
 from app.repositories import UserRoleRepo, RoleRepo, UserRepo
 from app.models import Role, User
 from app.services.andela import AndelaService
+from app.utils.auth import Auth
+from app.utils.id_generator import PushID
 
 
 class UserController(BaseController):
@@ -98,9 +100,20 @@ class UserController(BaseController):
         return self.handle_response('Invalid or incorrect id provided', status_code=404)
 
     def create_user(self):
-        user_info = self.request_params('slackId', 'firstName', 'lastName', 'userId', 'imageUrl')
+        push_id = PushID()
+        next_id = push_id.next_id()
 
-        slack_id, first_name, last_name, user_id, image_url = user_info
+        user_info = self.request_params('firstName', 'lastName', 'imageUrl', 'slackId', 'userId', 'userTypeId')
+
+        first_name, last_name, image_url, slack_id, user_id, role_id = user_info
+
+        role = self.role_repo.find_first(id=role_id)
+
+        if not role:
+            return self.handle_response(
+                f"Role with userTypeId(roleId) {role_id} does not exist",
+                status_code=400
+            )
 
         if self.user_repo.exists(slack_id=slack_id):
             return self.handle_response(
@@ -114,9 +127,18 @@ class UserController(BaseController):
                 status_code=400
             )
 
-        user = self.user_repo.new_user(*user_info)
+        slack_id = slack_id if slack_id else next_id
+        user_id = user_id if user_id else slack_id
 
-        return self.handle_response('OK', payload={'user': user.serialize()}, status_code=201)
+        user_type = self.user_role_repo.find_first(user_id=user_id) or \
+                    self.user_role_repo.new_user_role(role_id=role_id, user_id=user_id, location_id=Auth.get_location())
+
+        user = self.user_repo.new_user(*user_info, user_id=user_id, slack_id=slack_id, user_type=user_type).serialize()
+
+        user.__setitem__('userType', role.to_dict(only=['id', 'name', 'help', "timestamps"]))
+        user.pop('userTypeId')
+
+        return self.handle_response('OK', payload={'user': user}, status_code=201)
 
     def list_user(self, slack_id):
 
