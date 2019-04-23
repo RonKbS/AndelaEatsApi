@@ -36,11 +36,10 @@ def create_app(config_name):
     scheduler = BackgroundScheduler(timezone="Africa/Lagos")
     # in your case you could change seconds to hours
     scheduler.add_job(cron.run_24_hourly, trigger='interval', hours=24)
-    scheduler.add_job(cron.meal_session_cron.job_to_schedule, 'cron', day_of_week='mon-fri', hour=0, minute=0, misfire_grace_time=None)
+    scheduler.add_job(cron.run_meal_session_cron, 'cron', day_of_week='mon-fri', hour=0, minute=0,
+                      misfire_grace_time=None)
     scheduler.start()
 
-    # cron.register_and_start_other_cron_jobs()
-    print("REached this point")
     swg = Swagger(app)
 
     return app

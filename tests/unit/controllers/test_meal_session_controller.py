@@ -8,6 +8,7 @@ import pytz
 
 from app.controllers.meal_session_controller import MealSessionController
 from app.repositories.meal_session_repo import MealSessionRepo
+from app.business_logic.meal_session.meal_session_logic import MealSessionLogic
 from factories.location_factory import LocationFactory
 from tests.base_test_case import BaseTestCase
 
@@ -32,11 +33,11 @@ class TestMealSessionController(BaseTestCase):
                 "13:10",
                 "14:45",
                 "".join([
-                    MealSessionRepo.format_preceding(self.current_date.year),
+                    MealSessionLogic.format_preceding(self.current_date.year),
                     "-",
-                    MealSessionRepo.format_preceding(self.current_date.month),
+                    MealSessionLogic.format_preceding(self.current_date.month),
                     "-",
-                    MealSessionRepo.format_preceding(self.current_date.day)]
+                    MealSessionLogic.format_preceding(self.current_date.day)]
                 ),
                 new_location.id
             ]
@@ -55,10 +56,10 @@ class TestMealSessionController(BaseTestCase):
                 response_json['payload']['mealSession']['name'],
                 mock_request_params_return_value[0])
             self.assertEqual(
-                response_json['payload']['mealSession']['startTime'],
+                (response_json['payload']['mealSession']['startTime'])[:-3],
                 mock_request_params_return_value[1])
             self.assertEqual(
-                response_json['payload']['mealSession']['stopTime'],
+                (response_json['payload']['mealSession']['stopTime'])[:-3],
                 mock_request_params_return_value[2])
             self.assertEqual(
                 response_json['payload']['mealSession']['date'],
