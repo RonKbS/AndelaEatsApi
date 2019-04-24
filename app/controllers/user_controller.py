@@ -52,17 +52,17 @@ class UserController(BaseController):
             )
             associated_roles = [user_role.role_id for user_role in self.user_role_repo.filter_by(user_id=user_role.user_id).items]
             role_objects = Role.query.filter(Role.id.in_(associated_roles)).all()
-            roles = [{'id': role.id, 'name': role.name} for role in role_objects]
-            admin_user_profile['Email'] = andela_user_profile['email']
-            admin_user_profile['Name'] = andela_user_profile['name']
-            admin_user_profile['Id'] = andela_user_profile['id']
-            admin_user_profile['Roles'] = roles
+            roles = [{'role_id': role.id, 'role_name': role.name} for role in role_objects]
+            admin_user_profile['email'] = andela_user_profile['email']
+            admin_user_profile['name'] = andela_user_profile['name']
+            admin_user_profile['id'] = andela_user_profile['id']
+            admin_user_profile['roles'] = roles
 
             admin_users_list.append(admin_user_profile)
 
         return self.handle_response(
             'OK',
-            payload={'AdminUsers': admin_users_list}
+            payload={'adminUsers': admin_users_list}
         )
 
     def list_all_users(self):

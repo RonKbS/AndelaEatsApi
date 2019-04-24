@@ -23,11 +23,11 @@ from .meal_service import MealService
 from .listener_helpers import attach_listen_type
 
 tables_logged_after_every_insert = [Vendor, VendorEngagement, MealItem, Menu, Faq,
-                                    Role, Permission, UserRole, Location]
+                                    Role, Permission, UserRole, Location, Order]
 tables_logged_after_every_update = [Vendor, VendorEngagement, MealItem, Menu, Faq,
-                                    Role, Permission, UserRole, Location]
+                                    Role, Permission, UserRole, Location, Order]
 tables_logged_after_every_delete = [Vendor, VendorEngagement, MealItem, Menu, Faq,
-                                    Role, Permission, UserRole, Location, VendorRating]
+                                    Role, Permission, UserRole, Location, VendorRating, Order]
 generate_id_tables = (User,)
 
 # attach all listeners to each admin table

@@ -35,16 +35,22 @@ class OrderController(BaseController):
 		if len(orders.items) > 0:
 			for order in orders.items:
 				meal_items = self.order_repo.get(order.id).meal_item_orders
-				user = self.andela_service.get_user_by_email_or_id(order.user_id)
+				try:
+					user = self.andela_service.get_user_by_email_or_id(order.user_id)
+				except Exception as e:
+					return str(e)
 
 				order_item = order.serialize()
 				order_item['mealItems'] = [
 					item.to_dict(only=OrderController.default_meal_item_return_fields)
 					for item in meal_items
 				]
-				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
 
-				rating = self.rating_repo.get_rating(user['id'], 'order', order.id)
+
+				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name']) if user else None
+
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id) if user else None
+
 				order_item['user_rating'] = rating
 
 				order_list.append(order_item)
@@ -59,18 +65,24 @@ class OrderController(BaseController):
 		"""
 		location_id = Auth.get_location()
 		orders = self.order_repo.get_unpaginated(is_deleted=False, date_booked_for=start_date, location_id=location_id)
+
 		order_list = []
 		if len(orders) > 0:
 			for order in orders:
 				meal_items = self.order_repo.get(order.id).meal_item_orders
-				user = self.andela_service.get_user_by_email_or_id(order.user_id)
+				try:
+					user = self.andela_service.get_user_by_email_or_id(order.user_id)
+				except Exception as e:
+					return str(e)
+
 				order_item = order.serialize()
 				order_item['mealItems'] = [
 					item.to_dict(only=OrderController.default_meal_item_return_fields)
 					for item in meal_items]
-				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name']) if user else None
 
-				rating = self.rating_repo.get_rating(user['id'], 'order', order.id)
+
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id) if user else None
 				order_item['user_rating'] = rating
 
 				order_list.append(order_item)
@@ -92,14 +104,19 @@ class OrderController(BaseController):
 		if len(orders.items) > 0:
 			for order in orders.items:
 				meal_items = self.order_repo.get(order.id).meal_item_orders
-				user = self.andela_service.get_user_by_email_or_id(order.user_id)
+				try:
+					user = self.andela_service.get_user_by_email_or_id(order.user_id)
+				except Exception as e:
+					return str(e)
 				order_item = order.serialize()
 				order_item['mealItems'] = [
 					item.to_dict(only=OrderController.default_meal_item_return_fields)
 					for item in meal_items]
-				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name']) if user else None
 
-				rating = self.rating_repo.get_rating(user['id'], 'order', order.id)
+
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id) if user else None
+
 				order_item['user_rating'] = rating
 
 				order_list.append(order_item)
@@ -118,10 +135,15 @@ class OrderController(BaseController):
 				item.to_dict(only=OrderController.default_meal_item_return_fields)
 				for item in order.meal_item_orders]
 
-			user = self.andela_service.get_user_by_email_or_id(order.user_id)
-			order_serialized['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+			try:
+				user = self.andela_service.get_user_by_email_or_id(order.user_id)
+			except Exception as e:
+				return str(e)
+			order_serialized['user'] = '{} {}'.format(user['first_name'], user['last_name']) if user else None
 
-			rating = self.rating_repo.get_rating(user['id'], 'order', order.id)
+
+			rating = self.order_repo.get_rating(user['id'], 'order', order.id) if user else None
+
 			order_serialized['user_rating'] = rating
 
 			return self.handle_response('OK', payload={'order': order_serialized})
@@ -138,14 +160,18 @@ class OrderController(BaseController):
 		if len(orders.items) > 0:
 			for order in orders.items:
 				meal_items = self.order_repo.get(order.id).meal_item_orders
-				user = self.andela_service.get_user_by_email_or_id(order.user_id)
+				try:
+					user = self.andela_service.get_user_by_email_or_id(order.user_id)
+				except Exception as e:
+					return str(e)
 				order_item = order.serialize()
 				order_item['mealItems'] = [
 					item.to_dict(only=OrderController.default_meal_item_return_fields)
 					for item in meal_items]
-				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name']) if user else None
 
-				rating = self.rating_repo.get_rating(user['id'], 'order', order.id)
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id) if user else None
+
 				order_item['user_rating'] = rating
 
 				orders_list.append(order_item)
@@ -170,9 +196,11 @@ class OrderController(BaseController):
 					item.to_dict(only=OrderController.default_meal_item_return_fields)
 					for item in meal_items
 				]
-				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name'])
+				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name']) if user else None
 
-				rating = self.rating_repo.get_rating(user['id'], 'order', order.id)
+				rating = self.order_repo.get_rating(user['id'], 'order', order.id) if user else None
+
+
 				order_item['user_rating'] = rating
 
 				order_list.append(order_item)
@@ -196,7 +224,6 @@ class OrderController(BaseController):
 
 		if datetime.strptime(date_booked_for, "%Y-%m-%d") < datetime.now():
 			return self.handle_response('You are not allowed to book for a date in the past', status_code=400)
-
 
 		if int(current_time_by_zone(location.zone).strftime('%H')) > 15:
 			if check_date_current_vs_date_for(current_time, datetime.strptime(date_booked_for, "%Y-%m-%d")):
@@ -289,7 +316,7 @@ class OrderController(BaseController):
 		# get user_id from another method and reform to db's user id
 		order = self.order_repo.find_first(user_id=user_id, meal_period=order_type, date_booked_for=order_date, is_deleted=False)
 		if not order:
-			return self.handle_response('Invalid or incorrect details provided', status_code=400)
+			return self.handle_response(f'User has no {order_type} order for this date')
 		return self.handle_response('OK', payload={'order': order.serialize()})
 
 	def delete_order(self, order_id):

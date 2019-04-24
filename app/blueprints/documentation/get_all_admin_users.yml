@@ -26,25 +26,25 @@ definitions:
       payload:
         type: object
         properties:
-          AdminUsers:
+          adminUsers:
             type: array
             items:
               type: object
               properties:
-                Id:
+                id:
                   type: string
-                Email:
+                email:
                   type: string
-                Name:
+                name:
                   type: string
-                Roles:
+                roles:
                   type: array
                   items:
                     type: object
                     properties:
-                      id:
+                      role_id:
                         type: integer
-                      name:
+                      role_name:
                         type: string
 responses:
   200:
