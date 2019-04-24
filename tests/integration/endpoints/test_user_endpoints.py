@@ -238,3 +238,22 @@ class TestUserEndpoints(BaseTestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_create_user_endpoint_succeeds(self):
+        create_user_role('create_user')
+        user = UserFactory.create(user_id="user_id_2", is_deleted=True)
+        role = RoleFactory(name='test_role')
+
+        user_data = dict(firstName=user.first_name, lastName=user.last_name, userTypeId=role.id)
+
+        response = self.client().post(self.make_url("/users/"), headers=self.headers(),
+                                     data=self.encode_to_json_string(user_data))
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response_json['msg'], "OK")
+        self.assertEqual(response_json['payload']['user']['firstName'], user.first_name)
+        self.assertEqual(response_json['payload']['user']['lastName'], user.last_name)
+        self.assertEqual(response_json['payload']['user']['userType']['name'], role.name)
+        self.assertEqual(response_json['payload']['user']['userType']['help'], role.help)
+
