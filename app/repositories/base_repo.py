@@ -1,4 +1,5 @@
 from sqlalchemy import desc, asc
+from app.models import VendorRating
 
 
 class BaseRepo:
@@ -76,21 +77,17 @@ class BaseRepo:
         """Query and filter the data of a model, returning the first result."""
         return self._model.query.filter_by(**kwargs).first()
 
-
     def filter_and_count(self, **kwargs):
         """Query, filter and counts all the data of a model."""
         return self._model.query.filter_by(**kwargs).count()
-
 
     def filter_and_order(self, *args, **kwargs):
         """Query, filter and orders all the data of a model."""
         return self._model.query.filter_by(**kwargs).order_by(*args)
 
-
     def paginate(self, **kwargs):
         """Query and paginate the data of a model, returning the first result."""
         return self._model.query.paginate(**kwargs)
-
 
     def filter(self, *args):
         """Query and filter the data of the model."""
@@ -102,6 +99,12 @@ class BaseRepo:
             return True
 
         return False
+
+    def get_rating(self, user_id, rating_type, type_id):
+
+        rating = VendorRating.query.filter_by(user_id=user_id, rating_type=rating_type, type_id=type_id).first()
+
+        return rating.rating if rating else None
 
     @staticmethod
     def check_exists_else_where(model_class, first_attribute, first_compare_value, second_attribute, second_compare_value):

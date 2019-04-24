@@ -18,7 +18,7 @@ class TestSeeders(BaseTestCase):
             model = data.get('model')
             result = model.query.count()
 
-            assert result == 0
+            assert result > 0
 
     def test_flask_database_succeeds_valid_arguments(self):
 
@@ -27,7 +27,7 @@ class TestSeeders(BaseTestCase):
         model = model_mapper.get('location').get('model')
         result = model.query.count()
 
-        assert result == 0
+        assert result > 0
 
     @patch('app.utils.seeders.seed_database.db.session.bulk_insert_mappings')
     def test_flask_seed_raises_expection_on_duplicate_seed_data(self, mock_bulk_insert):
