@@ -3,6 +3,7 @@ from datetime import datetime, time
 
 from app.repositories.base_repo import BaseRepo
 from app.models.meal_session import MealSession
+from app.utils.location_time import get_location_time_zone
 
 
 class MealSessionRepo(BaseRepo):
@@ -341,7 +342,7 @@ class MealSessionRepo(BaseRepo):
         error_message_mapper = cls.return_error_message_mapper()
 
         # Get time zone object for the location specified
-        tz = cls.get_location_time_zone(kwargs.get('location_id'))
+        tz = get_location_time_zone(kwargs.get('location_id'))
 
         exception_message = error_message_mapper.get(tz)
 
@@ -368,7 +369,7 @@ class MealSessionRepo(BaseRepo):
             validated_data["error_message"] = error_message
             return validated_data
 
-        tz_stored_location = cls.get_location_time_zone(kwargs.get("meal_session").location_id)
+        tz_stored_location = get_location_time_zone(kwargs.get("meal_session").location_id)
         current_date_using_stored_tz = datetime.now(tz_stored_location)
 
         # check if meal session date is before current date(using the time zone information used to create it)

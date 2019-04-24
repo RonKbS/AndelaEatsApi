@@ -1,11 +1,11 @@
-import pytz
 from flask import make_response, jsonify
-from datetime import datetime, time
+from datetime import datetime
 
 from app.controllers.base_controller import BaseController
 from app.repositories.meal_session_repo import MealSessionRepo
 from app.repositories.meal_service_repo import MealServiceRepo
 from app.utils.auth import Auth
+from app.utils.location_time import get_location_time_zone
 
 
 class MealSessionController(BaseController):
@@ -31,7 +31,7 @@ class MealSessionController(BaseController):
 
         error_message_mapper = self.meal_session_repo.return_error_message_mapper()
 
-        tz = self.meal_session_repo.get_location_time_zone(location_id)
+        tz = get_location_time_zone(location_id)
         exception_message = error_message_mapper.get(tz)
 
         if exception_message:

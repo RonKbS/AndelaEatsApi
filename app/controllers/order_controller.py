@@ -1,7 +1,7 @@
 from app.controllers.base_controller import BaseController
-from app.repositories import OrderRepo, LocationRepo
+from app.repositories import OrderRepo, LocationRepo, VendorRatingRepo
 from app.repositories.meal_item_repo import MealItemRepo
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 
 from app.services.andela import AndelaService
 from app.utils.enums import OrderStatus
@@ -18,6 +18,7 @@ class OrderController(BaseController):
 		self.order_repo = OrderRepo()
 		self.meal_item_repo = MealItemRepo()
 		self.andela_service = AndelaService()
+		self.rating_repo = VendorRatingRepo()
 
 	def list_orders(self):
 		"""
@@ -45,9 +46,11 @@ class OrderController(BaseController):
 					for item in meal_items
 				]
 
+
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name']) if user else None
 
 				rating = self.order_repo.get_rating(user['id'], 'order', order.id) if user else None
+
 				order_item['user_rating'] = rating
 
 				order_list.append(order_item)
@@ -77,6 +80,7 @@ class OrderController(BaseController):
 					item.to_dict(only=OrderController.default_meal_item_return_fields)
 					for item in meal_items]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name']) if user else None
+
 
 				rating = self.order_repo.get_rating(user['id'], 'order', order.id) if user else None
 				order_item['user_rating'] = rating
@@ -110,7 +114,9 @@ class OrderController(BaseController):
 					for item in meal_items]
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name']) if user else None
 
+
 				rating = self.order_repo.get_rating(user['id'], 'order', order.id) if user else None
+
 				order_item['user_rating'] = rating
 
 				order_list.append(order_item)
@@ -135,7 +141,9 @@ class OrderController(BaseController):
 				return str(e)
 			order_serialized['user'] = '{} {}'.format(user['first_name'], user['last_name']) if user else None
 
+
 			rating = self.order_repo.get_rating(user['id'], 'order', order.id) if user else None
+
 			order_serialized['user_rating'] = rating
 
 			return self.handle_response('OK', payload={'order': order_serialized})
@@ -191,6 +199,7 @@ class OrderController(BaseController):
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name']) if user else None
 
 				rating = self.order_repo.get_rating(user['id'], 'order', order.id) if user else None
+
 
 				order_item['user_rating'] = rating
 
