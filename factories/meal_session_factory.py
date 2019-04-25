@@ -8,6 +8,7 @@ class MealSessionFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = MealSession
         sqlalchemy_session = db.session
+        force_flush = True
 
     id = factory.Sequence(lambda n: n)
     name = 'breakfast'
