@@ -144,8 +144,8 @@ class BotController(BaseController):
             location_id = payload_action_value.split('_')[1]
 
             period_buttons = [
-                {'name': 'meal_period', 'type': 'button', 'text': 'Breakfast',
-                 'value': 'breakfast_{}'.format(payload_action_value)},
+                # {'name': 'meal_period', 'type': 'button', 'text': 'Breakfast',
+                #  'value': 'breakfast_{}'.format(payload_action_value)},
                 {'name': 'meal_period', 'type': 'button', 'text': 'Lunch',
                  'value': 'lunch_{}'.format(payload_action_value)}
             ]
