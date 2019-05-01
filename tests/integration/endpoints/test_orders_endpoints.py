@@ -1,4 +1,4 @@
-from tests.base_test_case import BaseTestCase
+from tests.base_test_case import BaseTestCase, fake
 from factories import OrderFactory, MealItemFactory, RoleFactory, PermissionFactory, UserRoleFactory, MenuFactory, LocationFactory
 from app.utils.enums import MealTypes
 from json import loads
@@ -7,6 +7,7 @@ from app.repositories import OrderRepo
 from app.utils.enums import OrderStatus
 from unittest.mock import patch, Mock
 from .user_role import create_user_role
+from app.services.andela import AndelaService
 
 
 class TestOrderEndpoints(BaseTestCase):
@@ -58,13 +59,20 @@ class TestOrderEndpoints(BaseTestCase):
         self.assertEqual(payload['order']['userId'], BaseTestCase.user_id())
         self.assertEqual(payload['order']['channel'], 'web')
 
-    def test_list_order_endpoint(self):
+    @patch.object(AndelaService, 'get_user_by_email_or_id')
+    def test_list_order_endpoint(self, mock_andela_service):
         # Create Three Dummy Vendors
         OrderFactory.create_batch(3)
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
         PermissionFactory.create(keyword='view_orders', role_id=role.id)
         UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+        mock_andela_service.return_value = {
+            'id': user_id,
+            'first_name': fake.first_name(),
+            'last_name': fake.last_name()
+        }
 
         response = self.client().get(self.make_url('/orders/'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -73,12 +81,19 @@ class TestOrderEndpoints(BaseTestCase):
         self.assertEqual(len(payload['orders']), 3)
         self.assertJSONKeysPresent(payload['orders'][0], 'userId', 'channel', 'dateBookedFor')
 
-    def test_list_order_by_page_endpoint(self):
+    @patch.object(AndelaService, 'get_user_by_email_or_id')
+    def test_list_order_by_page_endpoint(self, mock_andela_service):
         OrderFactory.create_batch(3)
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
         PermissionFactory.create(keyword='view_orders', role_id=role.id)
         UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+        mock_andela_service.return_value = {
+            'id': user_id,
+            'first_name': fake.first_name(),
+            'last_name': fake.last_name()
+        }
 
         response = self.client().get(self.make_url('/orders/'), query_string={'per_page': 2, 'page': 1}, headers=self.headers())
         decoded = loads(response.data, encoding='utf-8')
@@ -92,13 +107,20 @@ class TestOrderEndpoints(BaseTestCase):
         self.assertEqual(decoded1['payload']['meta']['current_page'], 2)
         self.assertEqual(len(decoded1['payload']['orders']), 1)
 
-    def test_list_order_by_date_endpoint(self):
+    @patch.object(AndelaService, 'get_user_by_email_or_id')
+    def test_list_order_by_date_endpoint(self, mock_andela_service):
         OrderFactory.create_batch(3)
         book_date = (date.today() + timedelta(days=1)).strftime('%Y-%m-%d')
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
         PermissionFactory.create(keyword='view_orders', role_id=role.id)
         UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+        mock_andela_service.return_value = {
+            'id': user_id,
+            'first_name': fake.first_name(),
+            'last_name': fake.last_name()
+        }
 
         response = self.client().get(self.make_url('/orders/2008-11-20'), headers=self.headers())
         self.assert200(response)
@@ -199,10 +221,18 @@ class TestOrderEndpoints(BaseTestCase):
         response = self.client().post(self.make_url('/orders/collect'), data=self.encode_to_json_string(data) , headers=self.headers())
         self.assert400(response)
 
-    def test_get_all_orders_by_user_id_endpoint(self):
+    @patch.object(AndelaService, 'get_user_by_email_or_id')
+    def test_get_all_orders_by_user_id_endpoint(self, mock_andela_service):
         orders = OrderFactory.create_batch(3)
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
+
+        mock_andela_service.return_value = {
+            'id': user_id,
+            'first_name': fake.first_name(),
+            'last_name': fake.last_name()
+        }
+
         for order in orders:
             order.user_id = user_id
         PermissionFactory.create(keyword='view_orders', role_id=role.id)
@@ -212,9 +242,14 @@ class TestOrderEndpoints(BaseTestCase):
         self.assert200(response)
         self.assertEqual(len(loads(response.data, encoding='utf-8')['payload']['orders']), 3)
 
-    def test_get_specific_meal_item_endpoint(self):
+    @patch.object(AndelaService, 'get_user_by_email_or_id')
+    def test_get_specific_meal_item_endpoint(self, mock_andela_service):
         order = OrderFactory.create()
-        print('/orders/{}/'.format(order.id))
+        mock_andela_service.return_value = {
+            'id': fake.random_number(),
+            'first_name': fake.first_name(),
+            'last_name': fake.last_name()
+        }
 
         response = self.client().get(self.make_url('/orders/{}'.format(order.id)), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
