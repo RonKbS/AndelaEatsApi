@@ -73,7 +73,7 @@ class RoleController(BaseController):
 
 	def create_user_role(self):
 		location = Auth.get_location()
-		role_id, email_address = self.request_params('roleId', 'emailAddress')
+		role_id, email_address = self.request_params('roleId', 'email')
 		user = self.andela_service.get_user_by_email_or_id(email_address)
 		if user is None:
 			return self.handle_response('This user record does not exist', status_code=400)
@@ -82,7 +82,9 @@ class RoleController(BaseController):
 		if not user_role:
 			role = self.role_repo.get(role_id)
 			if role:
-				user_role = self.user_role_repo.new_user_role(role_id=role_id, user_id=user_id, location_id=location)
+				user_role = self.user_role_repo.new_user_role(
+					role_id=role_id, user_id=user_id,
+					location_id=location, email=email_address)
 				return self.handle_response('OK', payload={'user_role': user_role.serialize()}, status_code=201)
 			return self.handle_response('This role does not exist', status_code=400)
 		return self.handle_response('This User has this Role already', status_code=400)

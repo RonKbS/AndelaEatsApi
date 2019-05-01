@@ -41,26 +41,25 @@ class UserController(BaseController):
             List of admin users' profiles.
         '''
 
-        user_roles = self.user_role_repo.filter_by(
-            role_id=admin_role_id,
-            is_active=True
-        ).items
+        user_roles = self.user_role_repo.filter_by(role_id=admin_role_id, is_active=True).items
 
         admin_users_list = []
         for user_role in user_roles:
             admin_user_profile = {}
-            andela_user_profile = self.andela_service.get_user_by_email_or_id(
-                user_role.user_id
-            )
-            associated_roles = [user_role.role_id for user_role in self.user_role_repo.filter_by(user_id=user_role.user_id).items]
-            role_objects = Role.query.filter(Role.id.in_(associated_roles)).all()
-            roles = [{'role_id': role.id, 'role_name': role.name} for role in role_objects]
-            admin_user_profile['email'] = andela_user_profile['email']
-            admin_user_profile['name'] = andela_user_profile['name']
-            admin_user_profile['id'] = andela_user_profile['id']
-            admin_user_profile['roles'] = roles
+            andela_user_profile = self.andela_service.get_user_by_email_or_id(user_role.user_id) or \
+                                  self.andela_service.get_user_by_email_or_id(user_role.email)
 
-            admin_users_list.append(admin_user_profile)
+            if andela_user_profile:
+                associated_roles = [user_role.role_id for user_role in
+                                    self.user_role_repo.filter_by(user_id=user_role.user_id).items]
+                role_objects = Role.query.filter(Role.id.in_(associated_roles)).all()
+                roles = [{'role_id': role.id, 'role_name': role.name} for role in role_objects]
+                admin_user_profile['email'] = andela_user_profile['email']
+                admin_user_profile['name'] = andela_user_profile['name']
+                admin_user_profile['id'] = andela_user_profile['id']
+                admin_user_profile['roles'] = roles
+
+                admin_users_list.append(admin_user_profile)
 
         return self.handle_response(
             'OK',
@@ -131,7 +130,8 @@ class UserController(BaseController):
         user_id = user_id if user_id else slack_id
 
         user_type = self.user_role_repo.find_first(user_id=user_id) or \
-                    self.user_role_repo.new_user_role(role_id=role_id, user_id=user_id, location_id=Auth.get_location())
+                    self.user_role_repo.new_user_role(
+                        role_id=role_id, user_id=user_id, location_id=Auth.get_location(),email=None)
 
         user = self.user_repo.new_user(*user_info, user_id=user_id, slack_id=slack_id, user_type=user_type).serialize()
 

@@ -151,7 +151,7 @@ class TestRoleEndpoints(BaseTestCase):
 		new_role = RoleFactory.create()
 
 
-		user_role_data = { 'roleId': new_role.id, 'emailAddress': self.user_email()}
+		user_role_data = { 'roleId': new_role.id, 'email': self.user_email()}
 
 		response = self.client().post(self.make_url(f'/roles/user'), data=self.encode_to_json_string(user_role_data),
 									  headers=self.headers())
