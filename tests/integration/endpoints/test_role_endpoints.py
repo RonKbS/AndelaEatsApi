@@ -1,7 +1,8 @@
 import datetime
 from tests.base_test_case import BaseTestCase
+from tests import create_user_role
 from app.repositories import RoleRepo
-from factories import PermissionFactory, RoleFactory, UserRoleFactory
+from factories import PermissionFactory, RoleFactory, UserRoleFactory, UserFactory
 from .user_role import create_user_role
 from unittest.mock import Mock, patch
 
@@ -60,6 +61,18 @@ class TestRoleEndpoints(BaseTestCase):
 		self.assertEqual(payload['role']['id'], role.id)
 		self.assertEqual(payload['role']['name'], role.name)
 		self.assertEqual(payload['role']['help'], role.help)
+
+	def test_list_user_endpoint(self):
+		user = UserFactory(slack_id='-LMnsyxrsj_TEYEAHCBk')
+
+		create_user_role('view_users')
+
+		response = self.client().get(self.make_url(f'/users/{user.slack_id}/'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assertEqual(response_json['msg'], 'OK')
+		self.assertEqual(response_json['payload']['user']['firstName'], user.first_name)
+		self.assertEqual(response_json['payload']['user']['lastName'], user.last_name)
 
 	def test_update_roles_endpoint(self):
 
@@ -143,8 +156,8 @@ class TestRoleEndpoints(BaseTestCase):
 
 	@patch('app.controllers.role_controller.AndelaService.get_user_by_email_or_id')
 	def test_create_user_role_endpoint(self, mock_andela_get_user_by_email):
-
-		mock_andela_get_user_by_email.return_value = {'id': self.user_id()}
+		user = UserFactory()
+		mock_andela_get_user_by_email.return_value = {'id': user.user_id}
 
 		create_user_role('create_user_roles')
 
@@ -157,7 +170,7 @@ class TestRoleEndpoints(BaseTestCase):
 									  headers=self.headers())
 
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
-
+		print('response', response_json)
 		self.assertEqual(response.status_code, 201)
 		self.assertEqual(response_json['msg'], 'OK')
 		self.assertEqual(response_json['payload']['user_role']['roleId'], new_role.id)

@@ -29,6 +29,9 @@ class AndelaService:
 			return f'{self.API_URL}/{url_path}'
 	
 	def get_user_by_email_or_id(self, key):
+
+		if not key:
+			return None
 		
 		if key.find('@') > -1:
 			url_path = f'/users?email={key}'
