@@ -23,11 +23,11 @@ from .meal_service import MealService
 from .listener_helpers import attach_listen_type
 
 tables_logged_after_every_insert = [Vendor, VendorEngagement, MealItem, Menu, Faq,
-                                    Role, Permission, UserRole, Location]
+                                    Role, Permission, UserRole, Location, Order]
 tables_logged_after_every_update = [Vendor, VendorEngagement, MealItem, Menu, Faq,
-                                    Role, Permission, UserRole, Location]
+                                    Role, Permission, UserRole, Location, Order]
 tables_logged_after_every_delete = [Vendor, VendorEngagement, MealItem, Menu, Faq,
-                                    Role, Permission, UserRole, Location, VendorRating]
+                                    Role, Permission, UserRole, Location, VendorRating, Order]
 generate_id_tables = (User,)
 
 # attach all listeners to each admin table
@@ -39,8 +39,12 @@ attach_listen_type(tables_logged_after_every_delete, 'after_delete')
 def model_id_generator(mapper, connection, target):
     """A function to generate unique identifiers on insert."""
     push_id = PushID()
-    if not target.slack_id:
-        target.slack_id = push_id.next_id()
+    next_id = push_id.next_id()
+
+    target.slack_id = target.slack_id if target.slack_id else next_id
+
+    target.user_id =  target.user_id if target.user_id else target.slack_id
+
 
 for table in generate_id_tables:
     event.listen(table, 'before_insert', model_id_generator)

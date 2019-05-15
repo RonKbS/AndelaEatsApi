@@ -1,7 +1,8 @@
 from tests.base_test_case import BaseTestCase
 from app.repositories.base_repo import BaseRepo
 from factories.vendor_factory import VendorFactory
-from app.models.vendor import Vendor # One Model is required to test the base repo. Using Vendor
+from app.models.vendor import Vendor  # One Model is required to test the base repo. Using Vendor
+
 
 class TestBaseRepository(BaseTestCase):
 
@@ -95,15 +96,15 @@ class TestBaseRepository(BaseTestCase):
 		self.assertEqual(paginated_result.items[1], vendor_2)
 
 	def test_filter_and_count_method_returns_correct_count(self):
-		vendor_1 = VendorFactory.create()
-		vendor_2 = VendorFactory.create()
+		VendorFactory.create()
+		VendorFactory.create()
 
 		result = self.repo.filter_and_count()
 
 		self.assertEqual(result, 2)
 
 	def test_filter_and_order_method_returns_correct_order(self):
-		vendor_1 = VendorFactory.create()
+		VendorFactory.create()
 		vendor_2 = VendorFactory.create()
 
 		result = self.repo.filter_and_order('created_at')
@@ -113,7 +114,7 @@ class TestBaseRepository(BaseTestCase):
 
 
 	def test_order_by_method_returns_correct_order(self):
-		vendor_1 = VendorFactory.create()
+		VendorFactory.create()
 		vendor_2 = VendorFactory.create()
 
 		result = self.repo.order_by('created_at')
