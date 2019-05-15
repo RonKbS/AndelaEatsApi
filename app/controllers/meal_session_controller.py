@@ -6,6 +6,8 @@ from app.controllers.base_controller import BaseController
 from app.repositories.meal_session_repo import MealSessionRepo
 from app.repositories.meal_service_repo import MealServiceRepo
 from app.utils.auth import Auth
+from app.utils.location_time import get_location_time_zone
+from app.business_logic.meal_session.meal_session_logic import MealSessionLogic
 
 
 class MealSessionController(BaseController):
@@ -14,6 +16,7 @@ class MealSessionController(BaseController):
         BaseController.__init__(self, request)
         self.meal_session_repo = MealSessionRepo()
         self.meal_service_repo = MealServiceRepo()
+        self.business_logic = MealSessionLogic()
 
     def create_session(self):
         """
@@ -26,65 +29,20 @@ class MealSessionController(BaseController):
             'name', 'startTime', 'endTime', 'date', 'locationId'
         )
 
-        if not location_id:
-            location_id = Auth.get_location()
-
-        error_message_mapper = self.meal_session_repo.return_error_message_mapper()
-
-        tz = self.meal_session_repo.get_location_time_zone(location_id)
-        exception_message = error_message_mapper.get(tz)
-
-        if exception_message:
-            return make_response(jsonify({'msg': exception_message}), 400)
-
-        start_time = self.meal_session_repo.return_as_object(start_time, "time")
-        end_time = self.meal_session_repo.return_as_object(end_time, "time")
-
-        date_sent = self.meal_session_repo.return_as_object(date, "date")
-        current_date = datetime.now(tz)
-
-        message = self.meal_session_repo.validate_times_and_dates_not_greater_than_each_other(
-            start_time,
-            end_time,
-            datetime(year=current_date.year, month=current_date.month, day=current_date.day),
-            date_sent
-        )
-
-        error_message = error_message_mapper.get(message)
+        error_message, data = self.business_logic.validate_meal_session_details(**{
+                "name": name,
+                "date": date,
+                "location_id": location_id,
+                "start_time": start_time,
+                "end_time": end_time,
+        })
 
         if error_message:
             return make_response(jsonify({'msg': error_message}), 400)
 
-        message = self.meal_session_repo.validate_meal_session_times(
-            **{
-                "name": name,
-                "date_sent": date_sent,
-                "location_id": location_id,
-                "start_time": start_time,
-                "end_time": end_time,
-            }
-        )
-
-        message = error_message_mapper.get(message)
-
-        if message:
-            return make_response(jsonify({'msg': message}), 400)
-
         new_meal_session = self.meal_session_repo.new_meal_session(
-            name=name, start_time=start_time, stop_time=end_time,
-            date=date_sent, location_id=location_id
-        )
-
-        new_meal_session.name = new_meal_session.name.value
-
-        new_meal_session.start_time = self.meal_session_repo.get_time_as_string(
-            new_meal_session.start_time.hour,
-            new_meal_session.start_time.minute
-        )
-
-        new_meal_session.stop_time = self.meal_session_repo.get_time_as_string(
-            new_meal_session.stop_time.hour,
-            new_meal_session.stop_time.minute
+            name=data['name'], start_time=data['start_time'], stop_time=data['end_time'],
+            date=data['date_sent'], location_id=data['location_id']
         )
 
         new_meal_session.date = new_meal_session.date.strftime("%Y-%m-%d")
@@ -119,7 +77,7 @@ class MealSessionController(BaseController):
             "meal_session": meal_session,
         }
 
-        validated_data = self.meal_session_repo.validate_update_of_meal_session(
+        validated_data = self.business_logic.validate_update_of_meal_session(
             **meal_session_data
         )
 
@@ -139,12 +97,12 @@ class MealSessionController(BaseController):
 
         meal_session_updated.name = meal_session_updated.name.value
 
-        meal_session_updated.start_time = self.meal_session_repo.get_time_as_string(
+        meal_session_updated.start_time = self.business_logic.get_time_as_string(
             meal_session_updated.start_time.hour,
             meal_session_updated.start_time.minute
         )
 
-        meal_session_updated.stop_time = self.meal_session_repo.get_time_as_string(
+        meal_session_updated.stop_time = self.business_logic.get_time_as_string(
             meal_session_updated.stop_time.hour,
             meal_session_updated.stop_time.minute
         )
@@ -168,6 +126,7 @@ class MealSessionController(BaseController):
                          'meta': self.pagination_meta(sessions)})
 
         return self.handle_response('No meal sessions found', status_code=404)
+
     def delete_session(self, meal_session_id):
         """
         Deletes a meal session if correct meal_session_id is sent
@@ -180,12 +139,12 @@ class MealSessionController(BaseController):
             meal_session = self.meal_session_repo.update(meal_session, **dict(is_deleted=True))
             meal_session.name = meal_session.name.value
 
-            meal_session.start_time = self.meal_session_repo.get_time_as_string(
+            meal_session.start_time = self.business_logic.get_time_as_string(
                 meal_session.start_time.hour,
                 meal_session.start_time.minute
             )
 
-            meal_session.stop_time = self.meal_session_repo.get_time_as_string(
+            meal_session.stop_time = self.business_logic.get_time_as_string(
                 meal_session.stop_time.hour,
                 meal_session.stop_time.minute
             )

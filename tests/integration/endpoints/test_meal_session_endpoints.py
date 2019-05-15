@@ -3,6 +3,7 @@
 from datetime import datetime, time, timedelta
 from tests.base_test_case import BaseTestCase
 from app.repositories.meal_session_repo import MealSessionRepo
+from app.business_logic.meal_session.meal_session_logic import MealSessionLogic
 from factories import MealSessionFactory, LocationFactory, RoleFactory, UserRoleFactory, PermissionFactory
 
 
@@ -25,11 +26,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:00",
             "endTime": "14:00",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -42,8 +43,12 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response_json['msg'], 'OK')
         self.assertEqual(response_json['payload']['mealSession']['name'], meal_session_data['name'])
-        self.assertEqual(response_json['payload']['mealSession']['startTime'], meal_session_data['startTime'])
-        self.assertEqual(response_json['payload']['mealSession']['stopTime'], meal_session_data['endTime'])
+        self.assertEqual(
+            (response_json['payload']['mealSession']['startTime'])[:-3],
+            meal_session_data['startTime'])
+        self.assertEqual(
+            (response_json['payload']['mealSession']['stopTime'])[:-3],
+            meal_session_data['endTime'])
         self.assertEqual(response_json['payload']['mealSession']['date'], meal_session_data['date'])
         self.assertEqual(response_json['payload']['mealSession']['locationId'], meal_session_data['locationId'])
 
@@ -59,11 +64,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:00",
             "endTime": "14:00",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -98,11 +103,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:00",
             "endTime": "14:00",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": 100
         }
 
@@ -127,11 +132,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:00",
             "endTime": "14:00",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -156,11 +161,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "14:00",
             "endTime": "13:00",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -184,11 +189,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:00",
             "endTime": "14:00",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year - 1),
+                MealSessionLogic.format_preceding(self.current_date.year - 1),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -222,11 +227,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:10",
             "endTime": "14:30",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -265,11 +270,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "12:10",
             "endTime": "13:30",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -308,11 +313,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "12:10",
             "endTime": "14:45",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -367,11 +372,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "12:10",
             "endTime": "14:45",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -399,11 +404,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "90:10",
             "endTime": "14:45",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -430,11 +435,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:10",
             "endTime": "41:45",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -461,11 +466,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:10",
             "endTime": "14:45",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": "non integer"
         }
 
@@ -493,11 +498,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:10",
             "endTime": "14:45",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
         }
 
         response = self.client().post(self.make_url('/meals/session'),
@@ -509,9 +514,12 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response_json['msg'], 'OK')
         self.assertEqual(response_json['payload']['mealSession']['name'], meal_session_data['name'])
-        self.assertEqual(response_json['payload']['mealSession']['startTime'], meal_session_data['startTime'])
-        self.assertEqual(response_json['payload']['mealSession']['stopTime'], meal_session_data['endTime'])
-        self.assertEqual(response_json['payload']['mealSession']['date'], meal_session_data['date'])
+        self.assertEqual(
+            (response_json['payload']['mealSession']['startTime'])[:-3], meal_session_data['startTime'])
+        self.assertEqual(
+            (response_json['payload']['mealSession']['stopTime'])[:-3], meal_session_data['endTime'])
+        self.assertEqual(
+            (response_json['payload']['mealSession']['date']), meal_session_data['date'])
         self.assertEqual(response_json['payload']['mealSession']['locationId'], int(self.headers().get('X-Location')))
 
 
@@ -527,11 +535,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:00",
             "endTime": "14:00",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -570,11 +578,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:00",
             "endTime": "14:00",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": 100
         }
 
@@ -608,11 +616,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:00",
             "endTime": "14:00",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": location.id
         }
 
@@ -647,11 +655,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:00",
             "endTime": "14:00",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location_fake.id
         }
 
@@ -685,11 +693,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "14:00",
             "endTime": "13:00",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -726,11 +734,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:00",
             "endTime": "14:00",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year - 1),
+                MealSessionLogic.format_preceding(self.current_date.year - 1),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -773,11 +781,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:10",
             "endTime": "14:30",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -823,11 +831,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:00",
             "endTime": "14:00",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -873,11 +881,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "12:10",
             "endTime": "13:30",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -923,11 +931,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:10",
             "endTime": "13:30",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -999,11 +1007,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "12:10",
             "endTime": "14:45",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -1042,11 +1050,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "12:10",
             "endTime": "14:45",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -1082,11 +1090,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "90:10",
             "endTime": "14:45",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -1121,11 +1129,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:10",
             "endTime": "41:45",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": new_location.id
         }
 
@@ -1160,11 +1168,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:10",
             "endTime": "14:45",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
             "locationId": "non integer"
         }
 
@@ -1200,11 +1208,11 @@ class TestMealSessionEndpoints(BaseTestCase):
             "startTime": "13:10",
             "endTime": "14:45",
             "date": "".join([
-                MealSessionRepo.format_preceding(self.current_date.year),
+                MealSessionLogic.format_preceding(self.current_date.year),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.month),
+                MealSessionLogic.format_preceding(self.current_date.month),
                 "-",
-                MealSessionRepo.format_preceding(self.current_date.day)]),
+                MealSessionLogic.format_preceding(self.current_date.day)]),
         }
 
         meal_session = MealSessionFactory.create(

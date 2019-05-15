@@ -6,6 +6,7 @@ from app.blueprints.base_blueprint import BaseBlueprint
 from app.utils.auth import Auth
 from flasgger import Swagger
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 from app.utils.cron import Cron
 
 def create_app(config_name):
@@ -21,14 +22,24 @@ def create_app(config_name):
     blueprint = BaseBlueprint(app)
     blueprint.register()
 
-    cron = Cron(app)
-    scheduler = BackgroundScheduler()
-    # in your case you could change seconds to hours
-    scheduler.add_job(cron.run_24_hourly, trigger='interval', hours=24)
-    scheduler.start()
+    # cron = Cron(app)
+    # scheduler = BackgroundScheduler("Africa/Lagos")
+    # # in your case you could change seconds to hours
+    # scheduler.add_job(cron.run_24_hourly, trigger='interval', hours=24)
+    # scheduler.add_job(cron.meal_session_cron)
+    # scheduler.start()
 
     from . import models
     db.init_app(app)
+
+    cron = Cron(app)
+    scheduler = BackgroundScheduler(timezone="Africa/Lagos")
+    # in your case you could change seconds to hours
+    scheduler.add_job(cron.run_24_hourly, trigger='interval', hours=24)
+    scheduler.add_job(cron.run_meal_session_cron, 'cron', day_of_week='mon-fri', hour=0, minute=0,
+                      misfire_grace_time=None)
+    scheduler.start()
+
     swg = Swagger(app)
 
     return app

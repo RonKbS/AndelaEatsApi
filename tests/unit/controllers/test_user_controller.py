@@ -8,6 +8,9 @@ from app.controllers.user_controller import UserController
 from app.models.user_role import UserRole
 from tests.base_test_case import BaseTestCase
 from factories.user_factory import UserFactory
+from factories.role_factory import RoleFactory
+from factories.location_factory import LocationFactory
+from app.utils.auth import Auth
 
 
 class TestUserController(BaseTestCase):
@@ -56,16 +59,22 @@ class TestUserController(BaseTestCase):
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
 
+    @patch.object(Auth, 'get_location')
     @patch.object(UserController, 'request_params')
-    def test_create_user_succeeds(self, mock_request_params):
+    def test_create_user_succeeds(self, mock_request_params, mock_get_location):
+        location = LocationFactory()
+        role = RoleFactory(name='test_role')
 
         with self.app.app_context():
+            mock_get_location.return_value = location.id
+
             mock_request_params.return_value = [
-                None,
                 "Joseph",
                 "Serunjogi",
+                None,
+                None,
                 "-LXTuXlk2W4Gskt8KTte",
-                None
+                role.id
             ]
             user_controller = UserController(self.request_context)
 
@@ -80,13 +89,15 @@ class TestUserController(BaseTestCase):
     def test_create_user_method_handles_user_creation_with_duplicate_slack_id(self, mock_request_params):
         with self.app.app_context():
             user = UserFactory(slack_id="-LXTuXlk2W4Gskt8KTte")
+            role = RoleFactory(name='test_role')
 
             mock_request_params.return_value = [
-                user.slack_id,
                 "Joseph",
                 "Serunjogi",
+                None,
+                user.slack_id,
                 "-LXTuXlk2W4Gskt8KTte",
-                None
+                role.id
             ]
 
             user_controller = UserController(self.request_context)
@@ -103,13 +114,15 @@ class TestUserController(BaseTestCase):
     def test_create_user_method_handles_user_creation_with_duplicate_user_id(self, mock_request_params):
         with self.app.app_context():
             user = UserFactory(user_id="-LXTuXlk2W4Gskt8KTte")
+            role = RoleFactory(name='test_role')
 
             mock_request_params.return_value = [
-                None,
                 "Joseph",
                 "Serunjogi",
+                None,
+                None,
                 user.user_id,
-                None
+                role.id
             ]
 
             user_controller = UserController(self.request_context)
@@ -120,6 +133,32 @@ class TestUserController(BaseTestCase):
             self.assertEqual(
                 response.get_json()['msg'],
                 "User with userId '{}' already exists".format(user.user_id)
+            )
+
+    @patch.object(UserController, 'request_params')
+    def test_create_user_method_handles_user_creation_with_non_existent_role_id(self, mock_request_params):
+        with self.app.app_context():
+            user = UserFactory(user_id="-LXTuXlk2W4Gskt8KTte")
+
+            non_existent_role_id = 100
+
+            mock_request_params.return_value = [
+                "Joseph",
+                "Serunjogi",
+                None,
+                None,
+                user.user_id,
+                non_existent_role_id
+            ]
+
+            user_controller = UserController(self.request_context)
+
+            response = user_controller.create_user()
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(
+                response.get_json()['msg'],
+                "Role with userTypeId(roleId) {} does not exist".format(non_existent_role_id)
             )
 
     def test_list_user_succeeds(self):
