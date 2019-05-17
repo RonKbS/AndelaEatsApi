@@ -71,3 +71,5 @@ urllib3==1.22
 websocket-client==0.48.0
 Werkzeug==0.14.1
 wrapt==1.10.11
+bugsnag
+blinker

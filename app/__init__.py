@@ -8,6 +8,14 @@ from flasgger import Swagger
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from app.utils.cron import Cron
+import bugsnag
+from bugsnag.flask import handle_exceptions
+
+bugsnag.configure(
+    api_key=get_env('BUGSNAG_API_KEY'),
+    project_root=get_env('BUGSNAG_PROJECT_ROOT'),
+)
+
 
 def create_app(config_name):
     app = FlaskAPI(__name__, instance_relative_config=False)
@@ -41,5 +49,6 @@ def create_app(config_name):
     scheduler.start()
 
     swg = Swagger(app)
+    handle_exceptions(app)
 
     return app
