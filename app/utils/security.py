@@ -10,7 +10,7 @@ from app.utils.enums import ActionType, Channels, FaqCategoryType, MealSessionNa
 class Security:
 
 	EMAIL_REGEX = re.compile(
-		r"^[\-a-zA-Z0-9_]+(\.[\-a-zA-Z0-9_]+)*@[a-z]+\.[\-a-zA-Z0-9_]+\Z", re.I | re.UNICODE)
+		r"^[\-a-zA-Z0-9_]+(\.[\-a-zA-Z0-9_]+)*@[\-a-z]+\.[\-a-zA-Z0-9_]+\Z", re.I | re.UNICODE)
 
 	URL_REGEX = re.compile(r"^(http(s)?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]"
 						   r"{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$")
