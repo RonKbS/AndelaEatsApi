@@ -1,5 +1,18 @@
 from sqlalchemy import desc, asc
 from app.models import VendorRating
+from functools import wraps
+
+
+def filter_deleted(func):
+    @wraps(func)
+    def decorated(*args, **kwargs):
+        if not kwargs:
+            kwargs = dict(is_deleted=False)
+        kwargs.update(is_deleted=False) if not kwargs.get('is_deleted') else None
+
+        return func(*args, **kwargs)
+
+    return decorated
 
 
 class BaseRepo:
@@ -43,44 +56,52 @@ class BaseRepo:
         """Query and filter the data of the model."""
         return self._model.query.filter(**kwargs).paginate(error_out=False)
 
-
+    @filter_deleted
     def filter_by(self, **kwargs):
         """Query and filter the data of the model."""
         #return self._model.query.filter_by(is_deleted=False).paginate(**kwargs, error_out=False)
         return self._model.query.filter_by(**kwargs).paginate(error_out=False)
 
+    @filter_deleted
     def filter_by_desc(self, *args, **kwargs):
         """Query and filter the data of the model in descending order"""
         return self._model.query.filter_by(**kwargs).order_by(desc(*args)) \
             .paginate(error_out=False)
 
+    @filter_deleted
     def filter_by_asc(self, *args, **kwargs):
         """Query and filter the data of the model in ascending order"""
         return self._model.query.filter_by(**kwargs).order_by(asc(*args)) \
             .paginate(error_out=False)
 
+    @filter_deleted
     def get_unpaginated(self, **kwargs):
         """Query and filter the data of the model."""
         return self._model.query.filter_by(**kwargs).all()
 
+    @filter_deleted
     def get_unpaginated_asc(self, *args, **kwargs):
         """Query and filter the data of the model in ascending order."""
         return self._model.query.filter_by(**kwargs).order_by(asc(*args)) \
             .all()
 
+    @filter_deleted
     def get_unpaginated_desc(self, *args, **kwargs):
         """Query and filter the data of the model in ascending order."""
         return self._model.query.filter_by(**kwargs).order_by(desc(*args)) \
             .all()
 
+    @filter_deleted
     def find_first(self, **kwargs):
         """Query and filter the data of a model, returning the first result."""
         return self._model.query.filter_by(**kwargs).first()
 
+    @filter_deleted
     def filter_and_count(self, **kwargs):
         """Query, filter and counts all the data of a model."""
         return self._model.query.filter_by(**kwargs).count()
 
+    @filter_deleted
     def filter_and_order(self, *args, **kwargs):
         """Query, filter and orders all the data of a model."""
         return self._model.query.filter_by(**kwargs).order_by(*args)
