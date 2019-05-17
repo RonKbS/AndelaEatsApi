@@ -1,11 +1,24 @@
 from app.utils import db
 from config import get_env
 from app import create_app
+from flask import jsonify, make_response
 from flask_script import Manager
 from app.utils.auth import Auth
 from app.utils.seeders.seed_database import seed_db, SEED_OPTIONS
 from flask_migrate import Migrate, MigrateCommand
+import traceback
+import logging
 import click
+import bugsnag
+
+error_logger = logging.getLogger(__name__)
+error_logger.setLevel(logging.DEBUG)
+
+file_handler = logging.FileHandler('errors.log')
+file_handler.setLevel(logging.ERROR)
+file_handler.setFormatter(logging.Formatter('%(asctime)s:%(name)s:%(message)s'))
+
+error_logger.addHandler(file_handler)
 
 app = create_app(get_env('APP_ENV'))
 migrate = Migrate(app, db)
@@ -22,6 +35,15 @@ def check_token():
 def check_location_header():
 	return Auth.check_location_header()
 
+@app.errorhandler(Exception)
+def handle_exception(error):
+	"""Error handler called when a ValidationError is raised"""
+	traceback.print_exc()
+	error_logger.exception(str(error))
+	bugsnag.notify(error)
+	return make_response(
+		jsonify({'msg': 'An error occurred while processing your request. Please contact Admin.'})
+	), 500
 
 
 # Creates the db tables
