@@ -22,6 +22,7 @@ def create_app(config_name):
     app.config.from_object(env.app_env[config_name])
     app.config.from_pyfile('../config/env.py')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.url_map.strict_slashes = False
 
     # CORS
     CORS(app)
