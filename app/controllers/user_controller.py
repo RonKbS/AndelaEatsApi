@@ -69,10 +69,10 @@ class UserController(BaseController):
     def list_all_users(self):
 
         params = self.get_params_dict()
-        pg = int(params.get('page', 1))
-        pp = int(params.get('per_page', 10))
+        page = params.get('page')
+        per_page = params.get('per_page')
 
-        users = self.user_repo.paginate(error_out=False, page=pg, per_page=pp)
+        users = self.user_repo.paginate(error_out=False, page=page, per_page=per_page)
         if users.items:
             user_list = [user.serialize() for user in users.items]
             for user in user_list:
