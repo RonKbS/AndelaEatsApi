@@ -65,7 +65,6 @@ class TestOrderController(BaseTestCase):
             id=1,
             meal_type='main',
             name='mock',
-            description='mock',
             image='mock',
             location_id=1
         )

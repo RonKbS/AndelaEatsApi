@@ -286,9 +286,9 @@ class MenuEndpoints(BaseTestCase):
         the_date = datetime.now().date()
         current_date = the_date.strftime('%Y-%m-%d')
 
-        side_meal_item = meal_item_repo.new_meal_item(name="side1", description="descr11", image="image11",
+        side_meal_item = meal_item_repo.new_meal_item(name="side1",  image="image11",
                                                       meal_type="side", location_id=1)
-        protein_meal_item = meal_item_repo.new_meal_item(name="protein1", description="descr11", image="image12",
+        protein_meal_item = meal_item_repo.new_meal_item(name="protein1",  image="image12",
                                                          meal_type="protein", location_id=1)
         MenuFactory.create_batch(5, side_items=side_meal_item.id, protein_items=protein_meal_item.id, date=the_date)
 
@@ -320,9 +320,9 @@ class MenuEndpoints(BaseTestCase):
         start_date = current_date.strftime('%Y-%m-%d')
         end_date = (datetime.now().date() + timedelta(days=7)).strftime('%Y-%m-%d')
 
-        side_meal_item = meal_item_repo.new_meal_item(name="side1", description="descr11", image="image11",
+        side_meal_item = meal_item_repo.new_meal_item(name="side1",  image="image11",
                                                       meal_type="side", location_id=1)
-        protein_meal_item = meal_item_repo.new_meal_item(name="protein1", description="descr11", image="image12",
+        protein_meal_item = meal_item_repo.new_meal_item(name="protein1",  image="image12",
                                                          meal_type="protein", location_id=1)
         MenuFactory.create_batch(5, side_items=side_meal_item.id, protein_items=protein_meal_item.id)
 
@@ -360,9 +360,9 @@ class MenuEndpoints(BaseTestCase):
         start_date = current_date.strftime('%Y-%m-%d')
         end_date = (datetime.now().date() + timedelta(days=7)).strftime('%Y-%m-%d')
 
-        side_meal_item = meal_item_repo.new_meal_item(name="side1", description="descr11", image="image11",
+        side_meal_item = meal_item_repo.new_meal_item(name="side1",  image="image11",
                                                       meal_type="side", location_id=1)
-        protein_meal_item = meal_item_repo.new_meal_item(name="protein1", description="descr11", image="image12",
+        protein_meal_item = meal_item_repo.new_meal_item(name="protein1",  image="image12",
                                                          meal_type="protein", location_id=1)
         MenuFactory.create_batch(5, side_items=side_meal_item.id, protein_items=protein_meal_item.id)
 
@@ -382,11 +382,11 @@ class MenuEndpoints(BaseTestCase):
 
         meal_item_repo = MealItemRepo()
 
-        main_meal_item = meal_item_repo.new_meal_item(name="main1", description="descr1", image="image1",
+        main_meal_item = meal_item_repo.new_meal_item(name="main1", image="image1",
                                                       meal_type="main", location_id=1)
-        side_meal_item = meal_item_repo.new_meal_item(name="side1", description="descr11", image="image11",
+        side_meal_item = meal_item_repo.new_meal_item(name="side1",  image="image11",
                                                       meal_type="side", location_id=1)
-        protein_meal_item = meal_item_repo.new_meal_item(name="protein1", description="descr11", image="image12",
+        protein_meal_item = meal_item_repo.new_meal_item(name="protein1",  image="image12",
                                                          meal_type="protein", location_id=1)
         vendor = VendorFactory.build()
         vendor_engagement = VendorEngagementFactory.build(vendor_id=vendor.id)
@@ -418,11 +418,11 @@ class MenuEndpoints(BaseTestCase):
 
         meal_item_repo = MealItemRepo()
 
-        main_meal_item = meal_item_repo.new_meal_item(name="main1", description="descr1", image="image1",
+        main_meal_item = meal_item_repo.new_meal_item(name="main1", image="image1",
                                                       meal_type="main", location_id=1)
-        side_meal_item = meal_item_repo.new_meal_item(name="side1", description="descr11", image="image11",
+        side_meal_item = meal_item_repo.new_meal_item(name="side1",  image="image11",
                                                       meal_type="side", location_id=1)
-        protein_meal_item = meal_item_repo.new_meal_item(name="protein1", description="descr11", image="image12",
+        protein_meal_item = meal_item_repo.new_meal_item(name="protein1",  image="image12",
                                                          meal_type="protein", location_id=1)
         vendor = VendorFactory.build()
         vendor_engagement = VendorEngagementFactory.build(vendor_id=vendor.id)
@@ -452,11 +452,11 @@ class MenuEndpoints(BaseTestCase):
 
         meal_item_repo = MealItemRepo()
 
-        main_meal_item = meal_item_repo.new_meal_item(name="main1", description="descr1", image="image1",
+        main_meal_item = meal_item_repo.new_meal_item(name="main1", image="image1",
                                                       meal_type="main", location_id=1)
-        side_meal_item = meal_item_repo.new_meal_item(name="side1", description="descr11", image="image11",
+        side_meal_item = meal_item_repo.new_meal_item(name="side1",  image="image11",
                                                       meal_type="side", location_id=1)
-        protein_meal_item = meal_item_repo.new_meal_item(name="protein1", description="descr11", image="image12",
+        protein_meal_item = meal_item_repo.new_meal_item(name="protein1",  image="image12",
                                                          meal_type="protein", location_id=1)
 
         vendor = VendorFactory.build()
@@ -488,11 +488,11 @@ class MenuEndpoints(BaseTestCase):
 
         meal_item_repo = MealItemRepo()
 
-        main_meal_item = meal_item_repo.new_meal_item(name="main1", description="descr1", image="image1",
+        main_meal_item = meal_item_repo.new_meal_item(name="main1",image="image1",
                                                       meal_type="main", location_id=1)
-        side_meal_item = meal_item_repo.new_meal_item(name="side1", description="descr11", image="image11",
+        side_meal_item = meal_item_repo.new_meal_item(name="side1", image="image11",
                                                       meal_type="side", location_id=1)
-        protein_meal_item = meal_item_repo.new_meal_item(name="protein1", description="descr11", image="image12",
+        protein_meal_item = meal_item_repo.new_meal_item(name="protein1",image="image12",
                                                          meal_type="protein", location_id=1)
 
         vendor = VendorFactory.build()
@@ -524,11 +524,11 @@ class MenuEndpoints(BaseTestCase):
 
         meal_item_repo = MealItemRepo()
 
-        main_meal_item = meal_item_repo.new_meal_item(name="main1", description="descr1", image="image1",
+        main_meal_item = meal_item_repo.new_meal_item(name="main1", image="image1",
                                                       meal_type="main", location_id=1)
-        side_meal_item = meal_item_repo.new_meal_item(name="side1", description="descr11", image="image11",
+        side_meal_item = meal_item_repo.new_meal_item(name="side1",  image="image11",
                                                       meal_type="side", location_id=1)
-        protein_meal_item = meal_item_repo.new_meal_item(name="protein1", description="descr11", image="image12",
+        protein_meal_item = meal_item_repo.new_meal_item(name="protein1",  image="image12",
                                                          meal_type="protein", location_id=1)
 
         vendor = VendorFactory.build()
@@ -560,11 +560,11 @@ class MenuEndpoints(BaseTestCase):
 
         meal_item_repo = MealItemRepo()
 
-        main_meal_item = meal_item_repo.new_meal_item(name="main1", description="descr1", image="image1",
+        main_meal_item = meal_item_repo.new_meal_item(name="main1", image="image1",
                                                       meal_type="main", location_id=1)
-        side_meal_item = meal_item_repo.new_meal_item(name="side1", description="descr11", image="image11",
+        side_meal_item = meal_item_repo.new_meal_item(name="side1",  image="image11",
                                                       meal_type="side", location_id=1)
-        protein_meal_item = meal_item_repo.new_meal_item(name="protein1", description="descr11", image="image12",
+        protein_meal_item = meal_item_repo.new_meal_item(name="protein1",  image="image12",
                                                          meal_type="protein", location_id=1)
 
         vendor = VendorFactory.build()
@@ -596,11 +596,11 @@ class MenuEndpoints(BaseTestCase):
 
         meal_item_repo = MealItemRepo()
 
-        main_meal_item = meal_item_repo.new_meal_item(name="main1", description="descr1", image="image1",
+        main_meal_item = meal_item_repo.new_meal_item(name="main1", image="image1",
                                                       meal_type="main", location_id=1)
-        side_meal_item = meal_item_repo.new_meal_item(name="side1", description="descr11", image="image11",
+        side_meal_item = meal_item_repo.new_meal_item(name="side1",  image="image11",
                                                       meal_type="side", location_id=1)
-        protein_meal_item = meal_item_repo.new_meal_item(name="protein1", description="descr11", image="image12",
+        protein_meal_item = meal_item_repo.new_meal_item(name="protein1",  image="image12",
                                                          meal_type="protein", location_id=1)
 
         vendor = VendorFactory.build()
@@ -627,11 +627,11 @@ class MenuEndpoints(BaseTestCase):
     def test_list_menu_range_endpoint_succeeds(self):
         meal_item_repo = MealItemRepo()
 
-        main_meal_item = meal_item_repo.new_meal_item(name="main1", description="descr1", image="image1",
+        main_meal_item = meal_item_repo.new_meal_item(name="main1", image="image1",
                                                       meal_type="main", location_id=1)
-        side_meal_item = meal_item_repo.new_meal_item(name="side1", description="descr11", image="image11",
+        side_meal_item = meal_item_repo.new_meal_item(name="side1",  image="image11",
                                                       meal_type="side", location_id=1)
-        protein_meal_item = meal_item_repo.new_meal_item(name="protein1", description="descr11", image="image12",
+        protein_meal_item = meal_item_repo.new_meal_item(name="protein1",  image="image12",
                                                          meal_type="protein", location_id=1)
 
         menu = MenuFactory.create(main_meal_id=main_meal_item.id,

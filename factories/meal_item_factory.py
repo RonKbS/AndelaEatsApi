@@ -13,6 +13,5 @@ class MealItemFactory(factory.alchemy.SQLAlchemyModelFactory):
     id = factory.sequence(lambda n: n)
     meal_type = MealTypes.side
     name = factory.Faker('name')
-    description = factory.Faker('sentence', nb_words=4)
     image = 'https://www.pexels.com/photo/burrito-chicken-delicious-dinner-461198/'
 
