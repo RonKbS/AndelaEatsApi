@@ -40,7 +40,7 @@ def check_location_header():
 def handle_base_model_validation_error(error):
 	return make_response(
 		jsonify({'msg': error.msg})
-	), 400
+	), error.status_code
 
 @app.errorhandler(Exception)
 def handle_exception(error):
