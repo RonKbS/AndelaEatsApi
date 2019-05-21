@@ -74,6 +74,19 @@ class TestUserEndpoints(BaseTestCase):
         self.assert200(response)
         self.assertEqual(payload['status'], 'success')
         self.assertEqual(response_json['msg'], 'User deleted')
+    
+    def test_delete_already_deleted_user_with_right_permission(self):
+        user = UserFactory.create(is_deleted= True)
+        role = RoleFactory.create(name='admin')
+        user_id = BaseTestCase.user_id()
+        PermissionFactory.create(keyword='delete_user', role_id=role.id)
+        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+        response = self.client().delete(self.make_url(f'/users/{user.id}/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+        self.assert400(response)
+        self.assertEqual(400,response.status_code)
+        self.assertEqual(response_json['msg'], 'User has already been deleted')
 
     def test_delete_vendor_endpoint_without_right_permission(self):
         user = UserFactory.create()

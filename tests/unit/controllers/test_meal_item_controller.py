@@ -20,7 +20,6 @@ class TestMealItemController(BaseTestCase):
             updated_at=datetime.now(),
             meal_type='Mock meal type',
             name='Mock meal item',
-            description='Mock description',
             image='Mock image',
             location_id=1
         )
@@ -30,7 +29,6 @@ class TestMealItemController(BaseTestCase):
             updated_at=datetime.now(),
             meal_type='Mock meal type',
             name='Mock meal item',
-            description='Mock description',
             image='Mock image',
             location_id=1
         )
@@ -162,7 +160,7 @@ class TestMealItemController(BaseTestCase):
         with self.app.app_context():
             mock_get_location.return_value = 1
             mock_request_params.return_value = (
-                'Mock', 'Mock', 'Mock', 'Mock'
+                'Mock', 'Mock', 'Mock'
             )
             mock_get_unpaginated.return_value = self.mock_meal_item
             meal_item_controller = MealItemController(self.request_context)
@@ -191,7 +189,7 @@ class TestMealItemController(BaseTestCase):
         # Arrange
         with self.app.app_context():
             mock_request_params.return_value = (
-                'Mock', 'Mock', 'Mock', 'Mock'
+                'Mock', 'Mock', 'Mock'
             )
             mock_get_unpaginated.return_value = None
             mock_get_location.return_value = 1
@@ -224,7 +222,7 @@ class TestMealItemController(BaseTestCase):
         # Arrange
         with self.app.app_context():
             mock_request_params.return_value = (
-                'Mock', 'Mock', 'Mock', 'Mock'
+                'Mock', 'Mock', 'Mock'
             )
             mock_get_unpaginated.return_value = None
             mock_get_location.return_value = 1
@@ -250,7 +248,7 @@ class TestMealItemController(BaseTestCase):
         '''
         # Arrange
         with self.app.app_context():
-            mock_request_params.return_value = ('Mock', 'Mock', 'Mock', 'Mock')
+            mock_request_params.return_value = ('Mock', 'Mock', 'Mock')
             mock_get.return_value = None
             meal_item_controller = MealItemController(self.request_context)
 
@@ -274,7 +272,7 @@ class TestMealItemController(BaseTestCase):
         # Arrange
         with self.app.app_context():
             mock_get.return_value = self.mock_deleted_meal_item
-            mock_request_params.return_value = ('Mock', 'Mock', 'Mock', 'Mock')
+            mock_request_params.return_value = ('Mock', 'Mock', 'Mock')
             meal_item_controller = MealItemController(self.request_context)
 
             # Act
@@ -298,7 +296,7 @@ class TestMealItemController(BaseTestCase):
         '''
         # Arrange
         with self.app.app_context():
-            mock_request_params.return_value = ('mock', 'mock', 'mock', 'mock')
+            mock_request_params.return_value = ('mock', 'mock', 'mock')
             mock_get.return_value = self.mock_meal_item
             mock_get_unpaginated.return_value = self.mock_meal_item
             meal_item_controller = MealItemController(self.request_context)
@@ -325,7 +323,7 @@ class TestMealItemController(BaseTestCase):
         # Arrange
         with self.app.app_context():
             mock_get.return_value = self.mock_meal_item
-            mock_request_params.return_value = ('mock', 'mock', 'mock', 'mock')
+            mock_request_params.return_value = ('mock', 'mock', 'mock')
             mock_get_unpaginated.return_value = None
             meal_item_controller = MealItemController(self.request_context)
 

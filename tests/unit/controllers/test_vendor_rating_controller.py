@@ -326,7 +326,6 @@ class TestVendorRatingController(BaseTestCase):
                 updated_at=datetime.now(),
                 meal_type='main',
                 name='Mock meal',
-                description='Mock meal description',
                 image='',
                 location_id=1
             )
@@ -371,7 +370,6 @@ class TestVendorRatingController(BaseTestCase):
                 updated_at=datetime.now(),
                 meal_type='main',
                 name='Mock meal',
-                description='Mock meal description',
                 image='',
                 location_id=1
             )
@@ -429,7 +427,6 @@ class TestVendorRatingController(BaseTestCase):
                 updated_at=datetime.now(),
                 meal_type='main',
                 name='Mock meal',
-                description='Mock meal description',
                 image='',
                 location_id=1
             )
@@ -500,7 +497,6 @@ class TestVendorRatingController(BaseTestCase):
                 updated_at=datetime.now(),
                 meal_type='main',
                 name='Mock meal',
-                description='Mock meal description',
                 image='',
                 location_id=1
             )
@@ -578,7 +574,6 @@ class TestVendorRatingController(BaseTestCase):
                 updated_at=datetime.now(),
                 meal_type='main',
                 name='Mock meal',
-                description='Mock meal description',
                 image='',
                 location_id=1
             )
