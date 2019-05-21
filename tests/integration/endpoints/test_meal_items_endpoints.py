@@ -42,6 +42,20 @@ class TestMealItemEndpoints(BaseTestCase):
 		self.assertEqual(payload['mealItem']['name'], meal_item.name)
 		self.assertEqual(payload['mealItem']['image'], meal_item.image)
 		self.assertEqual(payload['mealItem']['mealType'], meal_item.meal_type)
+	
+	def test_create_meal_item_with_invalid_image_url(self):
+		role = RoleFactory.create(name='admin')
+		user_id = BaseTestCase.user_id()
+		PermissionFactory.create(keyword='create_meal_item', role_id=role.id)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+		meal_item = MealItemFactory.build()
+		data = {'mealName': meal_item.name, 'image': 'image',
+				'mealType': meal_item.meal_type}
+		response = self.client().post(self.make_url('/meal-items/'), data=self.encode_to_json_string(data),
+									  headers=self.headers())
+		self.assert400(response)
+		self.assertEqual(response.json['msg'], "Bad Request - 'image' is not a valid url.")
 
 
 	def test_create_meal_item_endpoint_with_missing_meal_type(self):
