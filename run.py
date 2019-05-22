@@ -4,6 +4,7 @@ from app import create_app
 from flask import jsonify, make_response
 from flask_script import Manager
 from app.utils.auth import Auth
+from app.utils.handled_exceptions import BaseModelValidationError
 from app.utils.seeders.seed_database import seed_db, SEED_OPTIONS
 from flask_migrate import Migrate, MigrateCommand
 import traceback
@@ -34,6 +35,12 @@ def check_token():
 @app.before_request
 def check_location_header():
 	return Auth.check_location_header()
+
+@app.errorhandler(BaseModelValidationError)
+def handle_base_model_validation_error(error):
+	return make_response(
+		jsonify({'msg': error.msg})
+	), error.status_code
 
 @app.errorhandler(Exception)
 def handle_exception(error):
