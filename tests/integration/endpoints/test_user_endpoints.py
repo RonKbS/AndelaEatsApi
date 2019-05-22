@@ -256,7 +256,7 @@ class TestUserEndpoints(BaseTestCase):
         user = UserFactory.create(user_id="user_id_2", is_deleted=True)
         role = RoleFactory(name='test_role')
 
-        user_data = dict(firstName=user.first_name, lastName=user.last_name, userTypeId=role.id)
+        user_data = dict(firstName=user.first_name, lastName=user.last_name, roleId=role.id)
 
         response = self.client().post(self.make_url("/users/"), headers=self.headers(),
                                      data=self.encode_to_json_string(user_data))

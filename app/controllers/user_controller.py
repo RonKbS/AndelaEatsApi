@@ -102,7 +102,7 @@ class UserController(BaseController):
         push_id = PushID()
         next_id = push_id.next_id()
 
-        user_info = self.request_params('firstName', 'lastName', 'imageUrl', 'slackId', 'userId', 'userTypeId')
+        user_info = self.request_params('firstName', 'lastName', 'imageUrl', 'slackId', 'userId', 'roleId')
 
         first_name, last_name, image_url, slack_id, user_id, role_id = user_info
 
