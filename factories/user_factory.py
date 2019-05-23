@@ -13,5 +13,6 @@ class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
     first_name = factory.Faker('name')
     last_name = factory.Faker('name')
     user_id = factory.Faker('word')
+    user_type_id = factory.Sequence(lambda n: n)
     image_url = factory.Faker('url')
 

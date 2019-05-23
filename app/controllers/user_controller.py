@@ -164,7 +164,7 @@ class UserController(BaseController):
                 payload={'user': 'User already deleted'}, status_code=400
             )
 
-        user_info = self.request_params_dict('slackId', 'firstName', 'lastName', 'userId', 'imageUrl')
+        user_info = self.request_params_dict('slackId', 'firstName', 'lastName', 'userId', 'imageUrl', 'roleId')
 
         slack_id = user_info.get('slack_id')
         user_id_sent = user_info.get('user_id')
@@ -183,6 +183,18 @@ class UserController(BaseController):
                 status_code=403
             )
 
-        user = self.user_repo.update(user, **user_info)
+        if user_info.get('role_id'):
+            role_id = user_info['role_id']
+            if not self.role_repo.exists(id=role_id):
+                return self.handle_response(
+                    f'Role with id {role_id} doesnot exist',
+                    status_code=400
+                )
+            self.user_role_repo.update(user.user_type, role_id=role_id)
 
-        return self.handle_response('OK', payload={'user': user.serialize()}, status_code=200)
+        user = self.user_repo.update(user, **user_info)
+        user_data = user.serialize()
+
+        user_data['userRole'] = self.role_repo.get(user.user_type.role_id).to_dict(only=['id', 'name'])
+
+        return self.handle_response('OK', payload={'user': user_data}, status_code=200)

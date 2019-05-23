@@ -44,10 +44,10 @@ def list_user(slack_id):
     return user_controller.list_user(slack_id)
 
 
-@user_blueprint.route('/<int:user_id>', methods=['PUT'])
+@user_blueprint.route('/<int:user_id>', methods=['PUT', 'PATCH'])
 @Auth.has_permission('update_user')
 @Security.validator(
-    ['slackId|optional', 'firstName|required', 'lastName|required',
+    ['slackId|optional', 'roleId|optional', 'firstName|optional', 'lastName|optional',
      'userId|optional', 'imageUrl|optional:url'])
 @swag_from('documentation/update_user.yml')
 def update_user(user_id):
