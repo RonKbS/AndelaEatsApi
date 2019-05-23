@@ -14,6 +14,8 @@ from bugsnag.flask import handle_exceptions
 bugsnag.configure(
     api_key=get_env('BUGSNAG_API_KEY'),
     project_root=get_env('BUGSNAG_PROJECT_ROOT'),
+    notify_release_stages=['production', 'staging'],
+    release_stage=get_env('APP_ENV')
 )
 
 
