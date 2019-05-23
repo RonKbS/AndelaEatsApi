@@ -145,7 +145,10 @@ class UserController(BaseController):
         user = self.user_repo.find_first(slack_id=slack_id)
 
         if user:
-            return self.handle_response('OK', payload={'user': user.serialize()}, status_code=200)
+            user_data = user.serialize()
+            del user_data['userTypeId']
+            user_data['userRole'] = self.role_repo.get(user.user_type.role_id).to_dict(only=['id', 'name'])
+            return self.handle_response('OK', payload={'user': user_data}, status_code=200)
 
         return self.handle_response('User not found', status_code=404)
 

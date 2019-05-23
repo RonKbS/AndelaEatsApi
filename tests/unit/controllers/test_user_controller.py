@@ -8,7 +8,7 @@ from app.controllers.user_controller import UserController
 from app.models.user_role import UserRole
 from tests.base_test_case import BaseTestCase
 from factories.user_factory import UserFactory
-from factories.role_factory import RoleFactory
+from factories import RoleFactory, UserRoleFactory
 from factories.location_factory import LocationFactory
 from app.utils.auth import Auth
 
@@ -164,7 +164,9 @@ class TestUserController(BaseTestCase):
     def test_list_user_succeeds(self):
 
         with self.app.app_context():
-            user = UserFactory(slack_id="-LXTuXlk2W4Gskt8KTte")
+            role = RoleFactory()
+            user_role = UserRoleFactory(role_id=role.id)
+            user = UserFactory(slack_id="-LXTuXlk2W4Gskt8KTte", user_type_id=user_role.id)
 
             user_controller = UserController(self.request_context)
 
