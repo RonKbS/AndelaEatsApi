@@ -81,6 +81,7 @@ class UserController(BaseController):
                 role_objects = Role.query.filter(Role.id.in_(associated_roles)).all()
                 roles = [{'id': role.id, 'name': role.name} for role in role_objects]
                 user['userRoles'] = roles
+                del user['userTypeId']
             return self.handle_response('OK', payload={'users': user_list, 'meta': self.pagination_meta(users)})
         return self.handle_response('No users found', status_code=404)
 
