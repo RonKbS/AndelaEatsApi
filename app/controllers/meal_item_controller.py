@@ -66,7 +66,7 @@ class MealItemController(BaseController):
                 updates['name'] = name
             if image_url:
                 updates['image'] = image_url
-            if meal_type:
+            if meal_type and MealTypes.has_value(meal_type):
                 updates['meal_type'] = meal_type
 
             self.meal_repo.update(meal, **updates)

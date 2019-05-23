@@ -4,7 +4,7 @@ from datetime import datetime
 import re
 from flask import request, make_response, jsonify
 from app.utils.snake_case import SnakeCaseConversion
-from app.utils.enums import ActionType, Channels, FaqCategoryType, MealSessionNames
+from app.utils.enums import ActionType, Channels, FaqCategoryType, MealSessionNames, MealTypes
 
 
 class Security:
@@ -387,6 +387,7 @@ class Security:
 		enum_mapper = {
 			'FaqCategoryType': [value.value for value in FaqCategoryType.__members__.values()],
 			'MealSessionNames': [value.value for value in MealSessionNames.__members__.values()],
+			'MealTypes': [value.value for value in MealTypes.__members__.values()],
 		}
 
 		if split_validator[0] == 'enum':
