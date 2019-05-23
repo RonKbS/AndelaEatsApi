@@ -134,7 +134,7 @@ class RoleController(BaseController):
 			'role_id', 'name', 'keyword'
 		)
 		permission = self.permission_repo.get_unpaginated(
-			name=name, is_deleted=False)
+			name=name, is_deleted=False,role_id=role_id)
 		if not permission:
 			role = self.role_repo.get(role_id)
 			if role:
