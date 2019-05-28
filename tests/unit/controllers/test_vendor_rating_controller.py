@@ -46,6 +46,29 @@ class TestVendorRatingController(BaseTestCase):
             assert result.get_json()['msg'] == 'No ratings for this date'
 
     @patch.object(VendorRatingRepo, 'filter_by')
+    def test_list_ratings_with_invalid_date_format(
+            self,
+            mock_vendor_rating_repo_filter_by
+    ):
+        '''Test list_ratings response when there are no ratings for the
+        given date.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_rating_repo_filter_by.return_value.items = None
+            mock_date = '02-05_2019'
+            vendor_rating_controller = VendorRatingController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_rating_controller.list_ratings(mock_date)
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == f'Bad Request - {mock_date} should be valid date. Format: YYYY-MM-DD'
+
+    @patch.object(VendorRatingRepo, 'filter_by')
     @patch.object(VendorRepo, 'get')
     @patch.object(MealItemRepo, 'get')
     @patch.object(VendorRatingRepo, 'meal_average')
@@ -91,6 +114,70 @@ class TestVendorRatingController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+
+    @patch.object(VendorRatingRepo, 'filter_by')
+    @patch.object(VendorRepo, 'get')
+    @patch.object(MealItemRepo, 'get')
+    @patch.object(VendorRatingRepo, 'meal_average')
+    def test_list_ratings_with_missing_main_meal_id_succeeds(
+            self,
+            mock_vendor_rating_repo_meal_average,
+            mock_meal_item_repo_get,
+            mock_vendor_repo_get,
+            mock_vendor_rating_repo_filter_by
+    ):
+        '''Test list_ratings OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_vendor_rating_1 = VendorRating(
+                vendor_id=1,
+                user_id=1,
+                comment='Mock comment',
+                service_date=datetime.now(),
+                rating=1.0,
+                channel='Mock channel',
+                rating_type='engagement',
+                type_id=0,
+                engagement_id=1,
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                main_meal_id=1
+            )
+            mock_vendor_rating_2 = VendorRating(
+                vendor_id=1,
+                user_id=1,
+                comment='Mock comment',
+                service_date=datetime.now(),
+                rating=1.0,
+                channel='Mock channel',
+                rating_type='engagement',
+                type_id=0,
+                engagement_id=1,
+                id=1,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                main_meal_id=None
+            )
+
+            mock_vendor_rating_repo_filter_by.return_value.items = [
+                mock_vendor_rating_1, mock_vendor_rating_2
+            ]
+            mock_vendor_repo_get.return_value.name = 'Mock vender'
+            mock_meal_item_repo_get.return_value.name = 'Mock meal name'
+            mock_vendor_rating_repo_meal_average.return_value = 2.0
+            vendor_rating_controller = VendorRatingController(
+                self.request_context
+            )
+
+            # Act
+            result = vendor_rating_controller.list_ratings('2019-02-06')
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
+            assert len(result.get_json()['payload']['result'][0]['items']) == 1
 
     @patch.object(VendorRatingRepo, 'get')
     def test_get_vendor_rating_when_rating_doesnot_exist(

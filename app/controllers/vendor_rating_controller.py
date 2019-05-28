@@ -19,15 +19,26 @@ class VendorRatingController(BaseController):
 
     def list_ratings(self, date):
         """retrieves a list of all ratings"""
+        try:
+            date = datetime.strptime(date, '%Y-%m-%d')
+        except Exception as e:
+            return self.handle_response(
+                'Bad Request - {} should be valid date. Format: YYYY-MM-DD'.format(date),
+                status_code=400
+            )
 
-        ratings = self.vendor_rating_repo.filter_by(service_date=datetime.strptime(date, '%Y-%m-%d'))
+        ratings = self.vendor_rating_repo.filter_by(service_date=date)
         if ratings.items:
             result = []
             vendor_name = self.vendor_repo.get(ratings.items[0].vendor_id).name
+
             for rating in ratings.items:
+                if not rating.main_meal_id:
+                    continue
+
                 meal_name = self.meal_repo.get(rating.main_meal_id).name
 
-                if not(meal_name in [item['mainMeal'] for item in result]):
+                if meal_name not in [item.get('mainMeal') for item in result]:
                     meal_rating = {'mainMeal': meal_name,
                                    'overallRating': self.vendor_rating_repo.meal_average(rating.main_meal_id, date),
                                    'items': [rtng.serialize() for rtng in ratings.items if rtng.main_meal_id == rating.main_meal_id]
