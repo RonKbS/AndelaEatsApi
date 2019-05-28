@@ -22,10 +22,12 @@ class TestVendorRatingController(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    @patch.object(VendorRatingController, 'get_params_dict')
     @patch.object(VendorRatingRepo, 'filter_by')
     def test_list_ratings_no_ratings_for_date(
         self,
-        mock_vendor_rating_repo_filter_by
+        mock_vendor_rating_repo_filter_by,
+        mock_vendor_rating_controler_get_params_dict
     ):
         '''Test list_ratings response when there are no ratings for the
         given date.
@@ -33,6 +35,7 @@ class TestVendorRatingController(BaseTestCase):
         # Arrange
         with self.app.app_context():
             mock_vendor_rating_repo_filter_by.return_value.items = None
+            mock_vendor_rating_controler_get_params_dict.return_value = {}
             mock_date = '2019-02-05'
             vendor_rating_controller = VendorRatingController(
                 self.request_context
@@ -45,29 +48,7 @@ class TestVendorRatingController(BaseTestCase):
             assert result.status_code == 404
             assert result.get_json()['msg'] == 'No ratings for this date'
 
-    @patch.object(VendorRatingRepo, 'filter_by')
-    def test_list_ratings_with_invalid_date_format(
-            self,
-            mock_vendor_rating_repo_filter_by
-    ):
-        '''Test list_ratings response when there are no ratings for the
-        given date.
-        '''
-        # Arrange
-        with self.app.app_context():
-            mock_vendor_rating_repo_filter_by.return_value.items = None
-            mock_date = '02-05_2019'
-            vendor_rating_controller = VendorRatingController(
-                self.request_context
-            )
-
-            # Act
-            result = vendor_rating_controller.list_ratings(mock_date)
-
-            # Assert
-            assert result.status_code == 400
-            assert result.get_json()['msg'] == f'Bad Request - {mock_date} should be valid date. Format: YYYY-MM-DD'
-
+    @patch.object(VendorRatingController, 'get_params_dict')
     @patch.object(VendorRatingRepo, 'filter_by')
     @patch.object(VendorRepo, 'get')
     @patch.object(MealItemRepo, 'get')
@@ -77,7 +58,8 @@ class TestVendorRatingController(BaseTestCase):
         mock_vendor_rating_repo_meal_average,
         mock_meal_item_repo_get,
         mock_vendor_repo_get,
-        mock_vendor_rating_repo_filter_by
+        mock_vendor_rating_repo_filter_by,
+        mock_vendor_rating_controler_get_params_dict
     ):
         '''Test list_ratings OK response.
         '''
@@ -103,6 +85,7 @@ class TestVendorRatingController(BaseTestCase):
             ]
             mock_vendor_repo_get.return_value.name = 'Mock vender'
             mock_meal_item_repo_get.return_value.name = 'Mock meal name'
+            mock_vendor_rating_controler_get_params_dict.return_value = {}
             mock_vendor_rating_repo_meal_average.return_value = 2.0
             vendor_rating_controller = VendorRatingController(
                 self.request_context
@@ -115,6 +98,7 @@ class TestVendorRatingController(BaseTestCase):
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
 
+    @patch.object(VendorRatingController, 'get_params_dict')
     @patch.object(VendorRatingRepo, 'filter_by')
     @patch.object(VendorRepo, 'get')
     @patch.object(MealItemRepo, 'get')
@@ -124,7 +108,8 @@ class TestVendorRatingController(BaseTestCase):
             mock_vendor_rating_repo_meal_average,
             mock_meal_item_repo_get,
             mock_vendor_repo_get,
-            mock_vendor_rating_repo_filter_by
+            mock_vendor_rating_repo_filter_by,
+            mock_vendor_rating_controler_get_params_dict
     ):
         '''Test list_ratings OK response.
         '''
@@ -164,6 +149,7 @@ class TestVendorRatingController(BaseTestCase):
             mock_vendor_rating_repo_filter_by.return_value.items = [
                 mock_vendor_rating_1, mock_vendor_rating_2
             ]
+            mock_vendor_rating_controler_get_params_dict.return_value = {}
             mock_vendor_repo_get.return_value.name = 'Mock vender'
             mock_meal_item_repo_get.return_value.name = 'Mock meal name'
             mock_vendor_rating_repo_meal_average.return_value = 2.0

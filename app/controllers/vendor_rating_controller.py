@@ -20,14 +20,7 @@ class VendorRatingController(BaseController):
     def list_ratings(self, date):
         """retrieves a list of all ratings"""
         query_kwargs = self.get_params_dict()
-
-        try:
-            date = datetime.strptime(date, '%Y-%m-%d')
-        except Exception as e:
-            return self.handle_response(
-                'Bad Request - {} should be valid date. Format: YYYY-MM-DD'.format(date),
-                status_code=400
-            )
+        date = datetime.strptime(date, '%Y-%m-%d')
 
         ratings = self.vendor_rating_repo.filter_by(service_date=date, **query_kwargs)
         if ratings.items:
