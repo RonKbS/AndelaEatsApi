@@ -102,7 +102,7 @@ class TestMealItemEndpoints(BaseTestCase):
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
 		self.assert400(response)
-		self.assertEqual(response_json['msg'], 'Invalid meal type. Must be main, protein or side')
+		self.assertEqual(response_json['msg'], "Bad Request - 'wrong_type' is not a valid value for key 'mealType'. values must be any of the following ['main', 'side', 'protein']")
 
 	def test_create_meal_item_endpoint_with_existing_name(self):
 		role = RoleFactory.create(name='admin')
@@ -248,7 +248,7 @@ class TestMealItemEndpoints(BaseTestCase):
 
 		meal_item = MealItemFactory.create()
 		data = {'mealName': 'Jollof Rice', 'mealType': 'protein',
-				'image': 'a new image link'}
+				'image': 'image.com'}
 		response = self.client().put(self.make_url('/meal-items/{}'.format(meal_item.id)),
 									 data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -267,7 +267,7 @@ class TestMealItemEndpoints(BaseTestCase):
 
 		meal_item = MealItemFactory.create()
 		data = {'mealName': 'Jollof Rice', 'mealType': 'protein',
-				'image': 'a new image link'}
+				'image': 'iamge.com'}
 		response = self.client().put(self.make_url('/meal-items/{}'.format(meal_item.id)),
 									 data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -300,7 +300,7 @@ class TestMealItemEndpoints(BaseTestCase):
 
 		meal_item = MealItemFactory.create()
 		data = {'mealName': 'Jollof Rice','mealType': 'protein',
-				'image': 'a new image link'}
+				'image': 'iamge.com'}
 		response = self.client().put(self.make_url('/meal-items/100'), data=self.encode_to_json_string(data),
 									 headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -316,7 +316,7 @@ class TestMealItemEndpoints(BaseTestCase):
 
 		meal_item = MealItemFactory.create(is_deleted=True)
 		data = {'mealName': 'Jollof Rice','mealType': 'protein',
-				'image': 'a new image link'}
+				'image': 'image.com'}
 		response = self.client().put(self.make_url('/meal-items/{}'.format(meal_item.id)),
 									 data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))

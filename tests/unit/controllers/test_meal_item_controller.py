@@ -8,6 +8,7 @@ from app.models import MealItem
 from app.repositories.meal_item_repo import MealItemRepo
 from app.utils.enums import MealTypes
 from tests.base_test_case import BaseTestCase
+from factories import MealItemFactory
 
 
 class TestMealItemController(BaseTestCase):
@@ -322,14 +323,14 @@ class TestMealItemController(BaseTestCase):
         '''
         # Arrange
         with self.app.app_context():
-            mock_get.return_value = self.mock_meal_item
+            mock_get.return_value = MealItemFactory(id=1)
             mock_request_params.return_value = ('mock', 'mock', 'mock')
             mock_get_unpaginated.return_value = None
             meal_item_controller = MealItemController(self.request_context)
 
             # Act
             result = meal_item_controller.update_meal(1)
-
+            
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
