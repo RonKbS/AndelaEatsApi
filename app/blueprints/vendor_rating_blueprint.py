@@ -9,7 +9,7 @@ rating_blueprint = Blueprint('rating', __name__, url_prefix='{}/ratings'.format(
 vendor_rating_controller = VendorRatingController(request)
 
 
-@rating_blueprint.route('/<menu_date>', methods=['GET'])
+@rating_blueprint.route('/<date:menu_date>', methods=['GET'])
 @Auth.has_permission('view_ratings')
 @swag_from('documentation/get_vendor_ratings.yml')
 def list_ratings(menu_date):

@@ -646,3 +646,24 @@ class MenuEndpoints(BaseTestCase):
 
         self.assertEqual(response_json['msg'], 'OK')
         self.assertEqual(response_json['payload']['menuList'][0]['menus'][0]['id'], menu.id)
+    
+
+    def test_list_menu_endpoint_with_invalid_date_fails(self):
+        """Test that users with the wrong date fails"""
+        meal_item_repo = MealItemRepo()
+
+        main_meal_item = meal_item_repo.new_meal_item(name="main1", image="image1",
+                                                        meal_type="main", location_id=1)
+        side_meal_item = meal_item_repo.new_meal_item(name="side1",  image="image11",
+                                                        meal_type="side", location_id=1)
+        protein_meal_item = meal_item_repo.new_meal_item(name="protein1",  image="image12",
+                                                            meal_type="protein", location_id=1)
+
+        menu = MenuFactory.create(main_meal_id=main_meal_item.id,
+                                    side_items=str(side_meal_item.id), protein_items=str(protein_meal_item.id))
+
+        date ='201502-24'
+
+        response = self.client().get(self.make_url(f'/menus/{menu.meal_period}/{date}/{date}'),
+                                        headers=self.headers())
+        self.assert400(response)
