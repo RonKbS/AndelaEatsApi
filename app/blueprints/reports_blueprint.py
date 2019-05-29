@@ -14,3 +14,9 @@ reports_controller = ReportsController(request)
 @swag_from('documentation/get_report.yml')
 def dashboard_summary():
     return reports_controller.dashboard_summary()
+
+
+@reports_blueprint.route('/taps/daily/', methods=['GET'])
+@swag_from('documentation/daily_taps.yml')
+def daily_taps():
+    return reports_controller.daily_taps()

@@ -39,4 +39,4 @@ COPY --from=dependencies /root/.cache /root/.cache
 RUN pip install -r requirements.txt
 COPY --from=build /usr/src/app/ ./
 
-CMD ["gunicorn","run:app", "-b", "0.0.0.0:4070", "--timeout", "90"]
+CMD ["gunicorn","run:app", "-b", "0.0.0.0:4070", "--timeout", "360"]

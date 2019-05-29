@@ -251,6 +251,7 @@ class TestOrderEndpoints(BaseTestCase):
     @patch.object(AndelaService, 'get_user_by_email_or_id')
     def test_get_specific_meal_item_endpoint(self, mock_andela_service):
         order = OrderFactory.create()
+
         mock_andela_service.return_value = {
             'id': fake.random_number(),
             'first_name': fake.first_name(),
