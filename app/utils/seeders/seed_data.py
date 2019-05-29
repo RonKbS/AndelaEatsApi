@@ -10,8 +10,8 @@ role_data = [
 ]
 
 user_role_data = [
-    {'role_id': '1', 'user_id': '-L5J538y77WvOnzJ1FPG'},
-    {'role_id': '1', 'user_id': '-K_djydLXD3FE_w141iJ'},
+    {'role_id': '1', 'user_id': '-L5J538y77WvOnzJ1FPG', "email": "eno.bassey@andela.com"},
+    {'role_id': '1', 'user_id': '-K_djydLXD3FE_w141iJ', "email": "ayoola.ajebeku@andela.com"},
 ]
 
 permission_data = [
@@ -36,4 +36,8 @@ permission_data = [
     {'id': '19', 'name': 'delete_vendor', 'role_id': '1', 'keyword': 'delete_vendor'},
     {'id': '20', 'name': 'delete_engagement', 'role_id': '1', 'keyword': 'delete_engagement'},
     {'id': '21', 'name': 'view_ratings', 'role_id': '1', 'keyword': 'view_ratings'},
+    {'id': '22', 'name': 'view_users', 'role_id': '1', 'keyword': 'view_users'},
+    {'id': '23', 'name': 'delete_user', 'role_id': '1', 'keyword': 'delete_user'},
+    {'id': '24', 'name': 'create_user', 'role_id': '1', 'keyword': 'create_user'},
+    {'id': '25', 'name': 'update_user', 'role_id': '1', 'keyword': 'update_user'},
 ]
