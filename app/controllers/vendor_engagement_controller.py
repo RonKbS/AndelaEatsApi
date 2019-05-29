@@ -6,6 +6,7 @@ from app.controllers.base_controller import BaseController
 from app.repositories.vendor_repo import VendorRepo
 from app.utils.auth import Auth
 from app.repositories.vendor_engagement_repo import VendorEngagementRepo
+from app.models import VendorEngagement
 
 class VendorEngagementController(BaseController):
 	def __init__(self, request):
@@ -140,3 +141,22 @@ class VendorEngagementController(BaseController):
 			self.vendor_engagement_repo.update(engagement, **updates)
 			return self.handle_response('Engagement deleted', payload={"status": "success"})
 		return self.handle_response('Invalid or incorrect engagement_id provided', status_code=400)
+
+	def immediate_past_engagement(self, location_id):
+		past_dates = self.vendor_engagement_repo.get_past_engagement_dates(location_id)
+		if past_dates:
+			latest_date = max(past_dates)
+
+			immediate_past_engagment = VendorEngagement.query.filter_by(end_date=latest_date).first()
+			e = immediate_past_engagment.serialize()
+
+			engmnt = {k: v for k, v in e.items() if k in ['startDate', 'endDate', 'vendor']}
+			vendor_id = e['vendorId']
+			vendor = self.vendor_repo.get(vendor_id).serialize()
+			vendor_info = {k: v for k, v in vendor.items() if k in ['id', 'name', 'tel', 'contactPerson']}
+			engmnt['vendor'] = vendor_info
+
+			return self.handle_response('OK', payload={'engagement': engmnt})
+		else:
+			return self.handle_response('No past engagement for this location', status_code=404)
+

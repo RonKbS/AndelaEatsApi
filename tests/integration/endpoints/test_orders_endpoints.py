@@ -238,6 +238,12 @@ class TestOrderEndpoints(BaseTestCase):
         PermissionFactory.create(keyword='view_orders', role_id=role.id)
         UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
+        mock_andela_service.return_value = {
+            'id': user_id,
+            'first_name': fake.first_name(),
+            'last_name': fake.last_name()
+        }
+
         response = self.client().get(self.make_url('/orders/user/{}'.format(user_id)), headers=self.headers())
         self.assert200(response)
         self.assertEqual(len(loads(response.data, encoding='utf-8')['payload']['orders']), 3)

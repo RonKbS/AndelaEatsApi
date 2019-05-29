@@ -3,6 +3,7 @@ from app.models.vendor_engagement import VendorEngagement
 from datetime import datetime
 from sqlalchemy import or_
 
+
 class VendorEngagementRepo(BaseRepo):
 	
 	def __init__(self):
@@ -34,3 +35,12 @@ class VendorEngagementRepo(BaseRepo):
 	def vendor_of_the_day(date):
 		vendor = VendorEngagement.query.filter(or_(VendorEngagement.start_date <= date, date <= VendorEngagement.end_date)).first().vendor
 		return {'name': vendor.name, 'id': vendor.id}
+
+	@staticmethod
+	def get_past_engagement_dates(location_id):
+		past_engagements = VendorEngagement.query.filter(
+			VendorEngagement.end_date < datetime.now().date(),
+			VendorEngagement.location_id == location_id
+		)
+		return [engagement.end_date for engagement in past_engagements]
+

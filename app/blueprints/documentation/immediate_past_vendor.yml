@@ -1,0 +1,62 @@
+Get Information on the immediate past Vendor Engagement
+---
+tags:
+  - Vendor Engagement
+summary: Return information about the most recently concluded vendor engagement
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    in: header
+    type: integer
+    required: true
+    description: The location of user
+    default: 1
+  - name: Authorization
+    in: header
+    type: string
+    required: true
+    description: Bearer Token Value
+  - name: location_id
+    in: path
+    type: integer
+    required: true
+    description: id of the location for which we are getting the information
+    default: 1
+
+definitions:
+  EngagementPayload:
+    type: object
+    properties:
+      msg:
+        type: string
+        default: Ok
+      payload:
+        type: object
+        properties:
+          engagement:
+              type: object
+              properties:
+                endDate:
+                  type: string
+                  default: 2018-11-02
+                startDate:
+                  type: string
+                  default: 2018-11-02
+                vendor:
+                  type: object
+                  properties:
+                    contactPerson:
+                      type: string
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    tel:
+                      type: string
+
+responses:
+  200:
+    description: The last engagement
+    schema:
+      $ref: '#/definitions/EngagementPayload'
