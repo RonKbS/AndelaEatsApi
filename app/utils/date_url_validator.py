@@ -13,6 +13,3 @@ class DateValidator(BaseConverter):
             raise BadRequest(
                 'Bad Request - {} should be valid date. Format: YYYY-MM-DD'.format(value))
         return value
-
-    def to_url(self, values):
-        return super().to_url(value)
