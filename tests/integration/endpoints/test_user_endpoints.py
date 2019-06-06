@@ -284,6 +284,6 @@ class TestUserEndpoints(BaseTestCase):
         self.assertEqual(response_json['msg'], "OK")
         self.assertEqual(response_json['payload']['user']['firstName'], user.first_name)
         self.assertEqual(response_json['payload']['user']['lastName'], user.last_name)
-        self.assertEqual(response_json['payload']['user']['userType']['name'], role.name)
-        self.assertEqual(response_json['payload']['user']['userType']['help'], role.help)
+        self.assertEqual(response_json['payload']['user']['userRoles'][0]['name'], role.name)
+        self.assertEqual(response_json['payload']['user']['userRoles'][0]['help'], role.help)
 

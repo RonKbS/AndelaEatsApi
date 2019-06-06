@@ -136,7 +136,7 @@ class UserController(BaseController):
 
         user = self.user_repo.new_user(*user_info, user_id=user_id, slack_id=slack_id, user_type=user_type).serialize()
 
-        user.__setitem__('userType', role.to_dict(only=['id', 'name', 'help', "timestamps"]))
+        user.__setitem__('userRoles', [role.to_dict(only=['id', 'name', 'help', "timestamps"])])
         user.pop('userTypeId')
 
         return self.handle_response('OK', payload={'user': user}, status_code=201)
@@ -148,7 +148,7 @@ class UserController(BaseController):
         if user:
             user_data = user.serialize()
             del user_data['userTypeId']
-            user_data['userRole'] = self.role_repo.get(user.user_type.role_id).to_dict(only=['id', 'name'])
+            user_data['userRoles'] = [self.role_repo.get(user.user_type.role_id).to_dict(only=['id', 'name'])]
             return self.handle_response('OK', payload={'user': user_data}, status_code=200)
 
         return self.handle_response('User not found', status_code=404)
@@ -199,6 +199,6 @@ class UserController(BaseController):
         user = self.user_repo.update(user, **user_info)
         user_data = user.serialize()
 
-        user_data['userRole'] = self.role_repo.get(user.user_type.role_id).to_dict(only=['id', 'name'])
+        user_data['userRoles'] = [self.role_repo.get(user.user_type.role_id).to_dict(only=['id', 'name'])]
 
         return self.handle_response('OK', payload={'user': user_data}, status_code=200)
