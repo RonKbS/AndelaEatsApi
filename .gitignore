@@ -42,3 +42,6 @@ nosetests.xml
 .cache/
 .vscode/
 .pytest_cache
+
+# logs
+*/*.log

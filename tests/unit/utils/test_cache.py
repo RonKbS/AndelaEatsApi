@@ -21,9 +21,11 @@ class MockRedis:
     def StrictRedis(*args, **kwargs):
         return MockObj()
 
-    @staticmethod
-    def ConnectionPool(*args, **kwargs):
-        return 1
+    class ConnectionPool:
+
+        @staticmethod
+        def from_url(*args, **kwargs):
+            return 1
 
 
 class TestCache(BaseTestCase):
