@@ -23,6 +23,12 @@ parameters:
     required: true
     description: the date the meal or order was served
     default: 1
+  - name: userId
+    in: query
+    required: false
+    description: filter results by userId
+    example: -LMc4AGZpzFoM_VRopuN
+    default: -LMc4AGZpzFoM_VRopuN
   - name: page
     in: path
     type: integer

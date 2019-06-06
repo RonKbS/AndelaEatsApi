@@ -349,12 +349,15 @@ class Security:
 
 	@staticmethod
 	def validate_query_params(model):
+		from app.controllers import BaseController
+
 		model_columns = model.get_columns()
 
 		model_fields = [column for column in model_columns]
 
 		model_fields_camel = list(map(SnakeCaseConversion.snake_to_camel, model_fields))
 
+		controller = BaseController(request)
 
 		def validator(f):
 
@@ -371,6 +374,16 @@ class Security:
 					return make_response(
 						jsonify({'msg': 'Invalid keys {}. The supported keys are {}'
 								.format(invalid_query_keys, model_fields_camel)})), 400
+
+
+				for name, val in controller.get_params_dict().items():
+					if name.endswith('ted_at'):
+						try:
+							kwargs.__setitem__(name, datetime.strptime(kwargs.get(name), '%Y-%m-%d'))
+						except Exception:
+							return controller.handle_response(
+								f"Bad Request - '{name}' should be valid date. Format: YYYY-MM-DD", status_code=400
+							)
 
 				return f(*args, **kwargs)
 
