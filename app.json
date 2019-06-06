@@ -1,0 +1,72 @@
+{
+    "name": "AndelaEatsApi",
+    "description": "",
+    "scripts": {
+        "postdeploy": "flask seed_database"
+    },
+    "env": {
+        "ANDELA_API_TOKEN": {
+            "required": true
+        },
+        "API_AUTH_URL": {
+            "required": true
+        },
+        "APP_ENV": {
+            "required": true
+        },
+        "BUGSNAG_API_KEY": {
+            "required": true
+        },
+        "BUGSNAG_PROJECT_ROOT": {
+            "required": true
+        },
+        "FLASK_APP": {
+            "required": true
+        },
+        "JWT_PUBLIC_KEY": {
+            "required": true
+        },
+        "JWT_PUBLIC_KEY_STAGING": {
+            "required": true
+        },
+        "REDIS_DB": {
+            "required": true
+        },
+        "REDIS_HOST": {
+            "required": true
+        },
+        "REDIS_PASSWORD": {
+            "required": true
+        },
+        "REDIS_PORT": {
+            "required": true
+        },
+        "REDIS_URL": {
+            "required": true
+        },
+        "REDIS_USER": {
+            "required": true
+        },
+        "SECRET_KEY": {
+            "generator": "secret"
+        },
+        "SLACK_TOKEN": {
+            "required": true
+        }
+    },
+    "formation": {
+        "web": {
+            "quantity": 1
+        }
+    },
+    "addons": [
+        "heroku-postgresql",
+        "heroku-redis"
+    ],
+    "buildpacks": [
+        {
+            "url": "heroku/python"
+        }
+    ],
+    "stack": "heroku-18"
+}
