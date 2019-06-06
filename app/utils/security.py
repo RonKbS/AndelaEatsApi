@@ -4,7 +4,7 @@ from datetime import datetime
 import re
 from flask import request, make_response, jsonify
 from app.utils.snake_case import SnakeCaseConversion
-from app.utils.enums import ActionType, Channels, FaqCategoryType, MealSessionNames
+from app.utils.enums import ActionType, Channels, FaqCategoryType, MealSessionNames, MealTypes
 
 
 class Security:
@@ -349,12 +349,15 @@ class Security:
 
 	@staticmethod
 	def validate_query_params(model):
+		from app.controllers import BaseController
+
 		model_columns = model.get_columns()
 
 		model_fields = [column for column in model_columns]
 
 		model_fields_camel = list(map(SnakeCaseConversion.snake_to_camel, model_fields))
 
+		controller = BaseController(request)
 
 		def validator(f):
 
@@ -372,6 +375,16 @@ class Security:
 						jsonify({'msg': 'Invalid keys {}. The supported keys are {}'
 								.format(invalid_query_keys, model_fields_camel)})), 400
 
+
+				for name, val in controller.get_params_dict().items():
+					if name.endswith('ted_at'):
+						try:
+							kwargs.__setitem__(name, datetime.strptime(kwargs.get(name), '%Y-%m-%d'))
+						except Exception:
+							return controller.handle_response(
+								f"Bad Request - '{name}' should be valid date. Format: YYYY-MM-DD", status_code=400
+							)
+
 				return f(*args, **kwargs)
 
 			return decorated
@@ -387,6 +400,7 @@ class Security:
 		enum_mapper = {
 			'FaqCategoryType': [value.value for value in FaqCategoryType.__members__.values()],
 			'MealSessionNames': [value.value for value in MealSessionNames.__members__.values()],
+			'MealTypes': [value.value for value in MealTypes.__members__.values()],
 		}
 
 		if split_validator[0] == 'enum':

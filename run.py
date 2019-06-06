@@ -4,8 +4,10 @@ from app import create_app
 from flask import jsonify, make_response
 from flask_script import Manager
 from app.utils.auth import Auth
+from app.utils.handled_exceptions import BaseModelValidationError
 from app.utils.seeders.seed_database import seed_db, SEED_OPTIONS
 from flask_migrate import Migrate, MigrateCommand
+from werkzeug.exceptions import HTTPException
 import traceback
 import logging
 import click
@@ -35,15 +37,29 @@ def check_token():
 def check_location_header():
 	return Auth.check_location_header()
 
+@app.errorhandler(BaseModelValidationError)
+def handle_base_model_validation_error(error):
+	return make_response(
+		jsonify({'msg': error.msg})
+	), error.status_code
+
 @app.errorhandler(Exception)
 def handle_exception(error):
 	"""Error handler called when a ValidationError is raised"""
+	
+	response ={'msg': 'An error occurred while processing your request. Please contact Admin.'}
+
+	if isinstance(error, HTTPException):
+    		return make_response(
+		jsonify({'msg': error.description})
+			), error.code
+		
 	traceback.print_exc()
 	error_logger.exception(str(error))
 	bugsnag.notify(error)
-	return make_response(
-		jsonify({'msg': 'An error occurred while processing your request. Please contact Admin.'})
-	), 500
+	
+	return  make_response(jsonify(response)), 500
+
 
 
 # Creates the db tables

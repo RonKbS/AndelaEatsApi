@@ -50,3 +50,9 @@ def update_engagement(engagement_id):
 @swag_from('documentation/delete_engagement.yml')
 def delete_engagement(engagement_id):
     return vendor_engagement_controller.delete_engagement(engagement_id)
+
+
+@engagement_blueprint.route('/past/<int:location_id>', methods=['GET'])
+@swag_from('documentation/immediate_past_vendor.yml')
+def immediate_past_engagements(location_id):
+    return vendor_engagement_controller.immediate_past_engagement(location_id)

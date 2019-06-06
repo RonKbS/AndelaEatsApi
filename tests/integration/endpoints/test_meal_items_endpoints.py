@@ -14,7 +14,7 @@ class TestMealItemEndpoints(BaseTestCase):
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		meal_item = MealItemFactory.build()
-		data = {'mealName': meal_item.name, 'description': meal_item.description, 'image': meal_item.image,
+		data = {'mealName': meal_item.name,'image': meal_item.image,
 				'mealType': meal_item.meal_type}
 		response = self.client().post(self.make_url('/meal-items/'), data=self.encode_to_json_string(data),
 									  headers=self.headers())
@@ -30,7 +30,7 @@ class TestMealItemEndpoints(BaseTestCase):
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		meal_item = MealItemFactory.build()
-		data = {'mealName': meal_item.name, 'description': meal_item.description, 'image': meal_item.image,
+		data = {'mealName': meal_item.name, 'image': meal_item.image,
 				'mealType': meal_item.meal_type}
 		response = self.client().post(self.make_url('/meal-items/'), data=self.encode_to_json_string(data),
 									  headers=self.headers())
@@ -40,24 +40,23 @@ class TestMealItemEndpoints(BaseTestCase):
 		self.assertEqual(response.status_code, 201)
 		self.assertJSONKeyPresent(response_json, 'payload')
 		self.assertEqual(payload['mealItem']['name'], meal_item.name)
-		self.assertEqual(payload['mealItem']['description'], meal_item.description)
 		self.assertEqual(payload['mealItem']['image'], meal_item.image)
 		self.assertEqual(payload['mealItem']['mealType'], meal_item.meal_type)
-
-	def test_create_meal_item_endpoint_with_missing_description(self):
+	
+	def test_create_meal_item_with_invalid_image_url(self):
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
 		PermissionFactory.create(keyword='create_meal_item', role_id=role.id)
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		meal_item = MealItemFactory.build()
-		data = {'mealName': meal_item.name, 'mealType': meal_item.meal_type, 'image': meal_item.image}
+		data = {'mealName': meal_item.name, 'image': 'image',
+				'mealType': meal_item.meal_type}
 		response = self.client().post(self.make_url('/meal-items/'), data=self.encode_to_json_string(data),
 									  headers=self.headers())
-		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
-
 		self.assert400(response)
-		self.assertEqual(response_json['msg'], 'Bad Request - description is required')
+		self.assertEqual(response.json['msg'], "Bad Request - 'image' is not a valid url.")
+
 
 	def test_create_meal_item_endpoint_with_missing_meal_type(self):
 		role = RoleFactory.create(name='admin')
@@ -66,7 +65,7 @@ class TestMealItemEndpoints(BaseTestCase):
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		meal_item = MealItemFactory.build()
-		data = {'mealName': meal_item.name, 'description': meal_item.description, 'image': meal_item.image}
+		data = {'mealName': meal_item.name,'image': meal_item.image}
 		response = self.client().post(self.make_url('/meal-items/'), data=self.encode_to_json_string(data),
 									  headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -81,7 +80,7 @@ class TestMealItemEndpoints(BaseTestCase):
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		meal_item = MealItemFactory.build()
-		data = {'mealType': meal_item.meal_type, 'description': meal_item.description, 'image': meal_item.image}
+		data = {'mealType': meal_item.meal_type, 'image': meal_item.image}
 		response = self.client().post(self.make_url('/meal-items/'), data=self.encode_to_json_string(data),
 									  headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -96,14 +95,14 @@ class TestMealItemEndpoints(BaseTestCase):
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		meal_item = MealItemFactory.build(meal_type='wrong_type')
-		data = {'mealName': meal_item.name, 'description': meal_item.description, 'image': meal_item.image,
+		data = {'mealName': meal_item.name,'image': meal_item.image,
 				'mealType': meal_item.meal_type}
 		response = self.client().post(self.make_url('/meal-items/'), data=self.encode_to_json_string(data),
 									  headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
 		self.assert400(response)
-		self.assertEqual(response_json['msg'], 'Invalid meal type. Must be main, protein or side')
+		self.assertEqual(response_json['msg'], "Bad Request - 'wrong_type' is not a valid value for key 'mealType'. values must be any of the following ['main', 'side', 'protein']")
 
 	def test_create_meal_item_endpoint_with_existing_name(self):
 		role = RoleFactory.create(name='admin')
@@ -113,7 +112,7 @@ class TestMealItemEndpoints(BaseTestCase):
 
 		MealItemFactory.create(name='sweet item')
 		meal_item = MealItemFactory.build(name='sweet item')
-		data = {'mealName': meal_item.name, 'description': meal_item.description, 'image': meal_item.image,
+		data = {'mealName': meal_item.name,'image': meal_item.image,
 				'mealType': meal_item.meal_type}
 		response = self.client().post(self.make_url('/meal-items/'), data=self.encode_to_json_string(data),
 									  headers=self.headers())
@@ -137,7 +136,7 @@ class TestMealItemEndpoints(BaseTestCase):
 
 		self.assert200(response)
 		self.assertEqual(len(payload['mealItems']), 3)
-		self.assertJSONKeysPresent(payload['mealItems'][0], 'name', 'description', 'mealType', 'image')
+		self.assertJSONKeysPresent(payload['mealItems'][0], 'name', 'mealType', 'image')
 
 	def test_list_meal_item_endpoint_correct_sort_order(self):
 		# Create Three Dummy Vendors
@@ -160,7 +159,7 @@ class TestMealItemEndpoints(BaseTestCase):
 
 		self.assert200(response)
 		self.assertEqual(len(payload['mealItems']), 3)
-		self.assertJSONKeysPresent(payload['mealItems'][0], 'name', 'description', 'mealType', 'image')
+		self.assertJSONKeysPresent(payload['mealItems'][0], 'name', 'mealType', 'image')
 		self.assertEqual(meals_returned[0], meals_sorted_by_name[0])
 		self.assertEqual(meals_returned[1], meals_sorted_by_name[1])
 		self.assertEqual(meals_returned[2], meals_sorted_by_name[2])
@@ -194,10 +193,9 @@ class TestMealItemEndpoints(BaseTestCase):
 
 		self.assert200(response)
 		self.assertJSONKeyPresent(payload, 'mealItem')
-		self.assertJSONKeysPresent(payload['mealItem'], 'name', 'description', 'mealType', 'image')
+		self.assertJSONKeysPresent(payload['mealItem'], 'name', 'mealType', 'image')
 		self.assertEqual(int(payload['mealItem']['id']), meal_item.id)
 		self.assertEqual(payload['mealItem']['name'], meal_item.name)
-		self.assertEqual(payload['mealItem']['description'], meal_item.description)
 		self.assertEqual(payload['mealItem']['mealType'], meal_item.meal_type)
 
 	def test_get_specific_meal_item_enpoint_wrong_permission(self):
@@ -249,8 +247,8 @@ class TestMealItemEndpoints(BaseTestCase):
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		meal_item = MealItemFactory.create()
-		data = {'mealName': 'Jollof Rice', 'description': 'tomato sautee rice', 'mealType': 'protein',
-				'image': 'a new image link'}
+		data = {'mealName': 'Jollof Rice', 'mealType': 'protein',
+				'image': 'image.com'}
 		response = self.client().put(self.make_url('/meal-items/{}'.format(meal_item.id)),
 									 data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -258,7 +256,6 @@ class TestMealItemEndpoints(BaseTestCase):
 
 		self.assert200(response)
 		self.assertEqual(payload['mealItem']['name'], data['mealName'])
-		self.assertEqual(payload['mealItem']['description'], data['description'])
 		self.assertEqual(payload['mealItem']['mealType'], data['mealType'])
 		self.assertEqual(payload['mealItem']['image'], data['image'])
 
@@ -269,8 +266,8 @@ class TestMealItemEndpoints(BaseTestCase):
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		meal_item = MealItemFactory.create()
-		data = {'mealName': 'Jollof Rice', 'description': 'tomato sautee rice', 'mealType': 'protein',
-				'image': 'a new image link'}
+		data = {'mealName': 'Jollof Rice', 'mealType': 'protein',
+				'image': 'iamge.com'}
 		response = self.client().put(self.make_url('/meal-items/{}'.format(meal_item.id)),
 									 data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -286,7 +283,7 @@ class TestMealItemEndpoints(BaseTestCase):
 
 		meal_item1 = MealItemFactory.create(name='sweet item')
 		meal_item = MealItemFactory.create()
-		data = {'mealName': meal_item1.name, 'description': meal_item.description, 'image': meal_item.image,
+		data = {'mealName': meal_item1.name, 'image': meal_item.image,
 				'mealType': meal_item.meal_type}
 		response = self.client().put(self.make_url('/meal-items/{}'.format(meal_item.id)),
 									 data=self.encode_to_json_string(data), headers=self.headers())
@@ -302,8 +299,8 @@ class TestMealItemEndpoints(BaseTestCase):
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		meal_item = MealItemFactory.create()
-		data = {'mealName': 'Jollof Rice', 'description': 'tomato sautee rice', 'mealType': 'protein',
-				'image': 'a new image link'}
+		data = {'mealName': 'Jollof Rice','mealType': 'protein',
+				'image': 'iamge.com'}
 		response = self.client().put(self.make_url('/meal-items/100'), data=self.encode_to_json_string(data),
 									 headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -318,8 +315,8 @@ class TestMealItemEndpoints(BaseTestCase):
 		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		meal_item = MealItemFactory.create(is_deleted=True)
-		data = {'mealName': 'Jollof Rice', 'description': 'tomato sautee rice', 'mealType': 'protein',
-				'image': 'a new image link'}
+		data = {'mealName': 'Jollof Rice','mealType': 'protein',
+				'image': 'image.com'}
 		response = self.client().put(self.make_url('/meal-items/{}'.format(meal_item.id)),
 									 data=self.encode_to_json_string(data), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))

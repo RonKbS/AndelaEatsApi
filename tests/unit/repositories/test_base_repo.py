@@ -2,6 +2,7 @@ from tests.base_test_case import BaseTestCase
 from app.repositories.base_repo import BaseRepo
 from factories.vendor_factory import VendorFactory
 from app.models.vendor import Vendor  # One Model is required to test the base repo. Using Vendor
+from app.utils.handled_exceptions import BaseModelValidationError
 
 
 class TestBaseRepository(BaseTestCase):
@@ -191,3 +192,18 @@ class TestBaseRepository(BaseTestCase):
 
 		self.assertIsInstance(results, str)
 		assert "An error occurred during the check" in results
+
+	def test_paginate_handles_invalid_type(self):
+
+		with self.assertRaises(BaseModelValidationError):
+			self.repo.paginate(page='test', per_page=20)
+
+	def test_paginate_handles_negative_values(self):
+		with self.assertRaises(BaseModelValidationError):
+			self.repo.paginate(page=-1, per_page=20)
+
+	def test_paginate_succeeds(self):
+		page = self.repo._positive_int('page', 3)
+
+		self.assertEquals(page, 3)
+

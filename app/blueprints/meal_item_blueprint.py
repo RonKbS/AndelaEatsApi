@@ -29,7 +29,7 @@ def get_meal(meal_item_id):
 
 
 @meal_item_blueprint.route('/', methods=['POST'])
-@Security.validator(['mealName|required:string', 'description|required:string', 'image|required', 'mealType|required'])
+@Security.validator(['mealName|required:string', 'image|required:url', 'mealType|required:enum_MealTypes'])
 @Auth.has_permission('create_meal_item')
 @swag_from('documentation/create_single_meal_item.yml')
 def create_meal():
@@ -37,6 +37,7 @@ def create_meal():
 
 
 @meal_item_blueprint.route('/<int:meal_item_id>', methods=['PATCH', 'PUT'])
+@Security.validator(['mealName|optional:string', 'image|optional:url', 'mealType|optional:enum_MealTypes'])
 @Auth.has_permission('update_meal_item')
 @swag_from('documentation/update_single_meal_item.yml')
 def update_meal(meal_item_id):

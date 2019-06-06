@@ -10,4 +10,5 @@ from .order_factory import OrderFactory
 from .location_factory import LocationFactory
 from .user_factory import UserFactory
 from .meal_session_factory import MealSessionFactory
+from .meal_service_factory import MealServiceFactory
 

@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 import pandas as pd
 from sqlalchemy import and_
 from app.controllers.base_controller import BaseController
-from app.repositories import OrderRepo, VendorRatingRepo, VendorEngagementRepo, VendorRepo
-from app.models import Order, Menu
+from app.repositories import OrderRepo, VendorRatingRepo, VendorEngagementRepo, VendorRepo, UserRepo, MealSessionRepo
+from app.models import Order, Menu, MealService
 from app.utils.auth import Auth
 
 
@@ -16,6 +16,8 @@ class ReportsController(BaseController):
         self.order_repo = OrderRepo()
         self.engagement_repo = VendorEngagementRepo()
         self.vendor_repo = VendorRepo()
+        self.user_repo = UserRepo()
+        self.session_repo = MealSessionRepo()
 
     def dashboard_summary(self):
         params = self.get_params_dict()
@@ -74,3 +76,42 @@ class ReportsController(BaseController):
 
         return self.handle_response('OK', payload=result)
 
+    def daily_taps(self):
+        date_range = self.get_params_dict().get('date_range')
+
+        if date_range is not None:
+            date_range_list = date_range.split(':')
+            start_date = datetime.strptime(date_range_list[0], '%Y-%m-%d')
+            end_date = datetime.strptime(date_range_list[1], '%Y-%m-%d')
+
+            if start_date < end_date:
+                return self.handle_response('Start date must not be less than end date', status_code=400)
+        else:
+            start_date = datetime.today().date()
+            end_date = start_date - timedelta(days=7)
+        services = MealService.query.filter(and_(MealService.date >= end_date, MealService.date <= start_date))
+        result = []
+        dates = [date.date() for date in pd.bdate_range(end_date, start_date)]
+        for date in dates:
+            srv_list = []
+            current_services = [service for service in services if service.date.date() == date]
+            for service in current_services:
+                user = self.user_repo.get(service.user_id)
+                session = self.session_repo.get(service.session_id).name
+                service_user = {
+                    'id': user.id,
+                    'name': f'{user.first_name} {user.last_name}',
+                    'userId': user.user_id,
+                    'slackId': user.slack_id,
+                    'session': session
+                }
+                srv_list.append(service_user)
+
+            date_info = {
+                'date': str(date),
+                'count': len(srv_list)
+            }
+
+            result.append(date_info)
+
+        return self.handle_response('OK', payload=result)

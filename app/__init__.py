@@ -10,10 +10,13 @@ from apscheduler.triggers.cron import CronTrigger
 from app.utils.cron import Cron
 import bugsnag
 from bugsnag.flask import handle_exceptions
+from app.utils.date_url_validator import DateValidator
 
 bugsnag.configure(
     api_key=get_env('BUGSNAG_API_KEY'),
     project_root=get_env('BUGSNAG_PROJECT_ROOT'),
+    notify_release_stages=['production', 'staging'],
+    release_stage=get_env('APP_ENV')
 )
 
 
@@ -22,6 +25,8 @@ def create_app(config_name):
     app.config.from_object(env.app_env[config_name])
     app.config.from_pyfile('../config/env.py')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.url_map.converters['date'] = DateValidator
+    app.url_map.strict_slashes = False
 
     # CORS
     CORS(app)

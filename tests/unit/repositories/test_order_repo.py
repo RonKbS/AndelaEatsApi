@@ -27,7 +27,7 @@ class TestOrderRepo(BaseTestCase):
 
   def test_update_order_method_updates_order_object(self):
     meal = MealItemFactory.build()
-    new_meal = MealItemRepo().new_meal_item(meal.name, meal.description, meal.image, meal.meal_type, meal.location_id)
+    new_meal = MealItemRepo().new_meal_item(meal.name, meal.image, meal.meal_type, meal.location_id)
 
     order = OrderFactory.build()
     new_order = self.repo.create_order(

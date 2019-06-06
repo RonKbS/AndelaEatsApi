@@ -41,18 +41,18 @@ class MealItemController(BaseController):
         Creates a new meal item
         """
         location_id = Auth.get_location()
-        name, description, image_url, meal_type = self.request_params('mealName', 'description', 'image', 'mealType')
+        name, image_url, meal_type = self.request_params('mealName', 'image', 'mealType')
         if self.meal_repo.get_unpaginated(name=name, location_id=location_id):
             return self.handle_response('Meal item with this name already exists', status_code=400)
         if MealTypes.has_value(meal_type):
-            new_meal_item = self.meal_repo.new_meal_item(name, description, image_url, meal_type, location_id).serialize()
+            new_meal_item = self.meal_repo.new_meal_item(name, image_url, meal_type, location_id).serialize()
         
             return self.handle_response('OK', payload={'mealItem': new_meal_item}, status_code=201)
         return self.handle_response('Invalid meal type. Must be main, protein or side', status_code=400)
         
 
     def update_meal(self, meal_id):
-        name, description, image_url, meal_type = self.request_params('mealName', 'description', 'image', 'mealType')
+        name, image_url, meal_type = self.request_params('mealName', 'image', 'mealType')
 
         meal = self.meal_repo.get(meal_id)
         if meal:
@@ -64,11 +64,9 @@ class MealItemController(BaseController):
                 if self.meal_repo.get_unpaginated(name=name):
                     return self.handle_response('Meal item with this name already exists', status_code=400)
                 updates['name'] = name
-            if description:
-                updates['description'] = description
             if image_url:
                 updates['image'] = image_url
-            if meal_type:
+            if meal_type and MealTypes.has_value(meal_type):
                 updates['meal_type'] = meal_type
 
             self.meal_repo.update(meal, **updates)

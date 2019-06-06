@@ -69,10 +69,10 @@ class UserController(BaseController):
     def list_all_users(self):
 
         params = self.get_params_dict()
-        pg = int(params.get('page', 1))
-        pp = int(params.get('per_page', 10))
+        page = params.get('page')
+        per_page = params.get('per_page')
 
-        users = self.user_repo.paginate(error_out=False, page=pg, per_page=pp)
+        users = self.user_repo.paginate(error_out=False, page=page, per_page=per_page)
         if users.items:
             user_list = [user.serialize() for user in users.items]
             for user in user_list:
@@ -81,6 +81,7 @@ class UserController(BaseController):
                 role_objects = Role.query.filter(Role.id.in_(associated_roles)).all()
                 roles = [{'id': role.id, 'name': role.name} for role in role_objects]
                 user['userRoles'] = roles
+                del user['userTypeId']
             return self.handle_response('OK', payload={'users': user_list, 'meta': self.pagination_meta(users)})
         return self.handle_response('No users found', status_code=404)
 
@@ -102,7 +103,7 @@ class UserController(BaseController):
         push_id = PushID()
         next_id = push_id.next_id()
 
-        user_info = self.request_params('firstName', 'lastName', 'imageUrl', 'slackId', 'userId', 'userTypeId')
+        user_info = self.request_params('firstName', 'lastName', 'imageUrl', 'slackId', 'userId', 'roleId')
 
         first_name, last_name, image_url, slack_id, user_id, role_id = user_info
 
@@ -135,7 +136,7 @@ class UserController(BaseController):
 
         user = self.user_repo.new_user(*user_info, user_id=user_id, slack_id=slack_id, user_type=user_type).serialize()
 
-        user.__setitem__('userType', role.to_dict(only=['id', 'name', 'help', "timestamps"]))
+        user.__setitem__('userRoles', [role.to_dict(only=['id', 'name', 'help', "timestamps"])])
         user.pop('userTypeId')
 
         return self.handle_response('OK', payload={'user': user}, status_code=201)
@@ -145,7 +146,10 @@ class UserController(BaseController):
         user = self.user_repo.find_first(slack_id=slack_id)
 
         if user:
-            return self.handle_response('OK', payload={'user': user.serialize()}, status_code=200)
+            user_data = user.serialize()
+            del user_data['userTypeId']
+            user_data['userRoles'] = [self.role_repo.get(user.user_type.role_id).to_dict(only=['id', 'name'])]
+            return self.handle_response('OK', payload={'user': user_data}, status_code=200)
 
         return self.handle_response('User not found', status_code=404)
 
@@ -164,7 +168,7 @@ class UserController(BaseController):
                 payload={'user': 'User already deleted'}, status_code=400
             )
 
-        user_info = self.request_params_dict('slackId', 'firstName', 'lastName', 'userId', 'imageUrl')
+        user_info = self.request_params_dict('slackId', 'firstName', 'lastName', 'userId', 'imageUrl', 'roleId')
 
         slack_id = user_info.get('slack_id')
         user_id_sent = user_info.get('user_id')
@@ -183,6 +187,18 @@ class UserController(BaseController):
                 status_code=403
             )
 
-        user = self.user_repo.update(user, **user_info)
+        if user_info.get('role_id'):
+            role_id = user_info['role_id']
+            if not self.role_repo.exists(id=role_id):
+                return self.handle_response(
+                    f'Role with id {role_id} doesnot exist',
+                    status_code=400
+                )
+            self.user_role_repo.update(user.user_type, role_id=role_id)
 
-        return self.handle_response('OK', payload={'user': user.serialize()}, status_code=200)
+        user = self.user_repo.update(user, **user_info)
+        user_data = user.serialize()
+
+        user_data['userRoles'] = [self.role_repo.get(user.user_type.role_id).to_dict(only=['id', 'name'])]
+
+        return self.handle_response('OK', payload={'user': user_data}, status_code=200)

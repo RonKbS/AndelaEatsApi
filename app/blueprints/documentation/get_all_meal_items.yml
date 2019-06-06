@@ -57,8 +57,6 @@ definitions:
             items:
               type: object
               properties:
-                description:
-                  type: string
                 id:
                   type: integer
                 image:
