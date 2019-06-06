@@ -54,7 +54,7 @@ def get_user_role(user_id):
 
 
 @role_blueprint.route('/user', methods=['POST'])
-@Security.validator(['roleId|required:int', 'email|required:email'])
+@Security.validator(['roleId|required:int', 'emailAddress|required:email'])
 @Auth.has_permission('create_user_roles')
 @swag_from('documentation/create_user_role.yml')
 def create_user_role():

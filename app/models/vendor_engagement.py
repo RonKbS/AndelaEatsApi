@@ -1,5 +1,6 @@
 from .base_model import BaseModel, db
 
+
 class VendorEngagement(BaseModel):
 	__tablename__ = 'vendor_engagements'
 	
@@ -12,6 +13,3 @@ class VendorEngagement(BaseModel):
 	vendor = db.relationship('Vendor', lazy=False)
 	location = db.relationship('Location', lazy=False)
 	menus = db.relationship('Menu', backref='vendor_engagements', lazy=True)
-	
-	# meal_items = db.relationship('MealItem', backref='vendor_engagements', lazy=True)
-	# vendor_ratings = db.relationship('VendorRating', backref='vendor_engagements', lazy=True)

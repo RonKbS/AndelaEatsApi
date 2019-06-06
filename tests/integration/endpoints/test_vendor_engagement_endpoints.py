@@ -1,9 +1,17 @@
-from datetime import date, datetime
+from datetime import datetime, timedelta
+from unittest.mock import patch, Mock
 from app.repositories.menu_repo import MenuRepo
+from app.models import Location
 from app.repositories import VendorEngagementRepo
 from tests.base_test_case import BaseTestCase
-from factories import VendorFactory, RoleFactory, UserRoleFactory, PermissionFactory, VendorEngagementFactory, \
-	MenuFactory, LocationFactory
+from factories import (
+	VendorFactory,
+	RoleFactory,
+	UserRoleFactory,
+	PermissionFactory,
+	VendorEngagementFactory,
+	LocationFactory
+	)
 
 
 class TestVendorEngagementEndpoints(BaseTestCase):
@@ -44,7 +52,7 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 
 	def test_list_vendor_engagement_endpoint(self):
 		location = LocationFactory(id=self.headers()['X-Location'])
-		engagements = VendorEngagementFactory.create_batch(4, location_id=location.id)
+		VendorEngagementFactory.create_batch(4, location_id=location.id)
 		
 		response = self.client().get(self.make_url('/engagements/'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -136,8 +144,8 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='delete_engagement', role_id=role.id)
-		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		PermissionFactory.create(keyword='delete_engagement', role_id=role.id)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		response = self.client().delete(self.make_url(f'/engagements/{engagement.id}'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -152,8 +160,8 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='delete_engagement', role_id=1000)
-		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		PermissionFactory.create(keyword='delete_engagement', role_id=1000)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		response = self.client().delete(self.make_url(f'/engagements/{engagement.id}'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -161,29 +169,29 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 		self.assertEqual(response_json['msg'], 'Access Error - No Permission Granted')
 
 	def test_delete_engagement_endpoint_with_wrong_vendor_id(self):
-		engagement = VendorEngagementFactory.create()
+		VendorEngagementFactory.create()
 
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='delete_engagement', role_id=role.id)
-		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		PermissionFactory.create(keyword='delete_engagement', role_id=role.id)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		response = self.client().delete(self.make_url(f'/engagement/-576A'), headers=self.headers())
 
 		self.assert404(response)
 
 	def test_delete_engagement_with_associated_menus(self):
-		current_date = datetime.now().date()
+		datetime.now().date()
 		engagement = VendorEngagementFactory.create()
 		menu_repo = MenuRepo()
-		menu = menu_repo.new_menu(date='2018-10-15', meal_period='lunch', main_meal_id=1, allowed_side=1,
+		menu_repo.new_menu(date='2018-10-15', meal_period='lunch', main_meal_id=1, allowed_side=1,
 								  allowed_protein=1,
 								  side_items=[2], protein_items=[3], vendor_engagement_id=engagement.id, location_id=1)
 
 		role = RoleFactory.create(name='admin')
 		user_id = BaseTestCase.user_id()
-		permission = PermissionFactory.create(keyword='delete_engagement', role_id=role.id)
-		user_role = UserRoleFactory.create(user_id=user_id, role_id=role.id)
+		PermissionFactory.create(keyword='delete_engagement', role_id=role.id)
+		UserRoleFactory.create(user_id=user_id, role_id=role.id)
 
 		response = self.client().delete(self.make_url(f'/engagements/{engagement.id}'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -193,7 +201,7 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 
 	def test_list_engagements_by_vendor_endpoint(self):
 		vendor = VendorFactory.create()
-		engagement = VendorEngagementFactory.create(vendor=vendor)
+		VendorEngagementFactory.create(vendor=vendor)
 
 		response = self.client().get(self.make_url(f'/engagements/vendor/{vendor.id}'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -204,7 +212,7 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 
 	def test_upcoming_engagements_endpoint(self):
 		vendor = VendorFactory.create()
-		engagement = VendorEngagementFactory.create(vendor=vendor)
+		VendorEngagementFactory.create(vendor=vendor)
 
 		response = self.client().get(self.make_url(f'/engagements/upcoming'), headers=self.headers())
 		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -212,5 +220,40 @@ class TestVendorEngagementEndpoints(BaseTestCase):
 		self.assert200(response)
 		self.assertEqual(response_json['msg'], 'OK')
 		self.assertEqual(response_json['payload']['engagements'][0]['vendor']['id'], vendor.id)
+
+	def test_immediate_past_engagement(self):
+
+		location = LocationFactory()
+		location.save()
+		vendor = VendorFactory.create(location_id=location.id)
+		vendor.save()
+		engagement1 = VendorEngagementFactory.create(vendor_id=vendor.id, end_date=datetime.now()-timedelta(10), location_id=location.id)
+		engagement2 = VendorEngagementFactory.create(vendor_id=vendor.id, end_date=datetime.now()-timedelta(14), location_id=location.id)
+		engagement1.save()
+		engagement2.save()
+
+		response = self.client().get(self.make_url(f'/engagements/past/{location.id}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assert200(response)
+		self.assertEqual(response_json['msg'], 'OK')
+
+	def test_immediate_past_engagement_no_past_engagement(self):
+
+		location = LocationFactory()
+		location.save()
+		vendor = VendorFactory.create(location_id=location.id)
+		vendor.save()
+		engagement1 = VendorEngagementFactory.create(vendor_id=vendor.id, end_date=datetime.now()+timedelta(10), location_id=location.id)
+		engagement2 = VendorEngagementFactory.create(vendor_id=vendor.id, end_date=datetime.now()+timedelta(14), location_id=location.id)
+		engagement1.save()
+		engagement2.save()
+
+		response = self.client().get(self.make_url(f'/engagements/past/{location.id}'), headers=self.headers())
+		response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+		self.assert404(response)
+		self.assertEqual(response_json['msg'], 'No past engagement for this location')
+
 
 

@@ -1,6 +1,17 @@
 import datetime
 from tests.base_test_case import BaseTestCase
-from factories import OrderFactory, VendorRatingFactory, VendorFactory, VendorEngagementFactory, MenuFactory
+from factories import (
+    OrderFactory,
+    VendorRatingFactory,
+    VendorFactory,
+    VendorEngagementFactory,
+    MenuFactory,
+    LocationFactory,
+    MealSessionFactory,
+    MealServiceFactory,
+    UserFactory
+)
+
 
 class TestReportsEndpoints(BaseTestCase):
 
@@ -46,4 +57,47 @@ class TestReportsEndpoints(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertJSONKeyPresent(response_json, 'payload')
         self.assertEqual(type(payload), list)
+
+    def test_daily_taps(self):
+        location = LocationFactory.create()
+        session = MealSessionFactory(location_id=location.id)
+        user = UserFactory()
+
+        MealServiceFactory.create_batch(3, user_id=user.id, session_id=session.id, date=datetime.datetime.now() - datetime.timedelta(3))
+
+        response = self.client().get(self.make_url('/reports/taps/daily/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+        payload = response_json['payload']
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONKeyPresent(response_json, 'payload')
+        self.assertEqual(type(payload), list)
+
+    def test_daily_taps_custom_date_range(self):
+        location = LocationFactory.create()
+        session = MealSessionFactory(location_id=location.id)
+        user = UserFactory()
+
+        MealServiceFactory.create_batch(3, user_id=user.id, session_id=session.id, date=datetime.datetime(2019, 4, 8))
+
+        response = self.client().get(self.make_url('/reports/taps/daily/?date_range=2019-04-10:2019-04-01'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+        payload = response_json['payload']
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONKeyPresent(response_json, 'payload')
+        self.assertEqual(type(payload), list)
+
+    def test_daily_taps_wrong_date_range(self):
+        location = LocationFactory.create()
+        session = MealSessionFactory(location_id=location.id)
+        user = UserFactory()
+
+        MealServiceFactory.create_batch(3, user_id=user.id, session_id=session.id, date=datetime.datetime(2019, 4, 8))
+
+        response = self.client().get(self.make_url('/reports/taps/daily/?date_range=2019-04-01:2019-04-10'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response_json['msg'], 'Start date must not be less than end date')
 

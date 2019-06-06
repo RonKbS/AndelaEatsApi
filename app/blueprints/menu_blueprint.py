@@ -34,7 +34,7 @@ def delete_menu(menu_id):
 	return menu_controller.delete_menu(menu_id)
 
 
-@menu_blueprint.route('/<meal_period>/<date>', methods=['GET'])
+@menu_blueprint.route('/<meal_period>/<date:date>', methods=['GET'])
 @Auth.has_permission('view_menu')
 @swag_from('documentation/get_menu_period_single_date.yml')
 def list_menu(meal_period, date):
@@ -42,7 +42,7 @@ def list_menu(meal_period, date):
 	return menu_controller.list_menus(meal_period, date)
 
 
-@menu_blueprint.route('/<meal_period>/<start_date>/<end_date>', methods=['GET'])
+@menu_blueprint.route('/<meal_period>/<date:start_date>/<date:end_date>', methods=['GET'])
 @Auth.has_permission('view_menu')
 @swag_from('documentation/get_admin_menu_period_date_range.yml')
 def list_menu_range_admin(meal_period, start_date, end_date):
@@ -50,7 +50,7 @@ def list_menu_range_admin(meal_period, start_date, end_date):
 	return menu_controller.list_menus_range_admin(meal_period, start_date, end_date)
 
 
-@user_menu_blueprint.route('/<meal_period>/<start_date>/<end_date>', methods=['GET'])
+@user_menu_blueprint.route('/<meal_period>/<date:start_date>/<date:end_date>', methods=['GET'])
 @swag_from('documentation/get_menu_period_date_range.yml')
 def list_menu_range(meal_period, start_date, end_date):
 	"""Blueprint function for fetching paginated && unpaginated menu records between two dates for user"""

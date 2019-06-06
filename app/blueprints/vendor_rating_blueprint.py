@@ -3,14 +3,16 @@ from flasgger import swag_from
 from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, request, Security, Auth
 from app.controllers.vendor_rating_controller import VendorRatingController
 from app.utils.auth import Auth
+from app.models import VendorRating
 
 rating_blueprint = Blueprint('rating', __name__, url_prefix='{}/ratings'.format(BaseBlueprint.base_url_prefix))
 
 vendor_rating_controller = VendorRatingController(request)
 
 
-@rating_blueprint.route('/<menu_date>', methods=['GET'])
+@rating_blueprint.route('/<date:menu_date>', methods=['GET'])
 @Auth.has_permission('view_ratings')
+@Security.validate_query_params(VendorRating)
 @swag_from('documentation/get_vendor_ratings.yml')
 def list_ratings(menu_date):
     """Gets all the ratings"""

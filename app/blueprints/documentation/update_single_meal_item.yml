@@ -33,8 +33,6 @@ parameters:
           type: string
         mealName:
           type: string
-        description:
-          type: string
         image:
           type: string
         mealType:
@@ -52,8 +50,6 @@ definitions:
           mealItem:
             type: object
             properties:
-              description:
-                type: string
               id:
                 type: integer
               image:

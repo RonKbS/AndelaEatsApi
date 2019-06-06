@@ -358,6 +358,20 @@ class TestSecurity(BaseTestCase):
             "['Id', 'IsDeleted', 'CreatedAt', 'UpdatedAt', 'Category', 'Question', 'Answer']"
         )
 
+    def test_validate_query_params_handles_invalidate_date_formats(self):
+
+        class MockRequest:
+            args = {'createdAt': 46}
+
+        with patch('app.utils.security.request', new_callable=MockRequest):
+
+            response = Security.validate_query_params(Faq)(lambda *args, **kwargs: ('test',))()
+
+        self.assertEqual(
+            response.get_json()['msg'],
+            "Bad Request - 'created_at' should be valid date. Format: YYYY-MM-DD"
+        )
+
     def test_validate_query_params_succeeds_with_enpty_args(self):
 
         class MockRequest:

@@ -1,5 +1,5 @@
 from app.utils import db
-from sqlalchemy import exc
+from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 from app.utils import to_camel_case
 
@@ -16,8 +16,9 @@ class BaseModel(db.Model):
         try:
             db.session.add(self)
             db.session.commit()
-        except (exc.IntegrityError, exc.InvalidRequestError):
+        except SQLAlchemyError as error:
             db.session().rollback()
+            raise error
 
     def delete(self):
         db.session.delete(self)

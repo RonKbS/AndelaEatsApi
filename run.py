@@ -1,11 +1,26 @@
 from app.utils import db
 from config import get_env
 from app import create_app
+from flask import jsonify, make_response
 from flask_script import Manager
 from app.utils.auth import Auth
+from app.utils.handled_exceptions import BaseModelValidationError
 from app.utils.seeders.seed_database import seed_db, SEED_OPTIONS
 from flask_migrate import Migrate, MigrateCommand
+from werkzeug.exceptions import HTTPException
+import traceback
+import logging
 import click
+import bugsnag
+
+error_logger = logging.getLogger(__name__)
+error_logger.setLevel(logging.DEBUG)
+
+file_handler = logging.FileHandler('errors.log')
+file_handler.setLevel(logging.ERROR)
+file_handler.setFormatter(logging.Formatter('%(asctime)s:%(name)s:%(message)s'))
+
+error_logger.addHandler(file_handler)
 
 app = create_app(get_env('APP_ENV'))
 migrate = Migrate(app, db)
@@ -21,6 +36,29 @@ def check_token():
 @app.before_request
 def check_location_header():
 	return Auth.check_location_header()
+
+@app.errorhandler(BaseModelValidationError)
+def handle_base_model_validation_error(error):
+	return make_response(
+		jsonify({'msg': error.msg})
+	), error.status_code
+
+@app.errorhandler(Exception)
+def handle_exception(error):
+	"""Error handler called when a ValidationError is raised"""
+	
+	response ={'msg': 'An error occurred while processing your request. Please contact Admin.'}
+
+	if isinstance(error, HTTPException):
+    		return make_response(
+		jsonify({'msg': error.description})
+			), error.code
+		
+	traceback.print_exc()
+	error_logger.exception(str(error))
+	bugsnag.notify(error)
+	
+	return  make_response(jsonify(response)), 500
 
 
 

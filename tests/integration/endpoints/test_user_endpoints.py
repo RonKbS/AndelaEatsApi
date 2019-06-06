@@ -74,6 +74,19 @@ class TestUserEndpoints(BaseTestCase):
         self.assert200(response)
         self.assertEqual(payload['status'], 'success')
         self.assertEqual(response_json['msg'], 'User deleted')
+    
+    def test_delete_already_deleted_user_with_right_permission(self):
+        user = UserFactory.create(is_deleted= True)
+        role = RoleFactory.create(name='admin')
+        user_id = BaseTestCase.user_id()
+        PermissionFactory.create(keyword='delete_user', role_id=role.id)
+        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+
+        response = self.client().delete(self.make_url(f'/users/{user.id}/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+        self.assert400(response)
+        self.assertEqual(400,response.status_code)
+        self.assertEqual(response_json['msg'], 'User has already been deleted')
 
     def test_delete_vendor_endpoint_without_right_permission(self):
         user = UserFactory.create()
@@ -135,11 +148,13 @@ class TestUserEndpoints(BaseTestCase):
     def test_update_user_endpoint_succeeds(self):
 
         create_user_role('update_user')
-        user = UserFactory.create()
+        role = RoleFactory()
+        user_role = UserRoleFactory(role_id=role.id)
+        user = UserFactory(user_type_id=user_role.id)
+        user_data = dict(firstName="Andela", lastName="Eats", roleId=role.id)
 
-        user_data = dict(firstName="Andela", lastName="Eats")
 
-        response = self.client().put(self.make_url("/users/" + str(user.id)), headers=self.headers(),
+        response = self.client().patch(self.make_url(f'/users/{user.id}'), headers=self.headers(),
                                       data=self.encode_to_json_string(user_data))
 
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -148,6 +163,21 @@ class TestUserEndpoints(BaseTestCase):
         self.assertEqual(response_json['msg'], 'OK')
         self.assertEqual(response_json['payload']['user']['firstName'], user.first_name)
         self.assertEqual(response_json['payload']['user']['lastName'], user.last_name)
+
+    def test_update_user_endpoint_with_invalid_role_fails(self):
+        create_user_role('update_user')
+        role = RoleFactory()
+        user_role = UserRoleFactory(role_id=role.id)
+        user = UserFactory(user_type_id=user_role.id)
+        user_data = dict(firstName="Andela", lastName="Eats", roleId=100)
+
+        response = self.client().patch(self.make_url(f'/users/{user.id}'), headers=self.headers(),
+                                       data=self.encode_to_json_string(user_data))
+
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response_json['msg'], 'Role with id 100 doesnot exist')
 
     def test_update_user_endpoint_for_another_user_with_same_slack_id_fails(self):
 
@@ -243,7 +273,7 @@ class TestUserEndpoints(BaseTestCase):
         user = UserFactory.create(user_id="user_id_2", is_deleted=True)
         role = RoleFactory(name='test_role')
 
-        user_data = dict(firstName=user.first_name, lastName=user.last_name, userTypeId=role.id)
+        user_data = dict(firstName=user.first_name, lastName=user.last_name, roleId=role.id)
 
         response = self.client().post(self.make_url("/users/"), headers=self.headers(),
                                      data=self.encode_to_json_string(user_data))
@@ -254,6 +284,6 @@ class TestUserEndpoints(BaseTestCase):
         self.assertEqual(response_json['msg'], "OK")
         self.assertEqual(response_json['payload']['user']['firstName'], user.first_name)
         self.assertEqual(response_json['payload']['user']['lastName'], user.last_name)
-        self.assertEqual(response_json['payload']['user']['userType']['name'], role.name)
-        self.assertEqual(response_json['payload']['user']['userType']['help'], role.help)
+        self.assertEqual(response_json['payload']['user']['userRoles'][0]['name'], role.name)
+        self.assertEqual(response_json['payload']['user']['userRoles'][0]['help'], role.help)
 

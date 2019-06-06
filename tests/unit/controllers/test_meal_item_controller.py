@@ -8,6 +8,7 @@ from app.models import MealItem
 from app.repositories.meal_item_repo import MealItemRepo
 from app.utils.enums import MealTypes
 from tests.base_test_case import BaseTestCase
+from factories import MealItemFactory
 
 
 class TestMealItemController(BaseTestCase):
@@ -20,7 +21,6 @@ class TestMealItemController(BaseTestCase):
             updated_at=datetime.now(),
             meal_type='Mock meal type',
             name='Mock meal item',
-            description='Mock description',
             image='Mock image',
             location_id=1
         )
@@ -30,7 +30,6 @@ class TestMealItemController(BaseTestCase):
             updated_at=datetime.now(),
             meal_type='Mock meal type',
             name='Mock meal item',
-            description='Mock description',
             image='Mock image',
             location_id=1
         )
@@ -162,7 +161,7 @@ class TestMealItemController(BaseTestCase):
         with self.app.app_context():
             mock_get_location.return_value = 1
             mock_request_params.return_value = (
-                'Mock', 'Mock', 'Mock', 'Mock'
+                'Mock', 'Mock', 'Mock'
             )
             mock_get_unpaginated.return_value = self.mock_meal_item
             meal_item_controller = MealItemController(self.request_context)
@@ -191,7 +190,7 @@ class TestMealItemController(BaseTestCase):
         # Arrange
         with self.app.app_context():
             mock_request_params.return_value = (
-                'Mock', 'Mock', 'Mock', 'Mock'
+                'Mock', 'Mock', 'Mock'
             )
             mock_get_unpaginated.return_value = None
             mock_get_location.return_value = 1
@@ -224,7 +223,7 @@ class TestMealItemController(BaseTestCase):
         # Arrange
         with self.app.app_context():
             mock_request_params.return_value = (
-                'Mock', 'Mock', 'Mock', 'Mock'
+                'Mock', 'Mock', 'Mock'
             )
             mock_get_unpaginated.return_value = None
             mock_get_location.return_value = 1
@@ -250,7 +249,7 @@ class TestMealItemController(BaseTestCase):
         '''
         # Arrange
         with self.app.app_context():
-            mock_request_params.return_value = ('Mock', 'Mock', 'Mock', 'Mock')
+            mock_request_params.return_value = ('Mock', 'Mock', 'Mock')
             mock_get.return_value = None
             meal_item_controller = MealItemController(self.request_context)
 
@@ -274,7 +273,7 @@ class TestMealItemController(BaseTestCase):
         # Arrange
         with self.app.app_context():
             mock_get.return_value = self.mock_deleted_meal_item
-            mock_request_params.return_value = ('Mock', 'Mock', 'Mock', 'Mock')
+            mock_request_params.return_value = ('Mock', 'Mock', 'Mock')
             meal_item_controller = MealItemController(self.request_context)
 
             # Act
@@ -298,7 +297,7 @@ class TestMealItemController(BaseTestCase):
         '''
         # Arrange
         with self.app.app_context():
-            mock_request_params.return_value = ('mock', 'mock', 'mock', 'mock')
+            mock_request_params.return_value = ('mock', 'mock', 'mock')
             mock_get.return_value = self.mock_meal_item
             mock_get_unpaginated.return_value = self.mock_meal_item
             meal_item_controller = MealItemController(self.request_context)
@@ -324,14 +323,14 @@ class TestMealItemController(BaseTestCase):
         '''
         # Arrange
         with self.app.app_context():
-            mock_get.return_value = self.mock_meal_item
-            mock_request_params.return_value = ('mock', 'mock', 'mock', 'mock')
+            mock_get.return_value = MealItemFactory(id=1)
+            mock_request_params.return_value = ('mock', 'mock', 'mock')
             mock_get_unpaginated.return_value = None
             meal_item_controller = MealItemController(self.request_context)
 
             # Act
             result = meal_item_controller.update_meal(1)
-
+            
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'

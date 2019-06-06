@@ -73,7 +73,7 @@ class RoleController(BaseController):
 
 	def create_user_role(self):
 		location = Auth.get_location()
-		role_id, email_address = self.request_params('roleId', 'email')
+		role_id, email_address = self.request_params('roleId', 'emailAddress')
 		user = self.andela_service.get_user_by_email_or_id(email_address)
 		if user is None:
 			return self.handle_response('This user record does not exist', status_code=400)
@@ -134,7 +134,7 @@ class RoleController(BaseController):
 			'role_id', 'name', 'keyword'
 		)
 		permission = self.permission_repo.get_unpaginated(
-			name=name, is_deleted=False)
+			name=name, is_deleted=False,role_id=role_id)
 		if not permission:
 			role = self.role_repo.get(role_id)
 			if role:

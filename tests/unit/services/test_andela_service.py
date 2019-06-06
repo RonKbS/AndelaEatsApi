@@ -71,3 +71,9 @@ class TestAndelaService(BaseTestCase):
         user = service.get_user_by_email_or_id("user_1@email.com")
 
         assert user == "user_1"
+
+    def test_get_user_by_email_or_id_returns_none_if_a_null_key_is_supplied(self):
+
+        user = AndelaService().get_user_by_email_or_id(key=None)
+
+        assert user is None
