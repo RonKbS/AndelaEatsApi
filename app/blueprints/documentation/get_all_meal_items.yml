@@ -29,6 +29,12 @@ parameters:
     required: optional
     description: The number of records per page
     default: 1
+  - name: name
+    in: query
+    required: false
+    description: filter results by meal name
+    example: Bread
+    default: Bread
 definitions:
   MenuItemsPayload:
     type: object

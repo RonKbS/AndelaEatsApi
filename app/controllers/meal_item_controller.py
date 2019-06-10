@@ -11,11 +11,13 @@ class MealItemController(BaseController):
         self.meal_repo = MealItemRepo()
     
     def list_meals(self):
+        query_kwargs = self.get_params_dict()
         location_id = Auth.get_location()
         meals = self.meal_repo.get_unpaginated_asc(
             self.meal_repo._model.name,
             is_deleted=False,
-            location_id=location_id
+            location_id=location_id,
+            **query_kwargs
         )
         meals_list = [meal.serialize() for meal in meals]
         return self.handle_response('OK', payload={'mealItems': meals_list})
