@@ -29,22 +29,7 @@
         "JWT_PUBLIC_KEY_STAGING": {
             "required": true
         },
-        "REDIS_DB": {
-            "required": true
-        },
-        "REDIS_HOST": {
-            "required": true
-        },
-        "REDIS_PASSWORD": {
-            "required": true
-        },
-        "REDIS_PORT": {
-            "required": true
-        },
         "REDIS_URL": {
-            "required": true
-        },
-        "REDIS_USER": {
             "required": true
         },
         "SECRET_KEY": {

@@ -1,5 +1,6 @@
 from app.blueprints.base_blueprint import Blueprint, BaseBlueprint, Security, request, Auth
 from app.controllers.meal_item_controller import MealItemController
+from app.models import MealItem
 from flasgger import swag_from
 
 url_prefix = '{}/meal-items'.format(BaseBlueprint.base_url_prefix)
@@ -9,6 +10,7 @@ meal_item_controller = MealItemController(request)
 
 @meal_item_blueprint.route('/', methods=['GET'])
 @Auth.has_permission('view_meal_item')
+@Security.validate_query_params(MealItem)
 @swag_from('documentation/get_all_meal_items.yml')
 def list_meals():
 	return meal_item_controller.list_meals()

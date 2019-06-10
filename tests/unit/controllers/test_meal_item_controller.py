@@ -34,12 +34,14 @@ class TestMealItemController(BaseTestCase):
             location_id=1
         )
 
+    @patch.object(MealItemController, 'get_params_dict')
     @patch.object(MealItemRepo, 'get_unpaginated')
     @patch('app.Auth.get_location')
     def test_list_meals_ok_response(
         self,
         mock_get_location,
-        mock_get_unpaginated
+        mock_get_unpaginated,
+        mock_get_params_dict
     ):
         '''Test list_meals OK response.
         '''
@@ -47,6 +49,7 @@ class TestMealItemController(BaseTestCase):
         with self.app.app_context():
             mock_get_location.return_value = 1
             mock_get_unpaginated.return_value = [self.mock_meal_item, ]
+            mock_get_params_dict.return_value = {}
             meal_item_controller = MealItemController(self.request_context)
 
             # Act
