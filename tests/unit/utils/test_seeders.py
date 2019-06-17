@@ -1,8 +1,10 @@
-from tests.base_test_case import BaseTestCase
-from subprocess import call
-from app.utils.seeders.seed_database import model_mapper, bulk_insert
+from subprocess import PIPE, call, run
 from unittest.mock import patch
+
 from sqlalchemy.exc import SQLAlchemyError
+
+from app.utils.seeders.seed_database import bulk_insert, model_mapper
+from tests.base_test_case import BaseTestCase
 
 
 class TestSeeders(BaseTestCase):
@@ -28,6 +30,20 @@ class TestSeeders(BaseTestCase):
         result = model.query.count()
 
         assert result > 0
+    
+    def test_flask_database_fails_with_invalid_arguments(self):
+        output= run(["flask", "seed_database", "23432"],stdout=PIPE, stderr=PIPE)
+        assert output.returncode == 2
+        
+    def test_flask_database_succeeds_with_testing_argument(self):
+
+        call(['flask', 'seed_database', '--testing'])
+
+        for data in model_mapper.values():
+            model = data.get('model')
+            result = model.query.count()
+
+            assert result > 0
 
     @patch('app.utils.seeders.seed_database.db.session.bulk_insert_mappings')
     def test_flask_seed_raises_expection_on_duplicate_seed_data(self, mock_bulk_insert):
@@ -36,4 +52,3 @@ class TestSeeders(BaseTestCase):
 
         with self.assertRaises(Exception) as e:
             bulk_insert(**model_mapper.get('location'))
-
