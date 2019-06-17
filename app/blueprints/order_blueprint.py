@@ -15,14 +15,14 @@ def list_order():
 	return order_controller.list_orders()
 
 
-@order_blueprint.route('/<start_date>', methods=['GET'])
+@order_blueprint.route('/<date:start_date>', methods=['GET'])
 @Auth.has_permission('view_orders')
 @swag_from('documentation/get_orders_by_date.yml')
 def list_orders_date(start_date):
 	return order_controller.list_orders_date(start_date)
 
 
-@order_blueprint.route('/<start_date>/<end_date>', methods=['GET'])
+@order_blueprint.route('/<date:start_date>/<date:end_date>', methods=['GET'])
 @Auth.has_permission('view_orders')
 @swag_from('documentation/get_orders_by_date_range.yml')
 def list_orders_date_range(start_date, end_date):
@@ -41,7 +41,7 @@ def get_order_by_user_id(user_id):
 	return order_controller.get_order_by_user_id(user_id)
 
 
-@order_blueprint.route('/user/<string:user_id>/<start_date>/<end_date>', methods=['GET'])
+@order_blueprint.route('/user/<string:user_id>/<date:start_date>/<date:end_date>', methods=['GET'])
 @swag_from('documentation/get_order_by_user_id_date_range.yml')
 def get_order_by_user_id_date_range(user_id, start_date, end_date):
 	return order_controller.get_order_by_user_id_date_range(user_id, start_date, end_date)

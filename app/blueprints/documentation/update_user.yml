@@ -22,9 +22,6 @@ parameters:
     description: Creation of an User
     schema:
       type: object
-      required:
-        - firstName
-        - lastName
       properties:
         slackId:
           type: string
@@ -33,6 +30,8 @@ parameters:
         lastName:
           type: string
         userId:
+          type: string
+        roleId:
           type: string
         imageUrl:
           type: string

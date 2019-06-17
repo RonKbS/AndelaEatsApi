@@ -21,14 +21,16 @@ parameters:
     in: path
     type: string
     required: true
-    description: date for query search
-    default: 1
+    format: date
+    description: The start date to search for
+    default: '2017-07-21'
   - name: end_date
     in: path
     type: string
     required: true
-    description: date for query search
-    default: 1
+    format: date
+    description: The end date to search for
+    default: '2019-07-21'
   - name: page
     in: path
     type: integer

@@ -22,7 +22,8 @@ parameters:
     type: string
     required: true
     description: date for query search
-    default: 1
+    format: date
+    default: '2019-07-21'
   - name: page
     in: path
     type: integer
