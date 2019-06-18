@@ -41,10 +41,10 @@ class UserController(BaseController):
             List of admin users' profiles.
         '''
 
-        user_roles = self.user_role_repo.filter_by(role_id=admin_role_id, is_active=True).items
+        user_roles = self.user_role_repo.filter_by(role_id=admin_role_id, is_active=True)
 
         admin_users_list = []
-        for user_role in user_roles:
+        for user_role in user_roles.items:
             admin_user_profile = {}
             andela_user_profile = self.andela_service.get_user_by_email_or_id(user_role.user_id) or \
                                   self.andela_service.get_user_by_email_or_id(user_role.email)
@@ -63,7 +63,7 @@ class UserController(BaseController):
 
         return self.handle_response(
             'OK',
-            payload={'adminUsers': admin_users_list}
+            payload={'adminUsers': admin_users_list, 'meta': self.pagination_meta(user_roles)}
         )
 
     def list_all_users(self):
