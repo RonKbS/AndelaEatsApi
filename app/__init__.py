@@ -10,6 +10,8 @@ from apscheduler.triggers.cron import CronTrigger
 from app.utils.cron import Cron
 import bugsnag
 from bugsnag.flask import handle_exceptions
+import rollbar
+import os
 from app.utils.date_url_validator import DateValidator
 
 bugsnag.configure(
@@ -17,6 +19,12 @@ bugsnag.configure(
     project_root=get_env('BUGSNAG_PROJECT_ROOT'),
     notify_release_stages=['production', 'staging'],
     release_stage=get_env('APP_ENV')
+)
+
+rollbar.init(
+    access_token=get_env('ROLLBAR_API_KEY'),
+    environment=get_env('APP_ENV'),
+    root=os.path.dirname(os.path.realpath(__file__))
 )
 
 
