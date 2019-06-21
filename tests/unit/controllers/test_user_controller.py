@@ -30,12 +30,14 @@ class TestUserController(BaseTestCase):
             is_active=True
         )
 
+    @patch.object(UserController, 'pagination_meta')
     @patch('app.repositories.user_role_repo.UserRoleRepo.filter_by')
     @patch('app.services.andela.AndelaService.get_user_by_email_or_id')
     def test_list_admin_users_ok_response(
         self,
         mock_get_user_by_email_or_id,
-        mock_filter_by
+        mock_filter_by,
+        mock_pagination_meta
     ):
         '''
         Test list_admin_users OK response.
@@ -50,6 +52,13 @@ class TestUserController(BaseTestCase):
                 "last_name": "Serunjogi",
                 "name": "Joseph Serunjogi"
             }
+            mock_pagination_meta.return_value = {
+            "total_rows": 1,
+            "total_pages": 1,
+            "current_page": 1,
+            "next_page": None,
+            "prev_page": None
+        }
             user_controller = UserController(self.request_context)
 
             # Act
@@ -58,6 +67,8 @@ class TestUserController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
+            assert result.get_json()['payload']['meta']['current_page'] == 1
+            assert result.get_json()['payload']['meta']['next_page'] == None
 
     @patch.object(Auth, 'get_location')
     @patch.object(UserController, 'request_params')
