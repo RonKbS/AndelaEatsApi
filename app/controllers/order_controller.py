@@ -1,7 +1,7 @@
 from app.controllers.base_controller import BaseController
 from app.repositories import OrderRepo, LocationRepo, VendorRatingRepo
 from app.repositories.meal_item_repo import MealItemRepo
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from app.services.andela import AndelaService
 from app.utils.enums import OrderStatus
@@ -26,10 +26,11 @@ class OrderController(BaseController):
 		:return:
 		"""
 		location_id = Auth.get_location()
-		current_date = datetime.now()
-		current_date += timedelta(days=1)
-		orders = self.order_repo.filter_by(
-			is_deleted=False, date_booked_for=current_date.strftime('%Y-%m-%d'), location_id=location_id
+		yesterday  = date.today() - timedelta(days=1)
+		tomorrow = date.today() + timedelta(days=1)
+
+		orders = self.order_repo.get_range_paginated_options_all(
+			start_date=yesterday, end_date=tomorrow, location_id=location_id
 		)
 		order_list = []
 		if len(orders.items) > 0:
