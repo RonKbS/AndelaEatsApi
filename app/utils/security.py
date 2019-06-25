@@ -379,7 +379,9 @@ class Security:
 				for name, val in controller.get_params_dict().items():
 					if name.endswith('ted_at'):
 						try:
-							kwargs.__setitem__(name, datetime.strptime(kwargs.get(name), '%Y-%m-%d'))
+							# kwargs.__setitem__(name, datetime.strptime(val, '%Y-%m-%d'))
+							datetime.strptime(val, '%Y-%m-%d')
+
 						except Exception:
 							return controller.handle_response(
 								f"Bad Request - '{name}' should be valid date. Format: YYYY-MM-DD", status_code=400
