@@ -96,3 +96,74 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/UserrPayload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          firstName:
+                            type: string
+                          lastName:
+                            type: string
+                          userRoles:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                help: {}
+                                name:
+                                  type: string
+                                id:
+                                  type: integer
+                          isDeleted:
+                            type: boolean
+                          slackId:
+                            type: string
+                          timestamps:
+                            type: object
+                            properties:
+                              updated_at:
+                                type: string
+                              created_at:
+                                type: string
+                          imageUrl: {}
+                          id:
+                            type: integer
+                          userId:
+                            type: string
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "user": {
+                          "id": 5, 
+                          "isDeleted": false, 
+                          "slackId": "-LiDQHP89c5HM4U-JJsJ", 
+                          "firstName": "Cedric", 
+                          "lastName": "Lusiba", 
+                          "userId": "-LiDQHP89c5HM4U-JJsJ", 
+                          "imageUrl": null, 
+                          "timestamps": {
+                            "created_at": "2019-06-25", 
+                            "updated_at": "Tue, 25 Jun 2019 14:26:56 GMT"
+                          }, 
+                          "userRoles": [
+                            {
+                              "id": 1, 
+                              "name": "admin", 
+                              "help": null
+                            }
+                          ]
+                        }
+                      }
+                    }

@@ -76,3 +76,72 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/VendorRatingUpdatePayload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      rating:
+                        type: object
+                        properties:
+                          serviceDate:
+                            type: string
+                          timestamps:
+                            type: object
+                            properties:
+                              updated_at:
+                                type: string
+                              created_at:
+                                type: string
+                          rating:
+                            type: number
+                          channel: {}
+                          vendorId:
+                            type: integer
+                          mainMealId:
+                            type: integer
+                          userId:
+                            type: string
+                          isDeleted:
+                            type: boolean
+                          ratingType:
+                            type: string
+                          comment:
+                            type: string
+                          typeId:
+                            type: integer
+                          id:
+                            type: integer
+                          engagementId:
+                            type: integer
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "rating": {
+                          "id": 1, 
+                          "isDeleted": false, 
+                          "vendorId": 2, 
+                          "userId": "-LWBQ-ropa_CKg5ny-op", 
+                          "comment": "delicious", 
+                          "serviceDate": "Thu, 25 Apr 2019 00:00:00 GMT", 
+                          "rating": 5.0, 
+                          "channel": null, 
+                          "ratingType": "meal", 
+                          "typeId": 1, 
+                          "engagementId": 1, 
+                          "mainMealId": 1, 
+                          "timestamps": {
+                            "created_at": "2019-06-25", 
+                            "updated_at": "Tue, 25 Jun 2019 15:41:40 GMT"
+                          }
+                        }
+                      }
+                    }

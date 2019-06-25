@@ -69,3 +69,62 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/UserRolePayload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      user_role:
+                        type: object
+                        properties:
+                          isDeleted:
+                            type: boolean
+                          roleId:
+                            type: integer
+                          locationId:
+                            type: integer
+                          timestamps:
+                            type: object
+                            properties:
+                              updated_at:
+                                type: string
+                              created_at:
+                                type: string
+                          name:
+                            type: string
+                          id:
+                            type: integer
+                          isActive:
+                            type: boolean
+                          userId:
+                            type: string
+                          email:
+                            type: string
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "user_role": {
+                          "id": 9, 
+                          "isDeleted": false, 
+                          "roleId": 4, 
+                          "locationId": 3, 
+                          "userId": "-LWBQ-ropa_CKg5ny-op", 
+                          "email": "cedric.lusiba@andela.com", 
+                          "isActive": true, 
+                          "timestamps": {
+                            "created_at": "2019-06-25", 
+                            "updated_at": "Tue, 25 Jun 2019 11:26:45 GMT"
+                          }, 
+                          "name": "Cedric Lusiba"
+                        }
+                      }
+                    }
+

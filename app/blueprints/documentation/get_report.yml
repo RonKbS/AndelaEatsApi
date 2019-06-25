@@ -78,3 +78,21 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/ReportPayload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: array
+                    items:
+                      type: string
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": []
+                    }

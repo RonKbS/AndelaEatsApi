@@ -27,6 +27,27 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/StatusPayload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "User deleted", 
+                      "payload": {
+                        "status": "success"
+                      }
+                    }
 
 definitions:
   UserPayload:

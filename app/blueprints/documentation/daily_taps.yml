@@ -49,3 +49,51 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/DailyTapsPayload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                        count:
+                          type: integer
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": [
+                        {
+                          "date": "2019-06-18", 
+                          "count": 0
+                        }, 
+                        {
+                          "date": "2019-06-19", 
+                          "count": 0
+                        }, 
+                        {
+                          "date": "2019-06-20", 
+                          "count": 0
+                        }, 
+                        {
+                          "date": "2019-06-21", 
+                          "count": 0
+                        }, 
+                        {
+                          "date": "2019-06-24", 
+                          "count": 0
+                        }, 
+                        {
+                          "date": "2019-06-25", 
+                          "count": 0
+                        }
+                      ]
+                    }
