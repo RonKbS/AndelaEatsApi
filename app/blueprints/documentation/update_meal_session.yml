@@ -7,83 +7,96 @@ consumes:
   - application/json
 parameters:
   - name: X-Location
-    in: header
     type: integer
     required: true
-    description: The location of user
-    default: 1
-  - name: Authorization
+    description: The center's location Id
     in: header
+    example: '1'
+  - name: Authorization
     type: string
     required: true
-    description: Bearer Token Value
-  - name: menu
+    description: User's token prefix with the word "Bearer"
+    in: header
+  - name: meal_session
     in: body
-    description: Updates of Meal Session
+    required: true
+    description: Creation of Meal Session
     schema:
       type: object
       required:
-        - breakfast
+        - name
         - startTime
         - endTime
         - date
       properties:
+        date:
+          type: string
+          example: 2019-07-07
         name:
           type: string
           enum: [breakfast, lunch]
+          example: lunch
         startTime:
           type: string
-          example: 08:00
+          example: "13:00"
         endTime:
           type: string
-          example: 09:00
-        date:
-          type: string
-          example: "2019-11-30"
-        locationId:
-          type: string
-          example: "1"
+          example: "15:00"
 definitions:
   MealSessionPayload:
     type: object
     properties:
       msg:
         type: string
-        default: Ok
       payload:
         type: object
         properties:
-          MealSession:
+          mealSession:
             type: object
             properties:
+              date:
+                type: string
+              isDeleted:
+                type: boolean
+              locationId:
+                type: integer
+              timestamps:
+                type: object
+                properties:
+                  updated_at:
+                    type: string
+                  created_at:
+                    type: string
               name:
                 type: string
               startTime:
                 type: string
-              endTime:
-                type: string
-              date:
-                type: string
-              locationId:
+              stopTime:
                 type: string
               id:
                 type: integer
-              isDeleted:
-                type: boolean
-              timestamps:
-                type: object
-                properties:
-                  created_at:
-                    type: string
-                    format: date
-                    example: 2018-10-22
-                  updated_at:
-                    type: string
-                    format: date
-                    example: 2018-10-22
-
 responses:
   200:
     description: Ok
     schema:
-          $ref: '#/definitions/MealSessionPayload'
+      $ref: '#/definitions/MealSessionPayload'
+    examples:
+      response: |
+        {
+          "msg": "OK",
+          "payload": {
+              "mealSession": {
+                  "id": 30,
+                  "isDeleted": false,
+                  "name": "lunch",
+                  "date": "2019-07-07",
+                  "locationId": 1,
+                  "startTime": "13:00",
+                  "stopTime": "15:00",
+                  "timestamps": {
+                      "created_at": "2019-06-25",
+                      "updated_at": "Tue, 25 Jun 2019 14:39:08 GMT"
+                  }
+              }
+          }
+        }
