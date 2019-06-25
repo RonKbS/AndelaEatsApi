@@ -6,11 +6,17 @@ summary: Deletes a Location with location id
 consumes:
   - application/json
 parameters:
-  - name: Authorization
+  - name: X-Location
+    type: integer
+    required: true
+    description: The center's location Id
     in: header
+    example: '1'
+  - name: Authorization
     type: string
     required: true
-    description: Bearer Token Value
+    description: User's token prefix with the word "Bearer"
+    in: header
   - name: location_id
     in: path
     type: integer
@@ -21,4 +27,45 @@ responses:
   200:
     description: Ok
     schema:
-          $ref: '#/definitions/StatusPayload'
+      type: object
+      properties:
+        msg:
+          type: string
+        payload:
+          type: object
+          properties:
+            location:
+              type: object
+              properties:
+                isDeleted:
+                  type: boolean
+                zone:
+                  type: string
+                timestamps:
+                  type: object
+                  properties:
+                    updated_at:
+                      type: string
+                    created_at:
+                      type: string
+                name:
+                  type: string
+                id:
+                  type: integer
+    examples:
+      response: |
+        {
+          "msg": "Location deleted successfully",
+          "payload": {
+              "location": {
+                  "id": 5,
+                  "isDeleted": true,
+                  "name": "Apac",
+                  "zone": "6",
+                  "timestamps": {
+                      "created_at": "2019-06-25",
+                      "updated_at": "Tue, 25 Jun 2019 11:22:00 GMT"
+                  }
+              }
+          }
+        }
