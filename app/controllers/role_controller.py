@@ -85,7 +85,9 @@ class RoleController(BaseController):
 				user_role = self.user_role_repo.new_user_role(
 					role_id=role_id, user_id=user_id,
 					location_id=location, email=email_address)
-				return self.handle_response('OK', payload={'user_role': user_role.serialize()}, status_code=201)
+				user_role_data = user_role.serialize()
+				user_role_data.update({'name': user.get('name')})
+				return self.handle_response('OK', payload={'user_role': user_role_data}, status_code=201)
 			return self.handle_response('This role does not exist', status_code=400)
 		return self.handle_response('This User has this Role already', status_code=400)
 

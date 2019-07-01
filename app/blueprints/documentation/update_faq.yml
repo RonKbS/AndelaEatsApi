@@ -7,28 +7,37 @@ consumes:
   - application/json
 parameters:
   - name: X-Location
-    in: header
     type: integer
     required: true
-    description: The location of user
-    default: 1
-  - name: Authorization
+    description: The center's location Id
     in: header
+    schema:
+      type: string
+    example: '1'
+  - name: Authorization
     type: string
     required: true
-    description: Bearer Token Value
-  - name: menu
-    in: body
-    description: Creation of an Engagement
+    description: User's token prefix with the word "Bearer"
+    in: header
     schema:
-      type: object
-      properties:
-        category:
-          type: string
-        question:
-          type: string
-        answer:
-          type: string
+      type: string
+  - name: question
+    type: string
+    required: false
+    description: The FAQ question
+    in: body
+  - name: answer
+    type: string
+    required: false
+    description: The FAQ answer
+    in: body
+  - name: category
+    type: string
+    required: false
+    description: The FAQ category
+    in: body
+
+    example: 'user_faq'
 definitions:
   FAQPayload:
     type: object
@@ -66,6 +75,25 @@ definitions:
 
 responses:
   201:
-    description: Ok
+    description: OK
     schema:
           $ref: '#/definitions/FAQPayload'
+    examples:
+      response: |
+        {
+          "msg": "OK",
+          "payload": {
+              "faq": {
+                  "id": 1,
+                  "isDeleted": false,
+                  "category": "user_faq",
+                  "question": "test question 2",
+                  "answer": "test answer 2",
+                  "timestamps": {
+                      "created_at": "2019-06-25",
+                      "updated_at": "Tue, 25 Jun 2019 09:34:20 GMT"
+                  }
+              }
+          }
+        }
+

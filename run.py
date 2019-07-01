@@ -12,6 +12,7 @@ import traceback
 import logging
 import click
 import bugsnag
+import rollbar
 from termcolor import colored
 
 error_logger = logging.getLogger(__name__)
@@ -64,6 +65,9 @@ def handle_exception(error):
     traceback.print_exc()
     error_logger.exception(str(error))
     bugsnag.notify(error)
+
+    if get_env('APP_ENV') in ['staging', 'production']:
+        rollbar.report_exc_info()
 
     return make_response(jsonify(response)), 500
 
