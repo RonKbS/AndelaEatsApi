@@ -7,24 +7,28 @@ consumes:
   - application/json
 parameters:
   - name: X-Location
-    in: header
     type: integer
     required: true
-    description: The location of user
-    default: 1
-  - name: Authorization
+    description: The center's location Id
     in: header
+    schema:
+      type: string
+    example: '1'
+  - name: Authorization
     type: string
     required: true
-    description: Bearer Token Value
+    description: User's token prefix with the word "Bearer"
+    in: header
+    schema:
+      type: string
   - name: action_type
-    in: path
+    in: query
     type: string
     required: true
     description: a value corresponding to the existing action types ie. create, update, delete
     default: "create"
   - name: date_range
-    in: path
+    in: query
     type: string
     required: true
     description: a range of dates
@@ -74,6 +78,29 @@ definitions:
 
 responses:
   200:
-    description: Ok
+    description: OK
     schema:
           $ref: '#/definitions/GetActivitiesByTypePayload'
+    examples:
+      response: |
+        {
+          "msg": "OK",
+          "payload": {
+              "activities": [
+                  {
+                      "id": 1265,
+                      "isDeleted": false,
+                      "moduleName": "Vendor",
+                      "ipAddress": "10.5.151.218",
+                      "userId": "-LMaMG3A7FXSNy1DJQSi",
+                      "actionType": "update",
+                      "actionDetails": "{-LMaMG3A7FXSNy1DJQSi} updated {Vendor} on {Friday} 2019-05-31\nBody: {'Previous State': {'is_active': True}, 'Current State': {'id': 39, 'is_deleted': False, 'created_at': '2019-05-31T12:17:46.016566', 'updated_at': '2019-05-31T12:17:46.019880', 'name': 'Test 45', 'address': 'bukoto', 'tel': '0706440589', 'contact_person': 'mike', 'is_active': 0, 'average_rating': 0.0, 'location_id': 1}}",
+                      "channel": "web",
+                      "timestamps": {
+                          "created_at": "2019-05-31",
+                          "updated_at": "Fri, 31 May 2019 12:17:46 GMT"
+                      }
+                  }
+                ]
+            }
+          }

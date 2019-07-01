@@ -1,62 +1,148 @@
 Create or Update about
 ---
+#tags:
+#  - About
+#summary: Creates or Update About Page
+#consumes:
+#  - application/json
+#parameters:
+#  - name: Authorization
+#    in: header
+#    type: string
+#    required: true
+#    description: Bearer Token Value
+#  - name: menu
+#    in: body
+#    description: HTML Markup
+#    schema:
+#      type: object
+#      required:
+#        - data
+#      properties:
+#        data:
+#          type: string
+#          example: "<html><head></head></html>"
+#definitions:
+#  AboutPayload:
+#    type: object
+#    properties:
+#      msg:
+#        type: string
+#        example: "Ok"
+#      payload:
+#        type: object
+#        properties:
+#          data:
+#            type: object
+#            properties:
+#              details:
+#                type: string
+#                example: "<html><head></head></html>"
+#              id:
+#                type: integer
+#                example: 1
+#              isDeleted:
+#                type: boolean
+#              timestamps:
+#                type: object
+#                properties:
+#                  created_at:
+#                    type: string
+#                    format: date
+#                    example: 2018-10-22
+#                  updated_at:
+#                    type: string
+#                    format: date
+#                    example: 2018-10-22
+#
+#responses:
+#  201:
+#    description: Ok
+#    schema:
+#          $ref: '#/definitions/AboutPayload'
+#
+#
+#Get About page
+#---
 tags:
   - About
 summary: Creates or Update About Page
 consumes:
   - application/json
 parameters:
-  - name: Authorization
+  - name: X-Location
+    type: integer
+    required: true
+    description: The center's location Id
     in: header
+    schema:
+      type: string
+    example: '1'
+  - name: Authorization
     type: string
     required: true
-    description: Bearer Token Value
-  - name: menu
+    description: User's token prefix with the word "Bearer"
+    in: header
+    schema:
+      type: string
+
+  - name: data
     in: body
-    description: HTML Markup
+    required: true
+    content:
+      application/json:
     schema:
       type: object
-      required:
-        - data
       properties:
         data:
           type: string
-          example: "<html><head></head></html>"
-definitions:
-  AboutPayload:
-    type: object
-    properties:
-      msg:
-        type: string
-        example: "Ok"
-      payload:
-        type: object
-        properties:
-          data:
-            type: object
-            properties:
-              details:
-                type: string
-                example: "<html><head></head></html>"
-              id:
-                type: integer
-                example: 1
-              isDeleted:
-                type: boolean
-              timestamps:
-                type: object
-                properties:
-                  created_at:
-                    type: string
-                    format: date
-                    example: 2018-10-22
-                  updated_at:
-                    type: string
-                    format: date
-                    example: 2018-10-22
+    examples:
+      '0': |
+        {
+            "data": "<html><head></head></html>"
+        }
 
 responses:
   201:
-    description: Ok
+    description: OK
+
     schema:
-          $ref: '#/definitions/AboutPayload'
+      type: object
+      properties:
+        msg:
+          type: string
+        payload:
+          type: object
+          properties:
+            data:
+              type: object
+              properties:
+                isDeleted:
+                  type: boolean
+                timestamps:
+                  type: object
+                  properties:
+                    updated_at:
+                      type: string
+                    created_at:
+                      type: string
+                details:
+                  type: string
+                id:
+                  type: integer
+    examples:
+      'response': |
+        {
+          "msg": "OK",
+          "payload": {
+            "data": {
+              "id": 1,
+              "isDeleted": false,
+              "details": "<html><head></head></html>",
+              "timestamps": {
+                "created_at": "2019-06-24",
+                "updated_at": "Mon, 24 Jun 2019 17:55:48 GMT"
+              }
+            }
+          }
+        }
