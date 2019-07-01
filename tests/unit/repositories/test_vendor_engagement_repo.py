@@ -24,14 +24,14 @@ class TestVendorEngagementRepo(BaseTestCase):
 		self.repo.new_vendor_engagement(engagement.vendor.id, engagement.start_date,
 														 engagement.location_id, engagement.end_date, 1, 1)
 
-		count = self.repo.get_existing_engagement(engagement.start_date)
+		count = self.repo.get_existing_engagement(engagement.start_date, engagement.end_date)
 
 		self.assertEqual(count, 1)
 
 	def test_get_existing_engagement_when_engagment_does_not_exists(self):
 		engagement = VendorEngagementFactory.build()
 
-		count = self.repo.get_existing_engagement(engagement.start_date)
+		count = self.repo.get_existing_engagement(engagement.start_date, engagement.end_date)
 
 		self.assertEqual(count, 0)
 

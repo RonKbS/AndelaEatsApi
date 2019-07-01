@@ -25,9 +25,10 @@ class VendorEngagementRepo(BaseRepo):
 			VendorEngagement.start_date >= datetime.now().date(),
 			VendorEngagement.is_deleted.is_(False)).paginate(error_out=False)
 
-	def get_existing_engagement(self, start_date):
+	def get_existing_engagement(self, start_date, end_date):
 		return VendorEngagement.query.filter(
-			VendorEngagement.end_date >= start_date,
+			VendorEngagement.start_date >= start_date,
+			VendorEngagement.end_date <= end_date,
 			VendorEngagement.is_deleted.is_(False)
 		).count()
 
