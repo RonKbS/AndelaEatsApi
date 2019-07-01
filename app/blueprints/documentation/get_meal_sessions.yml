@@ -7,16 +7,16 @@ consumes:
   - application/json
 parameters:
   - name: X-Location
-    in: header
     type: integer
     required: true
-    description: The location of user
-    default: 1
-  - name: Authorization
+    description: The center's location Id
     in: header
+    example: '1'
+  - name: Authorization
     type: string
     required: true
-    description: Bearer Token Value
+    description: User's token prefix with the word "Bearer"
+    in: header
   - name: date
     in: query
     type: string
@@ -97,4 +97,34 @@ responses:
   200:
     description: Ok
     schema:
-          $ref: '#/definitions/SessionListPayload'
+      $ref: '#/definitions/SessionListPayload'
+    examples:
+      response: |
+        {
+          "msg": "OK",
+          "payload": {
+              "MealSessions": [
+                  {
+                      "id": 2,
+                      "isDeleted": false,
+                      "name": "breakfast",
+                      "date": "Wed, 30 Oct 2019 00:00:00 GMT",
+                      "locationId": 1,
+                      "startTime": "08:00:00",
+                      "stopTime": "09:00:00",
+                      "timestamps": {
+                          "created_at": "2019-04-09",
+                          "updated_at": "Tue, 09 Apr 2019 06:51:27 GMT"
+                      }
+                  }
+
+              ],
+              "meta": {
+                  "total_rows": 29,
+                  "total_pages": 2,
+                  "current_page": 1,
+                  "next_page": 2,
+                  "prev_page": null
+              }
+          }
+        }

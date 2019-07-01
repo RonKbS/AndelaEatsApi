@@ -7,24 +7,28 @@ consumes:
   - application/json
 parameters:
   - name: X-Location
-    in: header
     type: integer
     required: true
-    description: The location of user
-    default: 1
-  - name: Authorization
+    description: The center's location Id
     in: header
+    schema:
+      type: string
+    example: '1'
+  - name: Authorization
     type: string
     required: true
-    description: Bearer Token Value
+    description: User's token prefix with the word "Bearer"
+    in: header
+    schema:
+      type: string
   - name: category
-    in: path
+    in: query
     type: string
     required: false
     description: category of of the FAQs
     default: "user_faq"
   - name: question
-    in: path
+    in: query
     type: string
     required: false
     description: question of the FAQs
@@ -32,51 +36,71 @@ definitions:
   FAQListPayload:
     type: object
     properties:
-      meta:
-        type: object
-        properties:
-          current_page:
-            type: integer
-          next_page:
-            type: integer
-          prev_page:
-            type: integer
-          total_pages:
-            type: integer
-          total_rows:
-            type: integer
       msg:
         type: string
-        default: Ok
       payload:
         type: object
         properties:
-          FAQs:
+          faqs:
             type: array
             items:
               type: object
               properties:
-                category:
+                is_deleted:
+                  type: boolean
+                updated_at:
                   type: string
                 question:
                   type: string
                 answer:
                   type: string
-                id:
-                  type: integer
-                isDeleted:
-                  type: boolean
                 created_at:
                   type: string
-                  format: date
-                  example: 2018-10-22
-                updated_at:
+                id:
+                  type: integer
+                category:
                   type: string
-                  format: date
-                  example: 2018-10-22
+          meta:
+            type: object
+            properties:
+              next_page: {}
+              total_rows:
+                type: integer
+              total_pages:
+                type: integer
+              prev_page: {}
+              current_page:
+                type: integer
 
 responses:
   200:
-    description: Ok
+    description: OK
     schema:
-          $ref: '#/definitions/FAQListPayload'
+      $ref: '#/definitions/FAQListPayload'
+    examples:
+      response: |
+        {
+          "msg": "OK",
+          "payload": {
+            "faqs": [
+              {
+                "id": 3,
+                "is_deleted": false,
+                "created_at": "Wed, 27 Mar 2019 11:05:19 GMT",
+                "updated_at": "Tue, 23 Apr 2019 06:05:05 GMT",
+                "category": "user_faq",
+                "question": "test question",
+                "answer": "test answering okays"
+              },
+              {
+                "id": 16,
+                "is_deleted": false,
+                "created_at": "Mon, 15 Apr 2019 06:22:45 GMT",
+                "updated_at": "Tue, 23 Apr 2019 09:30:10 GMT",
+                "category": "user_faq",
+                "question": "Added another.",
+                "answer": "Added an answer."
+              }
+            ]
+          }
+        }

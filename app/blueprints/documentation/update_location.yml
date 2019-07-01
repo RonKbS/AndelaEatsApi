@@ -6,29 +6,70 @@ summary: Updates an existing Location.
 consumes:
   - application/json
 parameters:
-  - name: Authorization
-    in: header
-    type: string
-    required: true
-    description: Bearer Token Value
-  - name: location_id
-    in: path
+  - name: X-Location
     type: integer
     required: true
-    description: The id of the Location
-    default: 1
-  - in: body
-    name: menu
-    description: update of a Location
-    schema:
-      type: object
-      required:
-        - name
-      properties:
-        name:
-          type: string
+    description: The center's location Id
+    in: header
+    example: '1'
+  - name: Authorization
+    type: string
+    required: true
+    description: User's token prefix with the word "Bearer"
+    in: header
+  - name: name
+    in: body
+    required: false
+    description: The name of the location to create
+    type: string
+    example: "Kigali"
+  - name: zone
+    in: body
+    required: false
+    description: The timezone of the location
+    type: integer
+    example: 3
 responses:
   200:
     description: Ok
     schema:
-          $ref: '#/definitions/LocationPayload'
+      msg:
+        type: string
+      payload:
+        type: object
+        properties:
+          location:
+            type: object
+            properties:
+              isDeleted:
+                type: boolean
+              zone:
+                type: string
+              timestamps:
+                type: object
+                properties:
+                  updated_at:
+                    type: string
+                  created_at:
+                    type: string
+              name:
+                type: string
+              id:
+                type: integer
+    examples:
+      response: |
+        {
+          "msg": "OK",
+          "payload": {
+              "location": {
+                  "id": 5,
+                  "isDeleted": false,
+                  "name": "Apac",
+                  "zone": "5",
+                  "timestamps": {
+                      "created_at": "2019-06-25",
+                      "updated_at": "Tue, 25 Jun 2019 10:53:14 GMT"
+                  }
+              }
+          }
+        }

@@ -7,16 +7,16 @@ consumes:
   - application/json
 parameters:
   - name: X-Location
-    in: header
     type: integer
     required: true
-    description: The location of user
-    default: 1
-  - name: Authorization
+    description: The center's location Id
     in: header
+    example: '1'
+  - name: Authorization
     type: string
     required: true
-    description: Bearer Token Value
+    description: User's token prefix with the word "Bearer"
+    in: header
   - name: meal_item_id
     in: path
     type: integer
@@ -29,15 +29,24 @@ definitions:
     properties:
       msg:
         type: string
-        default: Ok
       payload:
         type: object
         properties:
           status:
             type: string
 
+
 responses:
   200:
     description: Ok
     schema:
-          $ref: '#/definitions/StatusPayload'
+      $ref: '#/definitions/StatusPayload'
+    examples:
+      response: |
+        {
+          "msg": "OK",
+          "payload": {
+              "status": "success"
+          }
+        }
+
