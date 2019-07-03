@@ -58,6 +58,7 @@ class UserController(BaseController):
                 admin_user_profile['name'] = andela_user_profile['name']
                 admin_user_profile['id'] = andela_user_profile['id']
                 admin_user_profile['roles'] = roles
+                admin_user_profile['user_role_id'] = user_role.id
 
                 admin_users_list.append(admin_user_profile)
 
