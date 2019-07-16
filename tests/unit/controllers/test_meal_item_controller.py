@@ -59,6 +59,32 @@ class TestMealItemController(BaseTestCase):
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'OK'
 
+    @patch.object(MealItemController, 'get_params_dict')
+    @patch.object(MealItemRepo, 'get_unpaginated')
+    @patch('app.Auth.get_location')
+    def test_list_meals_with_query_params_ok_response(
+            self,
+            mock_get_location,
+            mock_get_unpaginated,
+            mock_get_params_dict
+    ):
+        '''Test list_meals OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_get_location.return_value = 1
+            mock_get_unpaginated.return_value = [self.mock_meal_item, ]
+            mock_get_params_dict.return_value = {'name': self.mock_meal_item.name}
+
+            meal_item_controller = MealItemController(self.request_context)
+
+            # Act
+            result = meal_item_controller.list_meals()
+
+            # Assert
+            assert result.status_code == 200
+            assert result.get_json()['msg'] == 'OK'
+
     @patch('app.Auth.get_location')
     @patch.object(MealItemRepo, 'filter_by')
     @patch.object(MealItemController, 'pagination_meta')

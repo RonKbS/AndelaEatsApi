@@ -1,5 +1,5 @@
-from sqlalchemy import desc, asc
-from app.models import VendorRating
+from sqlalchemy import desc, asc, cast, String
+from app.models import *
 from flask_sqlalchemy import Pagination
 from functools import wraps
 from app.utils.handled_exceptions import BaseModelValidationError
@@ -99,6 +99,23 @@ class BaseRepo:
     def get_unpaginated(self, **kwargs):
         """Query and filter the data of the model."""
         return self._model.query.filter_by(**kwargs).all()
+
+    def filter_by_query_params(self, query_params):
+        """Query and filter the data of the model based on the query params.
+
+        Args:
+            query_params (dict): Python dictionary containing the query params
+
+        """
+        alchemy_like_expression = 'cast({model}.{field}, String()).like("%{value}%"),'
+        filter_expression = ''
+
+        for field, value in query_params.items():
+            filter_expression += alchemy_like_expression.format(model=self._model.__name__, field=field, value=value)
+        filter_expression = eval(filter_expression)
+
+        return self._model.query.filter(*filter_expression).filter_by(is_deleted=False).all()  if filter_expression \
+            else []
 
     @filter_deleted
     def get_unpaginated_asc(self, *args, **kwargs):

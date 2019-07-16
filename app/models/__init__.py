@@ -19,6 +19,11 @@ from .user import User
 from .meal_session import MealSession
 from .meal_service import MealService
 
+__all__ = (
+    'Location', 'Vendor', 'VendorEngagement', 'Role', 'Permission', 'UserRole', 'VendorRating', 'Menu',
+    'MealItem', 'Order', 'Activity', 'Faq', 'About', 'User', 'MealSession', 'MealService',
+           )
+
 from .listener_helpers import attach_listen_type
 
 tables_logged_after_every_insert = [Vendor, VendorEngagement, MealItem, Menu, Faq,
