@@ -90,3 +90,130 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/UserListPayload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      meta:
+                        type: object
+                        properties:
+                          next_page: {}
+                          total_rows:
+                            type: integer
+                          total_pages:
+                            type: integer
+                          prev_page: {}
+                          current_page:
+                            type: integer
+                      users:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            firstName:
+                              type: string
+                            lastName:
+                              type: string
+                            userRoles:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  id:
+                                    type: integer
+                            isDeleted:
+                              type: boolean
+                            slackId:
+                              type: string
+                            timestamps:
+                              type: object
+                              properties:
+                                updated_at:
+                                  type: string
+                                created_at:
+                                  type: string
+                            imageUrl:
+                              type: string
+                            id:
+                              type: integer
+                            userId:
+                              type: string
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "users": [
+                          {
+                            "id": 3, 
+                            "isDeleted": false, 
+                            "slackId": "@cdvx", 
+                            "firstName": "Cedric", 
+                            "lastName": "Lusiba", 
+                            "userId": "-LWBQ-ropa_CKg5ny-op", 
+                            "imageUrl": "https://image.com", 
+                            "timestamps": {
+                              "created_at": "2019-06-29", 
+                              "updated_at": "Sun, 30 Jun 2019 14:46:17 GMT"
+                            }, 
+                            "userRoles": [
+                              {
+                                "id": 1, 
+                                "name": "admin"
+                              }, 
+                              {
+                                "id": 4, 
+                                "name": "Tech"
+                              }, 
+                              {
+                                "id": 2, 
+                                "name": "user"
+                              }
+                            ]
+                          }, 
+                          {
+                            "id": 4, 
+                            "isDeleted": false, 
+                            "slackId": "@cdvxr", 
+                            "firstName": "Cedric", 
+                            "lastName": "Lusiba", 
+                            "userId": "-LWBQ-ropa_CKg5ny-op", 
+                            "imageUrl": "https://image.com", 
+                            "timestamps": {
+                              "created_at": "2019-06-29", 
+                              "updated_at": "Sun, 30 Jun 2019 14:46:17 GMT"
+                            }, 
+                            "userRoles": [
+                              {
+                                "id": 1, 
+                                "name": "admin"
+                              }, 
+                              {
+                                "id": 4, 
+                                "name": "Tech"
+                              }, 
+                              {
+                                "id": 2, 
+                                "name": "user"
+                              }
+                            ]
+                          }
+                        ], 
+                        "meta": {
+                          "total_rows": 2, 
+                          "total_pages": 1, 
+                          "current_page": 1, 
+                          "next_page": null, 
+                          "prev_page": null
+                        }
+                      }
+                    }

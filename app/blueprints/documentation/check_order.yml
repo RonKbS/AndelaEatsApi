@@ -38,3 +38,70 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/Order1Payload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      order:
+                        type: object
+                        properties:
+                          isDeleted:
+                            type: boolean
+                          dateBookedFor:
+                            type: string
+                          mealPeriod:
+                            type: string
+                          locationId:
+                            type: integer
+                          timestamps:
+                            type: object
+                            properties:
+                              updated_at:
+                                type: string
+                              created_at:
+                                type: string
+                          channel:
+                            type: string
+                          orderStatus:
+                            type: string
+                          menuId:
+                            type: integer
+                          dateBooked:
+                            type: string
+                          id:
+                            type: integer
+                          userId:
+                            type: string
+                          hasRated:
+                            type: boolean
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "order": {
+                          "id": 1, 
+                          "isDeleted": false, 
+                          "userId": "-LWBQ-ropa_CKg5ny-op", 
+                          "dateBookedFor": "Thu, 27 Jun 2019 00:00:00 GMT", 
+                          "dateBooked": "Wed, 26 Jun 2019 00:00:00 GMT", 
+                          "channel": "slack", 
+                          "mealPeriod": "lunch", 
+                          "orderStatus": "booked", 
+                          "hasRated": false, 
+                          "menuId": 1, 
+                          "locationId": 3, 
+                          "timestamps": {
+                            "created_at": "2019-06-26", 
+                            "updated_at": "Wed, 26 Jun 2019 10:28:53 GMT"
+                          }
+                        }
+                      }
+                    }

@@ -60,3 +60,48 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/RolePayload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      role:
+                        type: object
+                        properties:
+                          help: {}
+                          isDeleted:
+                            type: boolean
+                          timestamps:
+                            type: object
+                            properties:
+                              updated_at:
+                                type: string
+                              created_at:
+                                type: string
+                          name:
+                            type: string
+                          id:
+                            type: integer
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "role": {
+                          "id": 1, 
+                          "isDeleted": false, 
+                          "name": "admin", 
+                          "help": null, 
+                          "timestamps": {
+                            "created_at": "2019-05-29", 
+                            "updated_at": "Wed, 29 May 2019 14:46:17 GMT"
+                          }
+                        }
+                      }
+                    }

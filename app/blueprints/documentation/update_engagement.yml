@@ -47,3 +47,104 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/EngagementPayload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      engagement:
+                        type: object
+                        properties:
+                          isDeleted:
+                            type: boolean
+                          endDate:
+                            type: string
+                          locationId:
+                            type: integer
+                          timestamps:
+                            type: object
+                            properties:
+                              updated_at:
+                                type: string
+                              created_at:
+                                type: string
+                          vendor:
+                            type: object
+                            properties:
+                              address:
+                                type: string
+                              isDeleted:
+                                type: boolean
+                              locationId:
+                                type: integer
+                              timestamps:
+                                type: object
+                                properties:
+                                  updated_at:
+                                    type: string
+                                  created_at:
+                                    type: string
+                              averageRating:
+                                type: number
+                              name:
+                                type: string
+                              contactPerson:
+                                type: string
+                              tel:
+                                type: string
+                              id:
+                                type: integer
+                              isActive:
+                                type: boolean
+                          vendorId:
+                            type: integer
+                          id:
+                            type: integer
+                          startDate:
+                            type: string
+                          terminationReason: {}
+                          status:
+                            type: integer
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "engagement": {
+                          "id": 1, 
+                          "isDeleted": false, 
+                          "vendorId": 2, 
+                          "locationId": 3, 
+                          "startDate": "Tue, 25 Jun 2019 00:00:00 GMT", 
+                          "endDate": "Sat, 25 Jun 2039 00:00:00 GMT", 
+                          "status": 1, 
+                          "terminationReason": null, 
+                          "timestamps": {
+                            "created_at": "2019-06-25", 
+                            "updated_at": "Tue, 25 Jun 2019 15:41:40 GMT"
+                          }, 
+                          "vendor": {
+                            "id": 2, 
+                            "isDeleted": false, 
+                            "name": "CJ's", 
+                            "address": "kampala", 
+                            "tel": "0702795397", 
+                            "contactPerson": "Konnichiwa", 
+                            "isActive": true, 
+                            "averageRating": 0.0, 
+                            "locationId": 3, 
+                            "timestamps": {
+                              "created_at": "2019-06-25", 
+                              "updated_at": "Tue, 25 Jun 2019 14:26:56 GMT"
+                            }
+                          }
+                        }
+                      }
+                    }
+

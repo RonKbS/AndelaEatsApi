@@ -82,3 +82,80 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/RoleListPayload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      meta:
+                        type: object
+                        properties:
+                          next_page: {}
+                          total_rows:
+                            type: integer
+                          total_pages:
+                            type: integer
+                          prev_page: {}
+                          current_page:
+                            type: integer
+                      roles:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            help: {}
+                            isDeleted:
+                              type: boolean
+                            timestamps:
+                              type: object
+                              properties:
+                                updated_at:
+                                  type: string
+                                created_at:
+                                  type: string
+                            name:
+                              type: string
+                            id:
+                              type: integer
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "roles": [
+                          {
+                            "id": 1, 
+                            "isDeleted": false, 
+                            "name": "admin", 
+                            "help": null, 
+                            "timestamps": {
+                              "created_at": "2019-05-29", 
+                              "updated_at": "Wed, 29 May 2019 14:46:17 GMT"
+                            }
+                          }, 
+                          {
+                            "id": 2, 
+                            "isDeleted": false, 
+                            "name": "user", 
+                            "help": null, 
+                            "timestamps": {
+                              "created_at": "2019-05-29", 
+                              "updated_at": "Wed, 29 May 2019 14:46:17 GMT"
+                            }
+                          }
+                        ], 
+                        "meta": {
+                          "total_rows": 2, 
+                          "total_pages": 1, 
+                          "current_page": 1, 
+                          "next_page": null, 
+                          "prev_page": null
+                        }
+                      }
+                    }

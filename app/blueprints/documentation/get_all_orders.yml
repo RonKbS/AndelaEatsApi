@@ -103,3 +103,117 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/OrderList1Payload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      meta:
+                        type: object
+                        properties:
+                          next_page: {}
+                          total_rows:
+                            type: integer
+                          total_pages:
+                            type: integer
+                          prev_page: {}
+                          current_page:
+                            type: integer
+                      orders:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            mealItems:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  image: {}
+                                  meal_type:
+                                    type: string
+                                  name:
+                                    type: string
+                                  id:
+                                    type: integer
+                            mealPeriod:
+                              type: string
+                            timestamps:
+                              type: object
+                              properties:
+                                updated_at:
+                                  type: string
+                                created_at:
+                                  type: string
+                            channel:
+                              type: string
+                            orderStatus:
+                              type: string
+                            userId:
+                              type: string
+                            hasRated:
+                              type: boolean
+                            isDeleted:
+                              type: boolean
+                            dateBookedFor:
+                              type: string
+                            locationId:
+                              type: integer
+                            menuId:
+                              type: integer
+                            dateBooked:
+                              type: string
+                            id:
+                              type: integer
+                            user:
+                              type: string
+                            user_rating: {}
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "orders": [
+                          {
+                            "id": 1, 
+                            "isDeleted": false, 
+                            "userId": "-LWBQ-ropa_CKg5ny-op", 
+                            "dateBookedFor": "Thu, 27 Jun 2019 00:00:00 GMT", 
+                            "dateBooked": "Wed, 26 Jun 2019 00:00:00 GMT", 
+                            "channel": "slack", 
+                            "mealPeriod": "lunch", 
+                            "orderStatus": "booked", 
+                            "hasRated": false, 
+                            "menuId": 1, 
+                            "locationId": 3, 
+                            "timestamps": {
+                              "created_at": "2019-06-26", 
+                              "updated_at": "Wed, 26 Jun 2019 10:28:53 GMT"
+                            }, 
+                            "mealItems": [
+                              {
+                                "id": 1, 
+                                "meal_type": "main", 
+                                "name": "Chow Kung Pow", 
+                                "image": null
+                              }
+                            ], 
+                            "user": "Cedric Lusiba", 
+                            "user_rating": null
+                          }
+                        ], 
+                        "meta": {
+                          "total_rows": 1, 
+                          "total_pages": 1, 
+                          "current_page": 1, 
+                          "next_page": null, 
+                          "prev_page": null
+                        }
+                      }
+                    }

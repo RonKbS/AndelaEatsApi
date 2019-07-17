@@ -99,3 +99,44 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/VendorListPayload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      meta:
+                        type: object
+                        properties:
+                          next_page: {}
+                          total_rows:
+                            type: integer
+                          total_pages:
+                            type: integer
+                          prev_page: {}
+                          current_page:
+                            type: integer
+                      vendors:
+                        type: array
+                        items:
+                          type: string
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "vendors": [], 
+                        "meta": {
+                          "total_rows": 0, 
+                          "total_pages": 0, 
+                          "current_page": 1, 
+                          "next_page": null, 
+                          "prev_page": null
+                        }
+                      }
+                    }

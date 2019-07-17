@@ -84,3 +84,74 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/PermissionListPayload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      role_permissions:
+                        type: array
+                        items:
+                          type: string
+                      role_id:
+                        type: integer
+              examples:
+                '0':
+                  value: |
+                      {
+                        "msg": "OK",
+                        "payload": {
+                          "permissions": [
+                              {
+                                  "id": 1,
+                                  "isDeleted": false,
+                                  "roleId": 1,
+                                  "name": "view_meal_item",
+                                  "keyword": "view_meal_item",
+                                  "timestamps": {
+                                      "created_at": "2019-05-29",
+                                      "updated_at": "Wed, 29 May 2019 14:46:17 GMT"
+                                  }
+                              },
+                              {
+                                  "id": 2,
+                                  "isDeleted": false,
+                                  "roleId": 1,
+                                  "name": "create_meal_item",
+                                  "keyword": "create_meal_item",
+                                  "timestamps": {
+                                      "created_at": "2019-05-29",
+                                      "updated_at": "Wed, 29 May 2019 14:46:17 GMT"
+                                  }
+                              },
+                              {
+                                  "id": 3,
+                                  "isDeleted": false,
+                                  "roleId": 1,
+                                  "name": "update_meal_item",
+                                  "keyword": "update_meal_item",
+                                  "timestamps": {
+                                      "created_at": "2019-05-29",
+                                      "updated_at": "Wed, 29 May 2019 14:46:17 GMT"
+                                  }
+                              },
+                              {
+                                  "id": 4,
+                                  "isDeleted": false,
+                                  "roleId": 1,
+                                  "name": "delete_meal_item",
+                                  "keyword": "delete_meal_item",
+                                  "timestamps": {
+                                      "created_at": "2019-05-29",
+                                      "updated_at": "Wed, 29 May 2019 14:46:17 GMT"
+                                  }
+                              }
+                          ]
+                        }
+                      }
+                          
