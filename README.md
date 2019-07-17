@@ -53,6 +53,10 @@ Execute the following code to seed the database
 flask seed_database
 ```
 
+Execute the following command in the terminal to start the redis server
+```
+bash redis.sh
+```
 
 Execute the following at the command line
 ```

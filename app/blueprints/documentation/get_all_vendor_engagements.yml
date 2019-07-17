@@ -115,3 +115,125 @@ responses:
     description: A list of all vendors
     schema:
       $ref: '#/definitions/EngagementListPayload'
+      content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      meta:
+                        type: object
+                        properties:
+                          next_page: {}
+                          total_rows:
+                            type: integer
+                          total_pages:
+                            type: integer
+                          prev_page: {}
+                          current_page:
+                            type: integer
+                      engagements:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            isDeleted:
+                              type: boolean
+                            endDate:
+                              type: string
+                            locationId:
+                              type: integer
+                            timestamps:
+                              type: object
+                              properties:
+                                updated_at:
+                                  type: string
+                                created_at:
+                                  type: string
+                            vendor:
+                              type: object
+                              properties:
+                                address:
+                                  type: string
+                                isDeleted:
+                                  type: boolean
+                                locationId:
+                                  type: integer
+                                timestamps:
+                                  type: object
+                                  properties:
+                                    updated_at:
+                                      type: string
+                                    created_at:
+                                      type: string
+                                averageRating:
+                                  type: number
+                                name:
+                                  type: string
+                                contactPerson:
+                                  type: string
+                                tel:
+                                  type: string
+                                id:
+                                  type: integer
+                                isActive:
+                                  type: boolean
+                            vendorId:
+                              type: integer
+                            id:
+                              type: integer
+                            startDate:
+                              type: string
+                            terminationReason: {}
+                            status:
+                              type: integer
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "engagements": [
+                          {
+                            "id": 2, 
+                            "isDeleted": false, 
+                            "vendorId": 2, 
+                            "locationId": 3, 
+                            "startDate": "Sun, 25 Jun 2017 00:00:00 GMT", 
+                            "endDate": "Mon, 25 Jun 2018 00:00:00 GMT", 
+                            "status": 1, 
+                            "terminationReason": null, 
+                            "timestamps": {
+                              "created_at": "2019-06-25", 
+                              "updated_at": "Tue, 25 Jun 2019 15:41:40 GMT"
+                            }, 
+                            "vendor": {
+                              "id": 2, 
+                              "isDeleted": false, 
+                              "name": "CJ's", 
+                              "address": "kampala", 
+                              "tel": "0702795397", 
+                              "contactPerson": "Konnichiwa", 
+                              "isActive": true, 
+                              "averageRating": 0.0, 
+                              "locationId": 3, 
+                              "timestamps": {
+                                "created_at": "2019-06-25", 
+                                "updated_at": "Tue, 25 Jun 2019 14:26:56 GMT"
+                              }
+                            }
+                          }
+                        ], 
+                        "meta": {
+                          "total_rows": 1, 
+                          "total_pages": 1, 
+                          "current_page": 1, 
+                          "next_page": null, 
+                          "prev_page": null
+                        }
+                      }
+                    }

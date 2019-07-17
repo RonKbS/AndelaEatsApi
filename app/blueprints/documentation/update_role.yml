@@ -1,4 +1,4 @@
-Update a Role
+Update a Role (PATCH)
 ---
 tags:
   - Roles
@@ -38,3 +38,66 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/RolePayload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      role:
+                        type: object
+                        properties:
+                          help:
+                            type: string
+                          isDeleted:
+                            type: boolean
+                          timestamps:
+                            type: object
+                            properties:
+                              updated_at:
+                                type: string
+                              created_at:
+                                type: string
+                          name:
+                            type: string
+                          id:
+                            type: integer
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "role": {
+                          "id": 4, 
+                          "isDeleted": false, 
+                          "name": "Tech-Support", 
+                          "help": "Provides engineers with technical technical support", 
+                          "timestamps": {
+                            "created_at": "2019-06-25", 
+                            "updated_at": "Tue, 25 Jun 2019 11:26:45 GMT"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "role": {
+                          "id": 4, 
+                          "isDeleted": false, 
+                          "name": "Tech", 
+                          "help": "Provides engineers with technical technical support", 
+                          "timestamps": {
+                            "created_at": "2019-06-25", 
+                            "updated_at": "Tue, 25 Jun 2019 11:26:45 GMT"
+                          }
+                        }
+                      }
+                    }
+                  
+      

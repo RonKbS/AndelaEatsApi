@@ -43,5 +43,8 @@ nosetests.xml
 .vscode/
 .pytest_cache
 
+# redis dir
+redis-stable/
+
 # logs
 */*.log

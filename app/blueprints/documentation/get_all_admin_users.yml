@@ -51,3 +51,113 @@ responses:
     description: Ok
     schema:
           $ref: '#/definitions/AdminUserListPayload'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      meta:
+                        type: object
+                        properties:
+                          next_page: {}
+                          total_rows:
+                            type: integer
+                          total_pages:
+                            type: integer
+                          prev_page: {}
+                          current_page:
+                            type: integer
+                      adminUsers:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            roles:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  role_name:
+                                    type: string
+                                  role_id:
+                                    type: integer
+                            name:
+                              type: string
+                            id:
+                              type: string
+                            email:
+                              type: string
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "adminUsers": [
+                          {
+                            "email": "eno.bassey@andela.com", 
+                            "name": "Eno Bassey", 
+                            "id": "-LG__88sozO1OGrqda2z", 
+                            "roles": [
+                              {
+                                "role_id": 1, 
+                                "role_name": "admin"
+                              }
+                            ]
+                          }, 
+                          {
+                            "email": "ayoola.ajebeku@andela.com", 
+                            "name": "Ayoola Ajebeku", 
+                            "id": "-K_djydLXD3FE_w141iJ", 
+                            "roles": [
+                              {
+                                "role_id": 1, 
+                                "role_name": "admin"
+                              }
+                            ]
+                          }, 
+                          {
+                            "email": "cedric.lusiba@andela.com", 
+                            "name": "Cedric Lusiba", 
+                            "id": "-LWBQ-ropa_CKg5ny-op", 
+                            "roles": [
+                              {
+                                "role_id": 1, 
+                                "role_name": "admin"
+                              }
+                            ]
+                          }, 
+                          {
+                            "email": "cedric.lusiba@andela.com", 
+                            "name": "Cedric Lusiba", 
+                            "id": "-LWBQ-ropa_CKg5ny-op", 
+                            "roles": [
+                              {
+                                "role_id": 1, 
+                                "role_name": "admin"
+                              }, 
+                              {
+                                "role_id": 4, 
+                                "role_name": "Tech"
+                              }, 
+                              {
+                                "role_id": 2, 
+                                "role_name": "user"
+                              }
+                            ]
+                          }
+                        ], 
+                        "meta": {
+                          "total_rows": 4, 
+                          "total_pages": 1, 
+                          "current_page": 1, 
+                          "next_page": null, 
+                          "prev_page": null
+                        }
+                      }
+                    }

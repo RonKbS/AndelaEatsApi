@@ -60,3 +60,49 @@ responses:
     description: The last engagement
     schema:
       $ref: '#/definitions/EngagementPayload'
+      content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      engagement:
+                        type: object
+                        properties:
+                          endDate:
+                            type: string
+                          vendor:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              contactPerson:
+                                type: string
+                              tel:
+                                type: string
+                              id:
+                                type: integer
+                          startDate:
+                            type: string
+              examples:
+                '0':
+                  value: |
+                    {
+                      "msg": "OK", 
+                      "payload": {
+                        "engagement": {
+                          "startDate": "Sun, 25 Jun 2017 00:00:00 GMT", 
+                          "endDate": "Mon, 25 Jun 2018 00:00:00 GMT", 
+                          "vendor": {
+                            "id": 2, 
+                            "name": "CJ's", 
+                            "tel": "0702795397", 
+                            "contactPerson": "Konnichiwa"
+                          }
+                        }
+                      }
+                    }
