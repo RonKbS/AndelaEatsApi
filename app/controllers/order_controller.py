@@ -294,18 +294,47 @@ class OrderController(BaseController):
 		"""
 		user_id, order_type, order_date = self.request_params('userId', 'orderType', 'orderDate')
 
+		# turn date_str into datetime object
+		date_time_obj = datetime.strptime(order_date, '%Y-%m-%d')
+		
+		# true if the order date has not passed
+		valid_date = date_time_obj > datetime.now()
+
 		order = self.order_repo.find_first(user_id=user_id, meal_period=order_type, date_booked_for=order_date, is_deleted=False)
-		if not order:
+		if order:
+			return self.handle_exisiting_order(order, valid_date, order_date)
+		else:
 			return self.handle_response(f'User has no {order_type} order for the date.', status_code=400)
 
-		if order.order_status == OrderStatus.collected:
+
+	def handle_exisiting_order(self, order, valid_date, order_date):
+		"""
+		Checks order for valid order date and status
+		and then returns the suitable responses
+
+		:param order:
+		:param valid_date:
+		:param order_date:
+
+		:return response:
+		"""
+
+		order_collected = order.order_status == OrderStatus.collected
+		order_date_passed = not order_collected and not valid_date
+
+		if order_collected:
 			return self.handle_response('Order already collected', status_code=400)
 
-		updates = {}
-		updates['order_status'] = OrderStatus.collected
-		self.order_repo.update(order, **updates)
+		elif order_date_passed:
+			return self.handle_response(f'Cannot collect order for past date {order_date}.', status_code=400)
 
-		return self.handle_response('Order successfully collected', payload={'order': order.serialize()})
+		else:
+			updates = {}
+			updates['order_status'] = OrderStatus.collected
+			self.order_repo.update(order, **updates)
+
+			return self.handle_response('Order successfully collected', payload={'order': order.serialize()})
+
 
 	def check_order(self):
 		"""
