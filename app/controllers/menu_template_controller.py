@@ -1,3 +1,4 @@
+
 from app.controllers.base_controller import BaseController
 from app.repositories.menu_template_repo import MenuTemplateRepo
 from app.models.menu_template import MenuTemplate
@@ -22,3 +23,11 @@ class MenuTemplateController(BaseController):
         template = self.menu_template_repo.create(
             name, location, meal_period, description)
         return self.handle_response('OK', payload=template.serialize(), status_code=201)
+
+    def update(self, template_id):
+        name, = self.request_params(
+            'templateName')
+        menu_template = self.menu_template_repo.get_or_404(template_id)
+        template = self.menu_template_repo.update(menu_template,name=name)
+        return self.handle_response('OK', payload=template.serialize(), status_code=200)
+

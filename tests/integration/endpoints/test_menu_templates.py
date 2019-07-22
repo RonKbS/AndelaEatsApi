@@ -90,3 +90,47 @@ class TestMenuTemplate(BaseTestCase, BaseTestUtils):
         self.assertJSONKeysPresent(response_json['payload'], 'message')
         self.assertEqual(response_json['payload']['message'],
                          'Meal Template with name  exists in your center')
+
+    def test_update_menu_template_with_permission_succeeds(self):
+        self.create_admin()
+        template = MenuTemplateFactory.create(name="Name of the template")
+        data = {
+            "templateName": "Update the name of template",
+        }
+        response = self.client().put(
+            self.make_url(f"/menu_templates/{template.id}"), headers=self.headers(),
+            data=self.encode_to_json_string(data))
+        response_json = self.decode_from_json_string(
+            response.data.decode('utf-8'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_json['msg'], 'OK')
+        self.assertJSONKeysPresent(response_json['payload'], 'name')
+        self.assertJSONKeysPresent(response_json['payload'], 'locationId')
+    
+    def test_update_menu_template_non_existing_template_fails(self):
+        self.create_admin()
+        data = {
+            "templateName": "Update the name of template",
+        }
+        response = self.client().put(
+            self.make_url(f"/menu_templates/13192498"), headers=self.headers(),
+            data=self.encode_to_json_string(data))
+        self.assertEqual(response.status_code, 404)
+    
+    def test_update_menu_template_succeeds(self):
+        self.create_admin()
+        template = MenuTemplateFactory.create(name="Name of the template")        
+        data = {
+            "templateName": "Update the name of template",
+        }
+        response = self.client().put(
+            self.make_url(f"/menu_templates/{template.id}"), headers=self.headers(),
+            data=self.encode_to_json_string(data))
+        response_json = self.decode_from_json_string(
+            response.data.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_json['msg'], 'OK')
+        self.assertJSONKeysPresent(response_json['payload'], 'name')
+        self.assertEqual(response_json['payload']['name'], "Update the name of template")
+        self.assertJSONKeysPresent(response_json['payload'], 'locationId')

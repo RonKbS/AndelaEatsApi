@@ -22,3 +22,12 @@ menu_template_controller = MenuTemplateController(request)
 @swag_from('documentation/create_menu_template.yml')
 def create_menu_template():
     return menu_template_controller.create()
+
+
+@menu_template_blueprint.route('/<string:id>', methods=['PATCH','PUT'])
+@Auth.has_role('admin')
+@Security.validator(['templateName|string', 'locationId|int'])
+def update_menu_template(id):
+    return menu_template_controller.update(id)
+
+

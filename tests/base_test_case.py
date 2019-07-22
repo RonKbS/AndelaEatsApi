@@ -6,6 +6,8 @@ from app.utils import db
 from app.utils.auth import Auth
 from flask_testing import TestCase
 from faker import Faker
+from app.utils.handled_exceptions import BaseModelValidationError
+from flask import make_response, jsonify
 
 config_name = 'testing'
 environ['APP_ENV'] = config_name
