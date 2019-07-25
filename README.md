@@ -50,7 +50,7 @@ python run.py db migrate
 
 Execute the following code to seed the database
 ```
-flask seed_database
+flask seed-database
 ```
 
 Execute the following command in the terminal to start the redis server
@@ -80,3 +80,6 @@ Tests can be run using
 ```
 pytest
 ```
+
+
+pip-compile --output-file requirements.txt requirements.in

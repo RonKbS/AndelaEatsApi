@@ -15,6 +15,9 @@ class TestBaseController(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_post_params_returns_non_empty_list(self):
         with self.app.app_context():
             fake = Faker()

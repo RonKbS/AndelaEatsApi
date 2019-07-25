@@ -12,10 +12,14 @@ from app.repositories.meal_session_repo import MealSessionRepo
 from app.utils.cron import Cron, MealSessionCron
 from app.business_logic.meal_session.meal_session_logic import MealSessionLogic
 
+
 class TestCron(BaseTestCase):
 
     def setUp(self):
         self.BaseSetUp()
+
+    def tearDown(self):
+        self.BaseTearDown()
 
     def test_run_24_hourly_method(self):
 
@@ -31,10 +35,10 @@ class TestCron(BaseTestCase):
         self.assertEqual(engagement.status, 0)
 
     def test_job_to_schedule_method_creates_meal_sessions(self):
-        LocationFactory.create(id=1, name="Lagos")
+        location = LocationFactory.create(id=1, name="Lagos")
+        location.save()
 
         with self.app.app_context():
-
             Cron(self.app).run_meal_session_cron()
 
             meal_sessions = MealSessionRepo().fetch_all().items
@@ -49,7 +53,8 @@ class TestCron(BaseTestCase):
             mock_location_current_date,
             mock_scheduler_current_date,
     ):
-        LocationFactory.create(id=1, name="Lagos")
+        location = LocationFactory.create(id=1, name="Lagos")
+        location.save()
 
         with self.app.app_context():
             mock_scheduler_current_date.return_value = datetime(
@@ -76,6 +81,7 @@ class TestCron(BaseTestCase):
             mock_validate_meal_session_times
     ):
         LocationFactory.create(id=1, name="Kampala")
+
         with self.app.app_context():
             mock_scheduler_current_date.return_value = datetime(
                 year=2019, month=4, day=10, tzinfo=pytz.timezone("Africa/Lagos"))

@@ -9,6 +9,9 @@ class TestAuth(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_daterange(self):
         d1 = datetime.strptime('2019-01-01', '%Y-%m-%d')
         d2 = datetime.strptime('2019-01-05', '%Y-%m-%d')
@@ -48,6 +51,3 @@ class TestAuth(BaseTestCase):
         resp = check_date_current_vs_date_for(d1, d2)
 
         self.assertTrue(resp)
-
-
-

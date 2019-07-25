@@ -15,12 +15,20 @@ from app.repositories.vendor_engagement_repo import VendorEngagementRepo
 from app.repositories.vendor_rating_repo import VendorRatingRepo
 from app.repositories.vendor_repo import VendorRepo
 from tests.base_test_case import BaseTestCase
+from factories.location_factory import LocationFactory
+from factories.vendor_factory import VendorFactory
+from factories.vendor_engagement_factory import VendorEngagementFactory
+from factories.meal_item_factory import MealItemFactory
+from factories.menu_factory import MenuFactory
 
 
 class TestVendorRatingController(BaseTestCase):
 
     def setUp(self):
         self.BaseSetUp()
+
+    def tearDown(self):
+        self.BaseTearDown()
 
     @patch.object(VendorRatingController, 'get_params_dict')
     @patch.object(VendorRatingRepo, 'filter_by')
@@ -640,6 +648,12 @@ class TestVendorRatingController(BaseTestCase):
         '''Test create_order_rating when order has already been rated.
         '''
         # Arrange
+        vendor = VendorFactory()
+        location = LocationFactory()
+        vendor_engagement = VendorEngagementFactory()
+        meal_item = MealItemFactory()
+        menu = MenuFactory()
+
         with self.app.app_context():
             mock_meal_item = MealItem(
                 id=1,
@@ -648,14 +662,14 @@ class TestVendorRatingController(BaseTestCase):
                 meal_type='main',
                 name='Mock meal',
                 image='',
-                location_id=1
+                location_id=location.id
             )
             mock_vendor_engagement = VendorEngagement(
                 id=1,
                 created_at=datetime.now(),
                 updated_at=datetime.now(),
-                vendor_id=1,
-                location_id=1,
+                vendor_id=vendor.id,
+                location_id=location.id,
                 start_date=datetime.now(),
                 end_date=(datetime.now() + timedelta(days=5)),
                 status=1,
@@ -672,11 +686,12 @@ class TestVendorRatingController(BaseTestCase):
                 meal_period='lunch',
                 order_status='booked',
                 has_rated=False,
-                menu_id=1,
-                location_id=1
+                menu_id=menu.id,
+                location_id=location.id
             )
+
             mock_vendor_rating_controller_request_params.return_value = (
-                1, 1, 1, 'Mock comment', 3, '2019-02-06', 'web'
+                2, meal_item.id, vendor_engagement.id, 'Mock comment', 3, '2019-02-06', 'web'
             )
             mock_auth_user.return_value = 1
             mock_meal_item_repo_get.return_value = mock_meal_item

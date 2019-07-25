@@ -11,6 +11,9 @@ class TestSlackHelper(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     @patch('app.utils.slackhelper.SlackClient.api_call')
     def test_post_message_works(
         self,

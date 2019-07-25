@@ -14,6 +14,9 @@ class TestLocationController(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     @patch.object(LocationRepo, 'fetch_all')
     @patch.object(LocationController, 'pagination_meta')
     def test_list_locations_ok_response(

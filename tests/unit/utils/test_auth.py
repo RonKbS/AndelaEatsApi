@@ -9,6 +9,9 @@ class TestAuth(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_get_user_method_return_dict_of_user_data_if_valid_header_present(self):
 
         with self.app.test_request_context(path='/api/v1/vendors', method='GET', headers=self.headers()) as request:

@@ -18,6 +18,9 @@ class TestReportsEndpoints(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_report(self):
         recent_date = datetime.datetime.now().date() + datetime.timedelta(7)
 
@@ -43,7 +46,8 @@ class TestReportsEndpoints(BaseTestCase):
     def test_all_vendor_comparison(self):
         vendor = VendorFactory.create()
         engagement = VendorEngagementFactory.create(vendor_id=vendor.id)
-        menu = MenuFactory.create(vendor_engagement_id=engagement.id)
+        menu = MenuFactory.create(vendor_engagement=engagement)
+        menu.save()
         OrderFactory.create(menu_id=menu.id)
         OrderFactory.create(menu_id=menu.id - 1)
 

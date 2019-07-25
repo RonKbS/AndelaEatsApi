@@ -16,6 +16,9 @@ class TestMenuController(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     @patch.object(MenuRepo, 'get_unpaginated')
     @patch.object(MenuController, 'request_params')
     @patch('app.Auth.get_location')

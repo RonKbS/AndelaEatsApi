@@ -9,6 +9,8 @@ from app.models.vendor import Vendor
 from app.models.vendor_rating import VendorRating
 from app.models.vendor_engagement import VendorEngagement
 from tests.base_test_case import BaseTestCase
+from factories.vendor_factory import VendorFactory
+from factories.location_factory import LocationFactory
 
 
 class TestVendorController(BaseTestCase):
@@ -16,12 +18,14 @@ class TestVendorController(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
         self.fake = Faker()
+        vendor = VendorFactory()
+        location = LocationFactory()
         self.mock_vendor_engagement = VendorEngagement(
             id=1,
             created_at=datetime.now(),
             updated_at=datetime.now(),
-            vendor_id=1,
-            location_id=1,
+            vendor_id=vendor.id,
+            location_id=location.id,
             start_date=datetime.now(),
             end_date=datetime.now(),
             status=1,
@@ -31,7 +35,7 @@ class TestVendorController(BaseTestCase):
             id=1,
             created_at=datetime.now(),
             updated_at=datetime.now(),
-            vendor_id=1,
+            vendor_id=vendor.id,
             user_id=1,
             comment=self.fake.text(),
             service_date=datetime.now(),
@@ -51,7 +55,7 @@ class TestVendorController(BaseTestCase):
             tel=self.fake.phone_number(),
             contact_person=self.fake.name(),
             is_active=True,
-            location_id=1,
+            location_id=location.id,
             ratings=[self.mock_rating, ],
             engagements=[self.mock_vendor_engagement, ]
         )
@@ -65,7 +69,7 @@ class TestVendorController(BaseTestCase):
             tel=self.fake.phone_number(),
             contact_person=self.fake.name(),
             is_active=True,
-            location_id=1
+            location_id=location.id
         )
         self.mock_deleted_vendor = Vendor(
             id=1,
@@ -77,8 +81,11 @@ class TestVendorController(BaseTestCase):
             tel=self.fake.phone_number(),
             contact_person=self.fake.name(),
             is_active=True,
-            location_id=1
+            location_id=location.id
         )
+    
+    def tearDown(self):
+        self.BaseTearDown()
 
     @patch('app.utils.auth.Auth.get_location')
     @patch('app.repositories.vendor_repo.VendorRepo.filter_by')
@@ -286,7 +293,7 @@ class TestVendorController(BaseTestCase):
         with self.app.app_context():
             mock_request_params.return_value = (
                 self.fake.name(),
-                self.fake.phone_number(),
+                self.fake.phone_number()[:20],
                 self.fake.address(),
                 True,
                 self.fake.name()

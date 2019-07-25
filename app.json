@@ -2,7 +2,7 @@
     "name": "AndelaEatsApi",
     "description": "",
     "scripts": {
-        "postdeploy": "flask seed_database --testing"
+        "postdeploy": "flask seed-database --testing"
     },
     "env": {
         "ANDELA_API_TOKEN": {

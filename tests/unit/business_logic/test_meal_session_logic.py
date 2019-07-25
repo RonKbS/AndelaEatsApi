@@ -7,7 +7,6 @@ from tests.base_test_case import BaseTestCase
 from app.models.meal_session import MealSession
 from factories.meal_session_factory import MealSessionFactory
 from factories.location_factory import LocationFactory
-from app.repositories.meal_session_repo import MealSessionRepo
 from app.business_logic.meal_session.meal_session_logic import MealSessionLogic
 from app.business_logic.meal_session.base_logic import BaseLogic
 
@@ -17,6 +16,9 @@ class TestMealSessionLogic(BaseTestCase):
         self.BaseSetUp()
         self.logic = MealSessionLogic()
         self.base_logic = BaseLogic()
+
+    def tearDown(self):
+        self.BaseTearDown()
 
     def test_check_two_values_are_greater_method_returns_true(self):
         return_value = self.logic.check_two_values_are_greater(2, 1)
@@ -44,7 +46,7 @@ class TestMealSessionLogic(BaseTestCase):
         self.assertEqual(pytz.exceptions.UnknownTimeZoneError, return_value)
 
     def test_check_meal_session_exists_in_specified_time_method_returns_true(self):
-        new_location = LocationFactory.create(id=1, name="Lagos")
+        new_location = LocationFactory.create(name="Lagos")
 
         tz = pytz.timezone("Africa/Lagos")
         current_date = datetime.now(tz)
@@ -62,14 +64,14 @@ class TestMealSessionLogic(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=current_date.year, month=current_date.month, day=current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         return_value = self.logic.check_meal_session_exists_in_specified_time(**first_meal_session)
         self.assertEqual(return_value, True)
 
     def test_check_meal_session_exists_in_specified_time_method_returns_false(self):
-        new_location = LocationFactory.create(id=1, name="Lagos")
+        new_location = LocationFactory.create(name="Lagos")
 
         tz = pytz.timezone("Africa/Lagos")
         current_date = datetime.now(tz)
@@ -94,7 +96,7 @@ class TestMealSessionLogic(BaseTestCase):
         self.assertEqual(return_value, False)
 
     def test_check_encloses_already_existing_meal_sessions_returns_true(self):
-        new_location = LocationFactory.create(id=1, name="Lagos")
+        new_location = LocationFactory.create(name="Lagos")
 
         tz = pytz.timezone("Africa/Lagos")
         current_date = datetime.now(tz)
@@ -112,14 +114,14 @@ class TestMealSessionLogic(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=current_date.year, month=current_date.month, day=current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         return_value = self.logic.check_encloses_already_existing_meal_sessions(**first_meal_session)
         self.assertEqual(return_value, True)
 
     def test_check_encloses_already_existing_meal_sessions_returns_false(self):
-        new_location = LocationFactory.create(id=1, name="Lagos")
+        new_location = LocationFactory.create(name="Lagos")
 
         tz = pytz.timezone("Africa/Lagos")
         current_date = datetime.now(tz)
@@ -137,7 +139,7 @@ class TestMealSessionLogic(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=current_date.year, month=current_date.month, day=current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         return_value = self.logic.check_encloses_already_existing_meal_sessions(**first_meal_session)

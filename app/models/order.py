@@ -14,6 +14,7 @@ class Order(BaseModel):
     meal_period = db.Column(db.Enum(MealPeriods))
     order_status = db.Column(db.Enum(OrderStatus))
     has_rated = db.Column(db.Boolean, default=False)
+    menu = db.relationship('Menu', lazy=False)
     menu_id = db.Column(db.Integer(), db.ForeignKey('menus.id'))
     meal_item_orders = db.relationship('MealItem', secondary='meal_item_orders', lazy=False,
                                        backref=db.backref('orders', lazy=True))

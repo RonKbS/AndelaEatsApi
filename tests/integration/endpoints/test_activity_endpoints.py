@@ -9,6 +9,9 @@ class TestActivityEndpoints(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_get_range_correct_date_range_succeeds(self):
 
         activity = ActivityFactory.create()

@@ -3,7 +3,7 @@ from datetime import datetime
 import unittest
 from tests.base_test_case import BaseTestCase
 from app.controllers import BotController
-from factories import LocationFactory, MenuFactory, MealItemFactory, VendorEngagementFactory
+from factories import LocationFactory, MenuFactory, MealItemFactory, VendorEngagementFactory, OrderFactory
 from tests.mock import (
     center_selected,
     date_selected,
@@ -25,6 +25,9 @@ class TestBotEndpoints(BaseTestCase):
         self.BaseSetUp()
         self.bot_controller = BotController(self.request_context)
         self.menu_factory = MenuFactory
+
+    def tearDown(self):
+        self.BaseTearDown()
 
     def test_bot(self):
         with self.app.app_context():
@@ -90,8 +93,15 @@ class TestBotEndpoints(BaseTestCase):
     @patch('app.controllers.bot_controller.json.loads')
     def test_interactions_after_selecting_action_menu_list_with_menus(self, mock_json_loads, mock_menu_repo):
         mock_json_loads.return_value = action_selected_menu
-        mock_menu_repo.return_value = [self.menu_factory.create()]
-
+        location = LocationFactory()
+        side_meal_item = MealItemFactory(location=location, meal_type="side")
+        side_meal_item.save()
+        protein_meal_item = MealItemFactory(location=location, meal_type="protein")
+        menu = MenuFactory.create(
+            side_items=str(side_meal_item.id),
+            protein_items=str(protein_meal_item.id)
+        )
+        mock_menu_repo.return_value = [menu]
         response = self.client().post(self.make_url(f'/bot/interactions/'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
@@ -198,11 +208,21 @@ class TestBotEndpoints(BaseTestCase):
     @patch('app.utils.slackhelper.SlackHelper.user_info')
     @patch('app.controllers.bot_controller.json.loads')
     def test_interactions_after_final_meal_selection(self, mock_json_loads, mock_user_info, mock_order_repo, mock_andela_service, mock_menu_repo, mock_meal_items, mock_post):
+        location = LocationFactory.create()
+        location.save()
+        menu = MenuFactory.create()
+        menu.save()
+
+        final_selection['state'] = f'{menu.id}_breakfast_2019-02-19_order_{location.id}_1'
         mock_json_loads.return_value = final_selection
         mock_user_info.return_value = {'user': {'profile': {'email': 'victor.adukwu@andela.com'}}}
         mock_andela_service.return_value = {'id': 'victor_adukwu_andela_com', 'email': 'victor.adukwu@andela.com'}
-        mock_menu_repo.return_value = self.menu_factory.create()
-        mock_order_repo.return_value = True
+
+        mock_menu_repo.return_value = menu
+
+        order = OrderFactory.create(menu=menu, location=location)
+
+        mock_order_repo.return_value = order
         mock_meal_items.return_values = MealItemFactory.create()
 
         response = self.client().post(self.make_url(f'/bot/interactions/'), headers=self.headers())
@@ -235,14 +255,28 @@ class TestBotEndpoints(BaseTestCase):
     @patch('app.services.andela.AndelaService.get_user_by_email_or_id')
     @patch('app.utils.slackhelper.SlackHelper.user_info')
     @patch('app.controllers.bot_controller.json.loads')
-    def test_interactions_after_final_meal_selection_valid(self, mock_json_loads, mock_user_info,
-                                                     mock_andela_service, mock_menu_repo, mock_engagement_repo, mock_post):
+    def test_interactions_after_final_meal_selection_valid(
+        self,
+        mock_json_loads,
+        mock_user_info,
+        mock_andela_service,
+        mock_menu_repo,
+        mock_engagement_repo,
+        mock_post
+    ):
+        location = LocationFactory.create()
+        location.save()
+        meal = MealItemFactory.create()
+        meal.save()
+        submit_rating['state'] = f'{meal.id}_breakfast_2019-02-20_rate_{location.id}_1'
+
         mock_json_loads.return_value = submit_rating
         mock_user_info.return_value = {'user': {'profile': {'email': 'victor.adukwu@andela.com'}}}
         mock_andela_service.return_value = {'id': 'victor_adukwu_andela_com'}
-        mock_engagement_repo.return_value = VendorEngagementFactory.create()
-        mock_menu_repo.return_value = self.menu_factory.create()
-
+        engagement = VendorEngagementFactory.create()
+        engagement.save()
+        mock_engagement_repo.return_value = engagement
+        mock_menu_repo.return_value = self	.menu_factory.create()
         response = self.client().post(self.make_url(f'/bot/interactions/'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
         mock_post.assert_called_once()

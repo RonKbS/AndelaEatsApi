@@ -99,7 +99,7 @@ class BotController(BaseController):
 
                 rating = self.vendor_rating_repo.new_rating(
                     vendor_id, user_id, rating_value, service_date, rating_type,
-                    type_id, engagement_id, channel, comment, type_id
+                    type_id, engagement_id, menu_id, channel, comment
                 )
 
                 if rating:

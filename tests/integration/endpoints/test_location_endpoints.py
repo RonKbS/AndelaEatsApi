@@ -10,6 +10,9 @@ class TestLocationEndpoints(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_get_location_succeeds(self):
 
         new_location = LocationFactory.create()

@@ -8,5 +8,3 @@ class AboutFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = About
         sqlalchemy_session = db.session
-
-    id = factory.sequence(lambda n: n)

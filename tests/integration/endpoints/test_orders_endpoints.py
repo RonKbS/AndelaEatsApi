@@ -1,5 +1,13 @@
 from tests.base_test_case import BaseTestCase, fake
-from factories import OrderFactory, MealItemFactory, RoleFactory, PermissionFactory, UserRoleFactory, MenuFactory, LocationFactory
+from factories import (
+    OrderFactory,
+    MealItemFactory,
+    RoleFactory,
+    PermissionFactory,
+    UserRoleFactory,
+    MenuFactory,
+    LocationFactory
+)
 from app.utils.enums import MealTypes
 from json import loads
 from datetime import date, timedelta
@@ -14,6 +22,9 @@ class TestOrderEndpoints(BaseTestCase):
 
     def setUp(self):
         self.BaseSetUp()
+
+    def tearDown(self):
+        self.BaseTearDown()
 
     def test_create_order_with_invalid_details_endpoint(self):
         items = [item.id for item in MealItemFactory.create_batch(4)]
@@ -62,19 +73,22 @@ class TestOrderEndpoints(BaseTestCase):
     @patch.object(AndelaService, 'get_user_by_email_or_id')
     def test_list_order_endpoint(self, mock_andela_service):
         # Create Three Dummy Vendors
-        OrderFactory.create_batch(3)
+        location = LocationFactory.create()
+        OrderFactory.create_batch(3, location=location)
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         mock_andela_service.return_value = {
             'id': user_id,
             'first_name': fake.first_name(),
             'last_name': fake.last_name()
         }
+        headers = self.headers()
+        headers.update({'X-Location': location.id})
 
-        response = self.client().get(self.make_url('/orders/'), headers=self.headers())
+        response = self.client().get(self.make_url('/orders/'), headers=headers)
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
         payload = response_json['payload']
         self.assert200(response)
@@ -83,11 +97,12 @@ class TestOrderEndpoints(BaseTestCase):
 
     @patch.object(AndelaService, 'get_user_by_email_or_id')
     def test_list_order_by_page_endpoint(self, mock_andela_service):
-        OrderFactory.create_batch(3)
+        location = LocationFactory()
+        OrderFactory.create_batch(3, location=location)
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         mock_andela_service.return_value = {
             'id': user_id,
@@ -95,13 +110,16 @@ class TestOrderEndpoints(BaseTestCase):
             'last_name': fake.last_name()
         }
 
-        response = self.client().get(self.make_url('/orders/'), query_string={'per_page': 2, 'page': 1}, headers=self.headers())
+        headers = self.headers()
+        headers.update({'X-Location': location.id})
+
+        response = self.client().get(self.make_url('/orders/'), query_string={'per_page': 2, 'page': 1}, headers=headers)
         decoded = loads(response.data, encoding='utf-8')
         self.assert200(response)
         self.assertEqual(decoded['payload']['meta']['current_page'], 1)
         self.assertEqual(len(decoded['payload']['orders']), 2)
 
-        response1 = self.client().get(self.make_url('/orders/'), query_string={'per_page': 2, 'page': 2}, headers=self.headers())
+        response1 = self.client().get(self.make_url('/orders/'), query_string={'per_page': 2, 'page': 2}, headers=headers)
         self.assert200(response1)
         decoded1 = loads(response1.data, encoding='utf-8')
         self.assertEqual(decoded1['payload']['meta']['current_page'], 2)
@@ -109,24 +127,27 @@ class TestOrderEndpoints(BaseTestCase):
 
     @patch.object(AndelaService, 'get_user_by_email_or_id')
     def test_list_order_by_date_endpoint(self, mock_andela_service):
-        OrderFactory.create_batch(3)
+        location = LocationFactory.create()
+        OrderFactory.create_batch(3, location=location)
         book_date = (date.today() + timedelta(days=1)).strftime('%Y-%m-%d')
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         mock_andela_service.return_value = {
             'id': user_id,
             'first_name': fake.first_name(),
             'last_name': fake.last_name()
         }
+        headers = self.headers()
+        headers.update({'X-Location': location.id})
 
-        response = self.client().get(self.make_url('/orders/2008-11-20'), headers=self.headers())
+        response = self.client().get(self.make_url('/orders/2008-11-20'), headers=headers)
         self.assert200(response)
         self.assertEqual(len(loads(response.data, encoding='utf-8')['payload']['orders']), 0)
 
-        response1 = self.client().get(self.make_url('/orders/{}'.format(book_date)), headers=self.headers())
+        response1 = self.client().get(self.make_url('/orders/{}'.format(book_date)), headers=headers)
         self.assert200(response1)
         self.assertEqual(len(loads(response1.data, encoding='utf-8')['payload']['orders']), 3)
 
@@ -135,8 +156,8 @@ class TestOrderEndpoints(BaseTestCase):
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
         order.meal_period, order.user_id = 'lunch', user_id
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         data={'userId': user_id, 'orderType': order.meal_period, 'orderDate': order.date_booked_for.strftime('%Y-%m-%d')}
         response = self.client().post(self.make_url('/orders/check'), data=self.encode_to_json_string(data) , headers=self.headers())
@@ -148,8 +169,8 @@ class TestOrderEndpoints(BaseTestCase):
         user_id = BaseTestCase.user_id()
         order.meal_period, order.user_id = 'lunch', user_id
         order.order_status = OrderStatus.cancelled
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         data = {'userId': user_id, 'orderType': order.meal_period, 'orderDate': order.date_booked_for.strftime('%Y-%m-%d')}
         response = self.client().post(self.make_url('/orders/check'), data=self.encode_to_json_string(data) , headers=self.headers())
@@ -162,8 +183,8 @@ class TestOrderEndpoints(BaseTestCase):
         user_id = BaseTestCase.user_id()
         order.meal_period, order.user_id = 'lunch', user_id
         order.order_status = OrderStatus.collected
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         data = {'userId': user_id, 'orderType': order.meal_period, 'orderDate': order.date_booked_for.strftime('%Y-%m-%d')}
         response = self.client().post(self.make_url('/orders/check'), data=self.encode_to_json_string(data) , headers=self.headers())
@@ -175,8 +196,8 @@ class TestOrderEndpoints(BaseTestCase):
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
         order.meal_period, order.user_id = 'lunch', user_id
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         data={'user_id': user_id, 'order_type': 'blahblah', 'order_date': order.date_booked_for.strftime('%Y-%m-%d')}
         response = self.client().post(self.make_url('/orders/check'), data=self.encode_to_json_string(data) , headers=self.headers())
@@ -187,8 +208,8 @@ class TestOrderEndpoints(BaseTestCase):
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
         order.meal_period, order.user_id = 'lunch', user_id
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         data = {'userId': user_id, 'orderType': order.meal_period, 'orderDate': order.date_booked_for.strftime('%Y-%m-%d')}
         response = self.client().post(self.make_url('/orders/collect'), data=self.encode_to_json_string(data) , headers=self.headers())
@@ -199,8 +220,8 @@ class TestOrderEndpoints(BaseTestCase):
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
         order.meal_period, order.user_id = 'lunch', user_id
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         data = {'userId': user_id, 'orderType': order.meal_period, 'orderDate': order.date_booked_for.strftime('%Y-%m-%d')}
         response = self.client().post(self.make_url('/orders/collect'), data=self.encode_to_json_string(data) , headers=self.headers())
@@ -214,10 +235,10 @@ class TestOrderEndpoints(BaseTestCase):
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
         order.meal_period, order.user_id = 'lunch', user_id
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
-        data={'userId': user_id, 'orderType': 'blahblah', 'orderDate': order.date_booked_for.strftime('%Y-%m-%d')}
+        data={'userId': user_id, 'orderType': 'breakfast', 'orderDate': order.date_booked_for.strftime('%Y-%m-%d')}
         response = self.client().post(self.make_url('/orders/collect'), data=self.encode_to_json_string(data) , headers=self.headers())
         self.assert400(response)
 
@@ -235,8 +256,8 @@ class TestOrderEndpoints(BaseTestCase):
 
         for order in orders:
             order.user_id = user_id
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         mock_andela_service.return_value = {
             'id': user_id,
@@ -250,10 +271,12 @@ class TestOrderEndpoints(BaseTestCase):
 
     @patch.object(AndelaService, 'get_user_by_email_or_id')
     def test_get_specific_meal_item_endpoint(self, mock_andela_service):
-        order = OrderFactory.create()
+        location = LocationFactory.create()
+        order = OrderFactory.create(location=location)
+        order.save()
 
         mock_andela_service.return_value = {
-            'id': fake.random_number(),
+            'id': str(fake.random_number()),
             'first_name': fake.first_name(),
             'last_name': fake.last_name()
         }
@@ -261,7 +284,6 @@ class TestOrderEndpoints(BaseTestCase):
         response = self.client().get(self.make_url('/orders/{}'.format(order.id)), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
         payload = response_json['payload']
-
         self.assert200(response)
         self.assertJSONKeyPresent(payload, 'order')
         self.assertJSONKeysPresent(payload['order'], 'userId', 'channel')
@@ -271,7 +293,9 @@ class TestOrderEndpoints(BaseTestCase):
 
     def test_update_order_with_valid_order_id_endpoint(self):
         order1 = OrderFactory.create()
+        order1.save()
         order2 = OrderFactory.create()
+        order2.save()
 
         meal_item1 = MealItemFactory.create()
         meal_item2 = MealItemFactory.create()
@@ -302,6 +326,7 @@ class TestOrderEndpoints(BaseTestCase):
         pass
 
     def test_delete_order_endpoint_with_right_permission(self):
+        location = LocationFactory.create()
         user_id = BaseTestCase.user_id()
         meal = MealItemFactory.create()
         menu = MenuFactory.create()
@@ -309,7 +334,7 @@ class TestOrderEndpoints(BaseTestCase):
             'user_id': user_id,
             'date_booked_for': '2018-10-20',
             'channel': 'web', 'meal_period': 'lunch', 'menu_id': menu.id,
-            'meal_items': [meal], 'location_id': 1
+            'meal_items': [meal], 'location_id': location.id
         }
         order_repo = OrderRepo()
         order = order_repo.create_order(**order_data)
@@ -323,6 +348,7 @@ class TestOrderEndpoints(BaseTestCase):
         self.assertEqual(response_json['msg'], 'Order deleted')
 
     def test_delete_order_not_yours(self):
+        location = LocationFactory.create()
         user_id = BaseTestCase.user_id()
         meal = MealItemFactory.create()
         menu = MenuFactory.create()
@@ -330,7 +356,7 @@ class TestOrderEndpoints(BaseTestCase):
             'user_id': '-UTG654RfggtdI',
             'date_booked_for': '2018-10-20',
             'channel': 'web', 'meal_period': 'lunch', 'menu_id': menu.id,
-            'meal_items': [meal], 'location_id': 1
+            'meal_items': [meal], 'location_id': location.id
         }
         order_repo = OrderRepo()
         order = order_repo.create_order(**order_data)
@@ -349,6 +375,7 @@ class TestOrderEndpoints(BaseTestCase):
         self.assertEqual(response_json['msg'], 'Invalid or incorrect order_id provided')
 
     def test_already_deleted_order(self):
+        location = LocationFactory.create()
         user_id = BaseTestCase.user_id()
         meal = MealItemFactory.create()
         menu = MenuFactory.create()
@@ -356,7 +383,7 @@ class TestOrderEndpoints(BaseTestCase):
             'user_id': user_id,
             'date_booked_for': '2018-10-20',
             'channel': 'web', 'meal_period': 'lunch', 'menu_id': menu.id,
-            'meal_items': [meal], 'location_id': 1
+            'meal_items': [meal], 'location_id': location.id
         }
         order_repo = OrderRepo()
         order = order_repo.create_order(**order_data)
@@ -379,10 +406,13 @@ class TestOrderEndpoints(BaseTestCase):
         }
 
         create_user_role('view_orders')
+        location = LocationFactory.create()
+        order = OrderFactory.create(location=location)
 
-        order = OrderFactory.create()
+        headers = self.headers()
+        headers.update({'X-Location': location.id})
 
-        response = self.client().get(self.make_url(f'/orders/{order.date_booked}/{order.date_booked_for}'), headers=self.headers())
+        response = self.client().get(self.make_url(f'/orders/{order.date_booked}/{order.date_booked_for}'), headers=headers)
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
         self.assert200(response)
@@ -414,8 +444,8 @@ class TestOrderEndpoints(BaseTestCase):
         OrderFactory.create()
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         response = self.client().get(self.make_url('/orders/'), headers=self.headers())
 
@@ -428,8 +458,8 @@ class TestOrderEndpoints(BaseTestCase):
         order = OrderFactory.create()
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         response = self.client().get(self.make_url(f'/orders/{order.date_booked}/{order.date_booked_for}'),
                                      headers=self.headers())
@@ -443,8 +473,8 @@ class TestOrderEndpoints(BaseTestCase):
         order = OrderFactory.create()
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         response = self.client().get(self.make_url(f'/orders/{order.date_booked_for}'),
                                      headers=self.headers())
@@ -456,10 +486,11 @@ class TestOrderEndpoints(BaseTestCase):
         mock_get_user.side_effect = Exception('exception occured')
 
         order = OrderFactory.create()
+        order.save()
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         response = self.client().get(self.make_url(f'/orders/{order.id}'),
                                      headers=self.headers())
@@ -473,8 +504,8 @@ class TestOrderEndpoints(BaseTestCase):
         OrderFactory.create()
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         response = self.client().get(self.make_url(f'/orders/user/{user_id}'),
                                      headers=self.headers())
@@ -488,8 +519,8 @@ class TestOrderEndpoints(BaseTestCase):
         order = OrderFactory.create()
         role = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
-        PermissionFactory.create(keyword='view_orders', role_id=role.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role.id)
+        PermissionFactory.create(keyword='view_orders', role=role)
+        UserRoleFactory.create(user_id=user_id, role=role)
 
         response = self.client().get(self.make_url(f'/orders/user/{order.user_id}/2019-04-01/2019-01-04'),
                                      headers=self.headers())
