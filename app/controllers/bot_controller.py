@@ -94,14 +94,13 @@ class BotController(BaseController):
                 comment = payload['submission']['comment']
 
                 # Retrieve User Object
+                main_meal_id = None
                 user = self.andela_service.get_user_by_email_or_id(slack_user_email)
                 user_id = user['id']
-
                 rating = self.vendor_rating_repo.new_rating(
                     vendor_id, user_id, rating_value, service_date, rating_type,
-                    type_id, engagement_id, menu_id, channel, comment
+                    type_id, engagement_id,main_meal_id, channel, comment
                 )
-
                 if rating:
                     slack_data = {'text': 'Rating Successful!'}
                     requests.post(webhook_url, data=json.dumps(slack_data),
