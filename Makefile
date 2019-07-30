@@ -47,7 +47,7 @@ help:
 	$(call print_options,"buildup","Rebuild and launch all containers including api in http://localhost:4070.")
 	$(call print_options,"stop","Clean code and stop any docker container.")
 	$(call print_options,"destroy","Clean code and destroy docker processes$(COMMA) images and volumes.")
-	$(call print_options,"destroy-all","Destroy docker processes$(COMMA) images and volumes. Download the images will be need.")
+	$(call print_options,"destroy-all","Destroy docker processes$(COMMA) images and volumes.")
 	$(call print_options,"down","Clean code and destroy docker processes.")
 	$(call print_options,"pull","Download docker images in parallel.")
 	$(call print_space)
