@@ -12,9 +12,6 @@
             "required": true
         },
         "APP_ENV": "testing",
-        "DATABASE_TEST_URL": {
-            "required": true
-        },
         "BUGSNAG_API_KEY": {
             "required": true
         },
