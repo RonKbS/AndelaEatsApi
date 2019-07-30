@@ -712,7 +712,7 @@ class TestOrderController(BaseTestCase):
             mock_request_params.return_value = (
                 1,
                 'mock',
-                '2019-02-13'
+                '2029-02-13'
             )
             mock_order_repo_update.return_value = self.mock_order
             order_controller = OrderController(self.request_context)
@@ -723,6 +723,35 @@ class TestOrderController(BaseTestCase):
             # Assert
             assert result.status_code == 200
             assert result.get_json()['msg'] == 'Order successfully collected'
+
+    @patch('app.controllers.order_controller.OrderController.request_params')
+    @patch('app.repositories.order_repo.OrderRepo.find_first')
+    @patch('app.repositories.order_repo.OrderRepo.update')
+    def test_collect_order_past_order_date(
+        self,
+        mock_order_repo_update,
+        mock_find_first,
+        mock_request_params
+    ):
+        '''Test collect_order OK response.
+        '''
+        # Arrange
+        with self.app.app_context():
+            mock_find_first.return_value = self.mock_order
+            mock_request_params.return_value = (
+                1,
+                'mock',
+                '2019-02-13'
+            )
+            mock_order_repo_update.return_value = self.mock_order
+            order_controller = OrderController(self.request_context)
+
+            # Act
+            result = order_controller.collect_order()
+
+            # Assert
+            assert result.status_code == 400
+            assert result.get_json()['msg'] == 'Cannot collect order for past date 2019-02-13.'
 
     @patch('app.controllers.order_controller.OrderController.request_params')
     @patch('app.repositories.order_repo.OrderRepo.find_first')
