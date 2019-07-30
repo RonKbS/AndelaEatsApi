@@ -48,3 +48,4 @@ redis-stable/
 
 # logs
 */*.log
+*.log
