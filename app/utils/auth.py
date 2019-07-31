@@ -7,6 +7,7 @@ from app.repositories.permission_repo import PermissionRepo
 from app.repositories.user_role_repo import UserRoleRepo
 from app.repositories.role_repo import RoleRepo
 
+
 class Auth:
     ''' This class will house Authentication and Authorization Methods '''
 
@@ -25,13 +26,14 @@ class Auth:
         if request.method != 'OPTIONS':
 
             for endpoint in Auth.authentication_header_ignore:
-                if request.path.find(endpoint) > -1: # If endpoint in request.path, ignore this check
+                # If endpoint in request.path, ignore this check
+                if request.path.find(endpoint) > -1:
                     return None
 
             try:
                 token = Auth.get_token()
             except Exception as e:
-                return make_response(jsonify({'msg': str(e)}),400)
+                return make_response(jsonify({'msg': str(e)}), 400)
 
             try:
                 decoded = Auth.decode_token(token)
@@ -54,7 +56,7 @@ class Auth:
 
     @staticmethod
     def _get_jwt_public_key():
-        decode_public_key = lambda key_64: b64decode(key_64).decode('utf-8')
+        def decode_public_key(key_64): return b64decode(key_64).decode('utf-8')
 
         jwt_env_mapper = {
             'testing': 'JWT_PUBLIC_KEY_TEST',
@@ -74,7 +76,8 @@ class Auth:
 
         public_key_64 = getenv(jwt_env_mapper.get(app_env, 'JWT_PUBLIC_KEY'))
 
-        public_key = public_key_mapper.get(app_env, decode_public_key)(public_key_64)
+        public_key = public_key_mapper.get(
+            app_env, decode_public_key)(public_key_64)
 
         return public_key
 
@@ -85,7 +88,8 @@ class Auth:
             if len(keys) > 1:
                 values = list()
                 for key in keys:
-                    values.append(user[key]) if key in user else values.append(None)
+                    values.append(
+                        user[key]) if key in user else values.append(None)
                 return values
             if len(keys) == 1 and keys[0] in user:
                 return user[keys[0]]
@@ -136,7 +140,8 @@ class Auth:
     def check_location_header():
         if request.method != 'OPTIONS':
             for endpoint in Auth.location_header_ignore:
-                if request.path.find(endpoint) > -1: # If endpoint in request.path, ignore this check
+                # If endpoint in request.path, ignore this check
+                if request.path.find(endpoint) > -1:
                     return None
             try:
                 Auth.get_location()
@@ -168,16 +173,16 @@ class Auth:
                 user_role = user_role_repo.find_first(**{'user_id': user_id})
 
                 if not user_id:
-                    return make_response(jsonify({'msg': 'Missing User ID in token'})), 400
+                    return make_response(jsonify({'msg': 'Missing User ID in token'})), 401
 
                 if not user_role:
-                    return make_response(jsonify({'msg': 'Access Error - No Role Granted'})), 400
+                    return make_response(jsonify({'msg': 'Access Error - No Role Granted'})), 401
 
                 if role_repo.get(user_role.role_id).name != role:
                     return make_response(
                         jsonify({'msg': 'Access Error - This role does not have the access rights'}
                                 )
-                    ), 400
+                    ), 401
 
                 return f(*args, **kwargs)
 
@@ -199,22 +204,22 @@ class Auth:
                 user_role = user_role_repo.find_first(**{'user_id': user_id})
 
                 if not user_id:
-                    return make_response(jsonify({'msg': 'Missing User ID in token'})), 400
+                    return make_response(jsonify({'msg': 'Missing User ID in token'})), 401
 
                 if not user_role:
-                    return make_response(jsonify({'msg': 'Access Error - No Role Granted'})), 400
+                    return make_response(jsonify({'msg': 'Access Error - No Role Granted'})), 401
 
-                user_perms = permission_repo.get_unpaginated(**{'role_id': user_role.role_id})
+                user_perms = permission_repo.get_unpaginated(
+                    **{'role_id': user_role.role_id})
 
                 perms = [perm.keyword for perm in user_perms]
                 if len(perms) == 0:
-                        return make_response(jsonify({'msg': 'Access Error - No Permission Granted'})), 400
+                    return make_response(jsonify({'msg': 'Access Error - No Permission Granted'})), 401
 
                 if permission not in perms:
-                    return make_response(jsonify({'msg': 'Access Error - Permission Denied'})), 400
+                    return make_response(jsonify({'msg': 'Access Error - Permission Denied'})), 401
 
                 return f(*args, **kwargs)
 
             return decorated
         return permission_checker
-

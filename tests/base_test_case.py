@@ -47,7 +47,8 @@ class BaseTestCase(TestCase):
         }
         payload.__setitem__('exp', exp) if exp is not None else ''
 
-        token = jwt.encode(payload, secret_key, algorithm='RS256').decode('utf-8')
+        token = jwt.encode(payload, secret_key,
+                           algorithm='RS256').decode('utf-8')
         return token
 
     @staticmethod
@@ -69,8 +70,10 @@ class BaseTestCase(TestCase):
     @staticmethod
     def user_first_and_last_name():
         return (
-                Auth.decode_token(BaseTestCase.get_valid_token())['UserInfo']['firstName'],
-                Auth.decode_token(BaseTestCase.get_valid_token())['UserInfo']['lastName']
+            Auth.decode_token(BaseTestCase.get_valid_token())[
+                'UserInfo']['firstName'],
+            Auth.decode_token(BaseTestCase.get_valid_token())[
+                'UserInfo']['lastName']
         )
 
     @staticmethod
@@ -109,7 +112,6 @@ class BaseTestCase(TestCase):
     def make_url(self, path):
         return '{}{}'.format(self.url, path)
 
-
     @staticmethod
     def migrate():
         db.session.close()
@@ -117,12 +119,12 @@ class BaseTestCase(TestCase):
         db.create_all()
 
     @staticmethod
-    def headers():
+    def headers(id=1):
         return {
             'Content-Type': 'application/json',
-            'X-Location': '1',
+            'X-Location': str(id),
             'Authorization': 'Bearer {}'.format(BaseTestCase.get_valid_token()),
-            }
+        }
 
     @staticmethod
     def headers_without_token():
@@ -198,13 +200,13 @@ class User:
             dict : User data dictionary.
         """
         return {
-                "id": self.id,
-                "first_name": self.first_name,
-                "last_name": self.last_name,
-                "firstName": self.firstName,
-                "lastName": self.lastName,
-                "email": self.email,
-                "name": self.name,
-                "picture": self.picture,
-                "roles": self.roles
-            }
+            "id": self.id,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "firstName": self.firstName,
+            "lastName": self.lastName,
+            "email": self.email,
+            "name": self.name,
+            "picture": self.picture,
+            "roles": self.roles
+        }

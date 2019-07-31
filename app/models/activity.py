@@ -3,7 +3,6 @@ from .base_model import BaseModel, db
 from app.utils.enums import Channels, ActionType
 from . import constants
 
-
 class Activity(BaseModel):
     """Activity Model class"""
     __tablename__ = 'activities'

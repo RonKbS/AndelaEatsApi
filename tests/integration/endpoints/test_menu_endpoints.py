@@ -264,7 +264,7 @@ class MenuEndpoints(BaseTestCase):
 
         response = self.client().delete(self.make_url(f'/admin/menus/{menu.id}'), headers=self.headers())
 
-        self.assert400(response)
+        self.assert401(response)
 
     def test_delete_menu_endpoint_with_wrong_menu_id(self):
         """Test that a for unsuccessful delete of wrong menu id"""
@@ -295,7 +295,7 @@ class MenuEndpoints(BaseTestCase):
         response = self.client().get(self.make_url(f'/admin/menus/{MealPeriods.lunch}/{current_date}'),
                                      headers=self.headers())
 
-        self.assert400(response)
+        self.assert401(response)
 
     def test_list_menu_endpoint_with_right_permission(self):
         """Test that users with the right permission can view list of menus"""
@@ -329,7 +329,7 @@ class MenuEndpoints(BaseTestCase):
         response = self.client().get(self.make_url(f'/admin/menus/{MealPeriods.lunch}/{start_date}/{end_date}'),
                                      headers=self.headers())
 
-        self.assert400(response)
+        self.assert401(response)
 
     def test_list_menu_range_endpoint_with_right_permission(self):
         """ Test that users with right permission can view list of menu with date range """
@@ -626,7 +626,7 @@ class MenuEndpoints(BaseTestCase):
                                      data=self.encode_to_json_string(data), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
-        self.assert400(response)
+        self.assert401(response)
         self.assertEqual(response_json['msg'], 'Access Error - Permission Denied')
 
     def test_update_menu_endpoint_with_wrong_menu_id(self):

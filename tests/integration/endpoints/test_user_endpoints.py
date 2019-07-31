@@ -105,7 +105,7 @@ class TestUserEndpoints(BaseTestCase):
         response = self.client().delete(self.make_url(f'/users/{user.id}/'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
-        self.assert400(response)
+        self.assert401(response)
         self.assertEqual(response_json['msg'], 'Access Error - No Permission Granted')
 
     def test_delete_user_endpoint_with_wrong_user_id(self):

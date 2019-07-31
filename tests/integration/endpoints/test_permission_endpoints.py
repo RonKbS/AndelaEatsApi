@@ -24,7 +24,7 @@ class TestPermissionEndpoints(BaseTestCase):
             data=self.encode_to_json_string(data), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
         
-        self.assert400(response)
+        self.assert401(response)
         self.assertEqual(response_json['msg'], 'Access Error - Permission Denied')
     
     def test_create_permission_with_right_permission(self):
@@ -57,7 +57,7 @@ class TestPermissionEndpoints(BaseTestCase):
         response = self.client().get(self.make_url('/roles/permissions'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
-        self.assert400(response)
+        self.assert401(response)
         self.assertEqual(response_json['msg'], 'Access Error - No Permission Granted')
 
     def test_list_permissions_with_right_permission(self):
@@ -89,7 +89,7 @@ class TestPermissionEndpoints(BaseTestCase):
         response = self.client().put(self.make_url('/roles/permissions/{}'.format(permission.id)), data=self.encode_to_json_string(data), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
-        self.assert400(response)
+        self.assert401(response)
         self.assertEqual(response_json['msg'], 'Access Error - No Permission Granted')
 
     def test_update_permissions_with_right_permission(self):
@@ -150,7 +150,7 @@ class TestPermissionEndpoints(BaseTestCase):
 
         response = self.client().delete(self.make_url(f'/roles/permissions/{permission.id}'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
-        self.assert400(response)
+        self.assert401(response)
         self.assertEqual(response_json['msg'], 'Access Error - No Permission Granted')
 
     def test_delete_permission_endpoint_with_wrong_permission_id(self):

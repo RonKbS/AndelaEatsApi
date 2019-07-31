@@ -192,7 +192,7 @@ class TestVendorRatingEndpoints(BaseTestCase):
 
         response = self.client().get(self.make_url(f'/ratings/{rating_id}'), headers=self.headers())
 
-        self.assert400(response)
+        self.assert401(response)
 
     def test_update_vendor_rating_endpoint(self):
 
