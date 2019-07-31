@@ -8,6 +8,8 @@ class TestBaseModel(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
 
     def test_base_model_delete_method(self):
 

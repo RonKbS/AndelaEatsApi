@@ -33,6 +33,9 @@ class TestCache(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_set_method(self):
         with patch('app.utils.cache.redis', new_callable=MockRedis):
 
@@ -61,5 +64,3 @@ class TestCache(BaseTestCase):
                 assert True
             else:
                 assert False
-
-

@@ -78,6 +78,9 @@ class TestOrderController(BaseTestCase):
         self.faker = Faker()
         self.faker.add_provider(date_time)
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     @patch('app.controllers.order_controller.OrderController.pagination_meta')
     @patch('app.services.andela.AndelaService.get_user_by_email_or_id')
     @patch('app.repositories.order_repo.OrderRepo.get')
@@ -99,7 +102,7 @@ class TestOrderController(BaseTestCase):
             mock_get_location.return_value = 1
             mock_get.return_value.meal_item_orders = [self.mock_meal_item, ]
             mock_get_user_by_email_or_id.return_value = {
-                'id': 1,
+                'id': '1',
                 'mail': 'joseph@mail.com',
                 'first_name': 'Joseph',
                 'last_name': 'Serunjogi'
@@ -136,7 +139,7 @@ class TestOrderController(BaseTestCase):
             ]
             mock_get.return_value.meal_item_orders = [self.mock_meal_item, ]
             mock_get_user_by_email_or_id.return_value = {
-                'id': 1,
+                'id': '1',
                 'mail': 'joseph@mail.com',
                 'first_name': 'Joseph',
                 'last_name': 'Serunjogi'
@@ -171,7 +174,7 @@ class TestOrderController(BaseTestCase):
             mock_get_unpaginated.return_value = [self.mock_order, ]
             mock_get.return_value.meal_item_orders = [self.mock_meal_item, ]
             mock_get_user_by_email_or_id.return_value = {
-                'id': 1,
+                'id': '1',
                 'mail': 'joseph@mail.com',
                 'first_name': 'Joseph',
                 'last_name': 'Serunjogi'
@@ -217,7 +220,7 @@ class TestOrderController(BaseTestCase):
         with self.app.app_context():
             mock_get.return_value = self.mock_order
             mock_get_user_by_email_or_id.return_value = {
-                'id': 1,
+                'id': '1',
                 'mail': 'joseph@mail.com',
                 'first_name': 'Joseph',
                 'last_name': 'Serunjogi'
@@ -247,7 +250,7 @@ class TestOrderController(BaseTestCase):
             mock_filter_by.return_value.items = [self.mock_order, ]
             mock_get.return_value.meal_item_orders = [self.mock_meal_item, ]
             mock_get_user_by_email_or_id.return_value = {
-                'id': 1,
+                'id': '1',
                 'mail': 'joseph@mail.com',
                 'first_name': 'Joseph',
                 'last_name': 'Serunjogi'
@@ -280,7 +283,7 @@ class TestOrderController(BaseTestCase):
             ]
             mock_get.return_value.meal_item_orders = [self.mock_meal_item, ]
             mock_get_user_by_email_or_id.return_value = {
-                'id': 1,
+                'id': '1',
                 'mail': 'joseph@mail.com',
                 'first_name': 'Joseph',
                 'last_name': 'Serunjogi'
@@ -312,7 +315,7 @@ class TestOrderController(BaseTestCase):
         # Arrange
         with self.app.app_context():
             mock_user.return_value = {
-                'id': 1,
+                'id': '1',
                 'mail': 'joseph@mail.com',
                 'first_name': 'Joseph',
                 'last_name': 'Serunjogi'
@@ -350,7 +353,7 @@ class TestOrderController(BaseTestCase):
         '''Test create_date when the date booked is in the past.
         '''
         mock_user.return_value = {
-            'id': 1,
+            'id': '1',
             'mail': 'joseph@mail.com',
             'first_name': 'Joseph',
             'last_name': 'Serunjogi'

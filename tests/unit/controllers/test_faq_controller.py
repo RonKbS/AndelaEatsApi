@@ -15,6 +15,9 @@ class TestFaqController(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_list_faq_method_captures_invalid_dates(self):
 
         with self.app.app_context():

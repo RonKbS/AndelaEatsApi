@@ -3,6 +3,7 @@ from app.utils import db
 from app.models.faq import Faq
 from app.utils.enums import FaqCategoryType
 
+
 class FaqFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     class Meta:

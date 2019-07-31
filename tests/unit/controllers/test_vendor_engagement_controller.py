@@ -12,12 +12,14 @@ from app.repositories.vendor_engagement_repo import VendorEngagementRepo
 from app.repositories.vendor_repo import VendorRepo
 from app.utils.auth import Auth
 from tests.base_test_case import BaseTestCase
+from factories.location_factory import LocationFactory
 
 
 class TestVendorEngagementController(BaseTestCase):
 
     def setUp(self):
         self.BaseSetUp()
+        location = LocationFactory()
         self.mock_vendor = Vendor(
             id=1,
             created_at=datetime.now(),
@@ -27,14 +29,13 @@ class TestVendorEngagementController(BaseTestCase):
             tel='',
             contact_person='Mock person',
             is_active=True,
-            location_id=1
+            location_id=location.id
         )
         self.mock_vendor_engagement = VendorEngagement(
             id=1,
             created_at=datetime.now(),
             updated_at=datetime.now(),
-            vendor_id=1,
-            location_id=1,
+            location_id=location.id,
             start_date=datetime.now(),
             end_date=datetime.now(),
             status=1,
@@ -45,7 +46,7 @@ class TestVendorEngagementController(BaseTestCase):
             is_deleted=False,
             date=datetime.now(),
             meal_period='',
-            location_id=1,
+            location_id=location.id,
             main_meal_id=1,
             allowed_side=1,
             allowed_protein=1,
@@ -59,8 +60,7 @@ class TestVendorEngagementController(BaseTestCase):
             id=1,
             created_at=datetime.now(),
             updated_at=datetime.now(),
-            vendor_id=1,
-            location_id=1,
+            location_id=location.id,
             start_date=datetime.now(),
             end_date=datetime.now(),
             status=1,
@@ -72,14 +72,16 @@ class TestVendorEngagementController(BaseTestCase):
             id=1,
             created_at=datetime.now(),
             updated_at=datetime.now(),
-            vendor_id=1,
-            location_id=1,
+            location_id=location.id,
             start_date=datetime.now(),
             end_date=datetime.now(),
             status=1,
             termination_reason='Mock reason',
             vendor=self.mock_vendor
         )
+
+    def tearDown(self):
+        self.BaseTearDown()
 
     @patch.object(VendorEngagementController, 'pagination_meta')
     @patch('app.utils.auth.Auth.get_location')

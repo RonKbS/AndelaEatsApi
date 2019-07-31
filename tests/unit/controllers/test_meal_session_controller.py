@@ -7,7 +7,6 @@ from datetime import datetime
 import pytz
 
 from app.controllers.meal_session_controller import MealSessionController
-from app.repositories.meal_session_repo import MealSessionRepo
 from app.business_logic.meal_session.meal_session_logic import MealSessionLogic
 from factories.location_factory import LocationFactory
 from tests.base_test_case import BaseTestCase
@@ -18,6 +17,9 @@ class TestMealSessionController(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
         self.current_date = datetime.now()
+
+    def tearDown(self):
+        self.BaseTearDown()
 
     @patch.object(MealSessionController, 'request_params')
     def test_create_session_method_succeeds(self, mock_request_params):

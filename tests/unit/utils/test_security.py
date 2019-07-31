@@ -9,6 +9,9 @@ class TestSecurity(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_url_validator_validates_empty_request_args(self):
 
         response = Security.url_validator('rules')('function')()

@@ -18,6 +18,9 @@ class TestAboutController(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     @patch.object(BaseController, 'request_params')
     def test_create_or_modify_about_page_method_creates_new_record(self, mock_request_params):
         """

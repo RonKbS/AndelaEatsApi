@@ -1,42 +1,37 @@
-# ---- Base python ----
-FROM python:3.7 AS base
-
-# --- Information about image ---
+FROM python:3.7-alpine
 
 LABEL MAINTAINER="dominic.motuka@gmail.com"
+
 LABEL application="eats-backend"
 
-# Create app directory
-WORKDIR /usr/src/app 
+ENV PYTHONUNBUFFERED 1
 
-# ---- Dependencies ----
-FROM base AS dependencies  
-COPY requirements.txt   ./
+ENV PYTHONDONTWRITEBYTECODE 1
 
-# install app dependencies
-RUN pip install -r requirements.txt
+RUN apk add --no-cache \
+    build-base \
+    git \
+    libffi-dev \
+    openssh-client \
+    openssl-dev \
+    python-dev 
 
-# ---- Copy Files/Build ----
-FROM dependencies AS build  
-WORKDIR /usr/src/app 
-COPY . /usr/src/app
+# Required for building psycopg2-binary: https://github.com/psycopg/psycopg2/issues/684
+RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
 
-# ----- EXPOSE port 4070 to allow communication to/from server -----
-EXPOSE 4070
+# Install requirements
+COPY requirements.txt /requirements.txt
+RUN pip install --upgrade pip \
+    && pip install --upgrade setuptools \
+    && pip install --upgrade -r /requirements.txt \
+    && rm -r /root/.cache
 
-# Build / Compile if required
+ARG WORKDIR=/usr/src/app
 
-# --- Release with Alpine ----
-FROM python:3.7 AS release 
+RUN mkdir $WORKDIR
 
-# Create app directory
-WORKDIR /usr/src/app
+ADD . /usr/src/
 
-COPY --from=dependencies /usr/src/app/requirements.txt ./
-COPY --from=dependencies /root/.cache /root/.cache
+WORKDIR $WORKDIR
 
-# Install app dependencies
-RUN pip install -r requirements.txt
-COPY --from=build /usr/src/app/ ./
-
-CMD ["gunicorn","run:app", "-b", "0.0.0.0:4070", "--timeout", "360"]
+CMD ["gunicorn", "run:app", "-b", "0.0.0.0:4070", "--timeout", "360"]

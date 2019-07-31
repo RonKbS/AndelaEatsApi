@@ -12,9 +12,12 @@ class TestSeeders(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_flask_seed_database_succeeds_without_arguments(self):
 
-        call(['flask', 'seed_database'])
+        call(['flask', 'seed-database'])
 
         for data in model_mapper.values():
             model = data.get('model')
@@ -24,20 +27,20 @@ class TestSeeders(BaseTestCase):
 
     def test_flask_database_succeeds_valid_arguments(self):
 
-        call(['flask', 'seed_database', 'location'])
+        call(['flask', 'seed-database', 'location'])
 
         model = model_mapper.get('location').get('model')
         result = model.query.count()
 
         assert result > 0
-    
+
     def test_flask_database_fails_with_invalid_arguments(self):
-        output= run(["flask", "seed_database", "23432"],stdout=PIPE, stderr=PIPE)
+        output= run(["flask", "seed-database", "23432"],stdout=PIPE, stderr=PIPE)
         assert output.returncode == 2
-        
+
     def test_flask_database_succeeds_with_testing_argument(self):
 
-        call(['flask', 'seed_database', '--testing'])
+        call(['flask', 'seed-database', '--testing'])
 
         for data in model_mapper.values():
             model = data.get('model')

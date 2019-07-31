@@ -13,4 +13,3 @@ class MealServiceRepo(BaseRepo):
         meal_service = MealService(user_id=user_id, session_id=session_id, date=date)
         meal_service.save()
         return meal_service
-

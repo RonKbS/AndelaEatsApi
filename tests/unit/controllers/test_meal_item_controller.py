@@ -34,6 +34,9 @@ class TestMealItemController(BaseTestCase):
             location_id=1
         )
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     @patch.object(MealItemController, 'get_params_dict')
     @patch.object(MealItemRepo, 'get_unpaginated')
     @patch('app.Auth.get_location')

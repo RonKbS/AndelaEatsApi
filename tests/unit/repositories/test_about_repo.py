@@ -14,6 +14,9 @@ class TestAboutRepo(BaseTestCase):
         self.BaseSetUp()
         self.repo = AboutRepo()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_new_about_method_returns_new_about_object(self):
         """
         Test that new_about method actually creates an item in the database and returns
@@ -54,5 +57,3 @@ class TestAboutRepo(BaseTestCase):
         """
         existing_about = self.repo.get_first_item()
         self.assertIsNone(existing_about)
-
-
