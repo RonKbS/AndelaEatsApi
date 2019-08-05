@@ -1,6 +1,9 @@
-class BaseModelValidationError(Exception):
+from werkzeug.exceptions import HTTPException
+
+
+class BaseModelValidationError(HTTPException):
 
     def __init__(self, msg, status_code=400):
         Exception.__init__(self)
-        self.msg = msg
-        self.status_code = status_code
+        self.description = msg
+        self.code = status_code

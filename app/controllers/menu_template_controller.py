@@ -1,8 +1,8 @@
 
-from app.controllers.base_controller import BaseController
-from app.repositories.menu_template_repo import MenuTemplateRepo
-from app.models.menu_template import MenuTemplate
 
+from app.controllers.base_controller import BaseController
+from app.models.menu_template import MenuTemplate
+from app.repositories.menu_template_repo import MenuTemplateRepo
 from app.utils.auth import Auth
 
 
@@ -14,7 +14,7 @@ class MenuTemplateController(BaseController):
     def create(self):
         location = Auth.get_location()
         name, meal_period, description = self.request_params(
-            'templateName', 'mealPeriod', 'description')
+            'name', 'mealPeriod', 'description')
         # check unique together attirbutes
         if self.menu_template_repo.exists(name=name, location_id=location):
             return self.handle_response('error', payload={
@@ -25,9 +25,7 @@ class MenuTemplateController(BaseController):
         return self.handle_response('OK', payload=template.serialize(), status_code=201)
 
     def update(self, template_id):
-        name, = self.request_params(
-            'templateName')
+        params = self.request_params_dict()
         menu_template = self.menu_template_repo.get_or_404(template_id)
-        template = self.menu_template_repo.update(menu_template,name=name)
+        template = self.menu_template_repo.update(menu_template, **params)
         return self.handle_response('OK', payload=template.serialize(), status_code=200)
-
