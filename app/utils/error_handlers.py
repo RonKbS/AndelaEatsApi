@@ -1,11 +1,12 @@
 import logging
 import traceback
-from config import get_env
 
 import bugsnag
 import rollbar
 from flask import jsonify, make_response
 from werkzeug.exceptions import HTTPException
+
+from config import get_env
 
 error_logger = logging.getLogger(__name__)
 error_logger.setLevel(logging.DEBUG)

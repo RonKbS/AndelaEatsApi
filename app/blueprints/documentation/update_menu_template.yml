@@ -1,8 +1,8 @@
-Create a Menu Template
+Update a Menu Template
 ---
 tags:
   - Menu Template
-summary: Creates Menu Template.
+summary: Update Menu Template.
 consumes:
   - application/json
 parameters:
@@ -17,6 +17,11 @@ parameters:
     required: true
     description: User's token prefix with the word "Bearer"
     in: header
+  - name: menu_template_id
+    in: path
+    type: integer
+    required: true
+    description: The id of the menu
   - name: menu_template
     in: body
     required: true
@@ -24,24 +29,21 @@ parameters:
     schema:
       type: object
       required:
-        - name
+        - templateName
         - description
         - mealPeriod
       properties:
-        name:
+        templateName:
           type: string
           example: name
         mealPeriod:
           type: string
           enum: [breakfast, lunch]
           example: lunch
-        description:
-          type: string
-          example: somethind
 definitions:
   MenuTemplatePayload:
     properties:
-      name:
+      templateName:
         type: string
       locationId:
         type: integer
@@ -63,9 +65,8 @@ definitions:
         type: boolean
       name:
         type: string
-      locationId:
-        type: integer
-        format: int32
+      description:
+        type: string
       mealPeriod:
         type: string
       timestamps:
@@ -78,7 +79,7 @@ definitions:
         $ref: '#/definitions/Payload'
 
 responses:
-  201:
+  200:
     description: Ok
     schema:
       $ref: '#/definitions/MenuTemplatePayload'
