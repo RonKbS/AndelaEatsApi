@@ -49,3 +49,4 @@ redis-stable/
 # logs
 */*.log
 *.log
+app/andelaeats1.db
