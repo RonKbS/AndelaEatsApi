@@ -1,5 +1,6 @@
 
 from app.utils.enums import MealPeriods, WeekDays
+from sqlalchemy.event import listens_for
 
 from .base_model import BaseModel, db
 
@@ -27,16 +28,13 @@ class MenuTemplate(BaseModel):
 class MenuTemplateWeekDay(BaseModel):
     __tablename__ = 'menu_template_weekday'
 
-    day = db.Column(db.Enum(WeekDays), nullable=False, unique=True)
+    day = db.Column(db.Enum(WeekDays), nullable=False)
 
     template_id = db.Column(db.Integer(), db.ForeignKey(
         'menu_template.id'), nullable=False)
 
-    menu_template = db.relationship('MenuTemplate', lazy=False)
-
-    __table_args__ = (
-        db.UniqueConstraint(day, template_id),
-    )
+    menu_template = db.relationship(
+        'MenuTemplate', backref=db.backref('menu_template', lazy='dynamic'))
 
 
 class MenuTemplateItem(BaseModel):
@@ -56,8 +54,22 @@ class MenuTemplateItem(BaseModel):
     protein_items = db.relationship(
         "MealItem", secondary=side_association_table, backref=db.backref('protein_items', lazy='dynamic'))
 
-    day_id = db.Column(db.Enum(WeekDays), db.ForeignKey(
-        'menu_template_weekday.day'), nullable=False)
+    day_id = db.Column(db.Integer(), db.ForeignKey(
+        'menu_template_weekday.id'), nullable=False)
 
     main_meal = db.relationship('MealItem', lazy=False)
     day = db.relationship('MenuTemplateWeekDay', lazy=True)
+
+
+@listens_for(MenuTemplate, 'after_insert')
+def after_insert(mapper, connect, target):
+    """
+    Create MenuTemplateWeekDay after creation of template
+    """
+
+    @listens_for(db.session, "after_flush", once=True)
+    def receive_session_after_flush(session, context):
+        menu_template_id = target.id
+        objects = [MenuTemplateWeekDay(
+            day=day, template_id=menu_template_id) for day in WeekDays.all()]
+        session.bulk_save_objects(objects)

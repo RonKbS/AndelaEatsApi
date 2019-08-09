@@ -1,13 +1,14 @@
 from app.controllers.base_controller import BaseController
 from app.repositories.menu_template_repo import MenuTemplateRepo
+from app.models.menu_template import MenuTemplate
 
 from app.utils.auth import Auth
 
 
 class MenuTemplateController(BaseController):
     def __init__(self, request):
-        BaseController.__init__(self, request)
-        self.menu_template_repo = MenuTemplateRepo()
+        super().__init__(request)
+        self.menu_template_repo = MenuTemplateRepo(MenuTemplate)
 
     def create(self):
         location = Auth.get_location()

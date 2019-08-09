@@ -3,10 +3,7 @@ from app.repositories import BaseRepo
 
 
 class MenuTemplateRepo(BaseRepo):
-
-    def __init__(self):
-        BaseRepo.__init__(self, MenuTemplate)
-
+    
     def create(self, name, location_id, meal_period, description):
         menu_template = MenuTemplate(
             name=name, location_id=location_id, meal_period=meal_period, description=description)

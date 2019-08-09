@@ -27,7 +27,7 @@ class Auth:
 
             for endpoint in Auth.authentication_header_ignore:
                 # If endpoint in request.path, ignore this check
-                if request.path.find(endpoint) > -1:
+                if endpoint in request.path:
                     return None
 
             try:

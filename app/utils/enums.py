@@ -7,6 +7,10 @@ class BaseEnum(str, enum.Enum):
     def has_value(cls, value):
         return any(value == item.value for item in cls)
 
+    @classmethod
+    def all(cls):
+        return [status.value for status in cls]
+
 
 class MealTypes(BaseEnum):
     main = "main"
