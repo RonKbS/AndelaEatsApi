@@ -36,10 +36,32 @@ jobs:
             . venv/bin/activate
             pip install -r requirements.txt
       - run:
-          name: run test and coverage
+          name:  Download test reporter 
+          command: |
+            mkdir -p tmp/
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./tmp/cc-test-reporter
+            chmod +x ./tmp/cc-test-reporter
+      - persist_to_workspace:
+          root: tmp
+          paths:
+            - cc-test-reporter
+      - run:
+          name: run tests
           command: |
             . venv/bin/activate
-            pytest --cov=app/ && coverage report && coveralls
+            pytest --cov=app/ --cov-report xml
+            ./tmp/cc-test-reporter format-coverage coverage.xml -t "coverage.py" -o "tmp/cc.testreport.json"
+      - run:
+          name: upload coverage
+          command: |
+            . venv/bin/activate
+            coverage report && coveralls || ./tmp/cc-test-reporter upload-coverage -i tmp/cc.testreport.json
+      
+      - persist_to_workspace:
+          root: tmp/
+          paths:
+            - cc.testreport.json
+
       - save_cache:
           paths:
             - ./venv
