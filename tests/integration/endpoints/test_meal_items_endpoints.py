@@ -30,7 +30,7 @@ class TestMealItemEndpoints(BaseTestCase):
                                       headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
-        self.assert400(response)
+        self.assert401(response)
         self.assertEqual(response_json['msg'], 'Access Error - Permission Denied')
 
     def test_create_meal_item_endpoint_with_right_permission(self):
@@ -208,7 +208,7 @@ class TestMealItemEndpoints(BaseTestCase):
         response = self.client().get(self.make_url('/meal-items/'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
-        self.assert400(response)
+        self.assert401(response)
         self.assertEqual(response_json['msg'], 'Access Error - Permission Denied')
 
     def test_get_specific_meal_item_enpoint_right_permission(self):
@@ -241,7 +241,7 @@ class TestMealItemEndpoints(BaseTestCase):
         response = self.client().get(self.make_url('/meal-items/{}'.format(meal_item.id)), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
-        self.assert400(response)
+        self.assert401(response)
         self.assertEqual(response_json['msg'], 'Access Error - Permission Denied')
 
     def test_get_specific_meal_item_enpoint_wrong_meal_item_id(self):
@@ -304,7 +304,7 @@ class TestMealItemEndpoints(BaseTestCase):
                                      data=self.encode_to_json_string(data), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
-        self.assert400(response)
+        self.assert401(response)
         self.assertEqual(response_json['msg'], 'Access Error - Permission Denied')
 
     def test_update_meal_item_endpoint_to_existing_name(self):
@@ -382,7 +382,7 @@ class TestMealItemEndpoints(BaseTestCase):
         response = self.client().delete(self.make_url('/meal-items/{}'.format(meal_item.id)), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
-        self.assert400(response)
+        self.assert401(response)
         self.assertEqual(response_json['msg'], 'Access Error - Permission Denied')
 
     def test_delete_meal_item_enpoint_wrong_meal_item_id(self):

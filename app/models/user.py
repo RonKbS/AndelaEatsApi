@@ -1,4 +1,5 @@
 from .base_model import BaseModel, db
+from . import constants
 
 from . import constants
 

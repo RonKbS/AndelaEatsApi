@@ -1257,7 +1257,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         response = self.client().get(self.make_url('/meals/session/'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
-        self.assert400(response)
+        self.assert401(response)
         self.assertEqual(response_json['msg'], 'Access Error - This role does not have the access rights')
 
     def test_list_mealsession_with_right_permission(self):

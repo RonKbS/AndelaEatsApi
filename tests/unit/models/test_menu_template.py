@@ -22,10 +22,6 @@ class TestMenuTemplate(BaseTestCase):
     def test_create_on_menu_template_model(self):
         self.assertNotEquals(self.menu_template.id, None)
 
-    def test_hard_delete_a_menu_template_model(self):
-        self.menu_template.delete()
-        self.assertEqual(MenuTemplate.query.get(self.menu_template.id), None)
-
     def test_create_on_menu_template_model_gets_logged(self):
         activity = [
             activity.action_details for activity in Activity.query.all()]
