@@ -1,0 +1,171 @@
+Create a Menu Template
+---
+tags:
+  - Menu Template
+summary: Creates a new menu template
+parameters:
+  - name: X-Location
+    type: integer
+    required: true
+    description: The center's location Id
+    in: header
+    example: '1'
+  - name: Authorization
+    type: string
+    required: true
+    description: User's token prefix with the word "Bearer"
+    in: header
+  - name: menu_template
+    in: body
+    required: true
+    description: Creation of Menu Template
+    schema:
+      type: object
+      required:
+        - name
+        - description
+        - mealPeriod
+      properties:
+        name:
+          type: string
+          example: name
+        mealPeriod:
+          type: string
+          enum: [breakfast, lunch]
+          example: lunch
+        description:
+          type: string
+          example: somethind
+requestBody:
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          mealPeriod:
+            type: string
+          name:
+            type: string
+          description:
+            type: string
+      examples:
+        '0':
+          value: |-
+            {
+                        "name": "Name of the template",
+                        "mealPeriod": "lunch",
+                        "description": "somehting"
+                    }
+        '1':
+          value: |-
+            {
+                        "name": "Name of the template",
+                        "mealPeriod": "lunch",
+                        "description": "somehting"
+                    }
+        '2':
+          value: |-
+            {
+                        "name": "Name of the template",
+                        "description": "somehting"
+                    }
+        '3':
+          value: |-
+            {
+                        "name": "Name of the template",
+                        "description": "somehting"
+                    }
+responses:
+  '201':
+    description: Successfully create menu_template
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            msg:
+              type: string
+            payload:
+              type: object
+              properties:
+                isDeleted:
+                  type: boolean
+                mealPeriod:
+                  type: string
+                locationId:
+                  type: integer
+                timestamps:
+                  type: object
+                  properties:
+                    updated_at:
+                      type: string
+                    created_at:
+                      type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                id:
+                  type: integer
+        examples:
+          '0':
+            value: |
+              {
+                "msg": "OK", 
+                "payload": {
+                  "id": 1, 
+                  "isDeleted": false, 
+                  "name": "Name of the template", 
+                  "description": "somehting", 
+                  "locationId": 1, 
+                  "mealPeriod": "lunch", 
+                  "timestamps": {
+                    "created_at": "2019-08-14", 
+                    "updated_at": "Wed, 14 Aug 2019 17:24:48 GMT"
+                  }
+                }
+              }
+  '400':
+    description: Auto generated using Swagger Inspector
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            msg:
+              type: string
+            payload:
+              type: object
+              properties:
+                message:
+                  type: string
+        examples:
+          '0':
+            value: |
+              {
+                "msg": "error", 
+                "payload": {
+                  "message": "Meal Template with name  exists in your center"
+                }
+              }
+          '1':
+            value: |
+              {
+                "msg": "Bad Request - mealPeriod is required"
+              }
+  '500':
+    description: Auto generated using Swagger Inspector
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            msg:
+              type: string
+        examples:
+          '0':
+            value: |
+              {
+                "msg": "An error occurred while processing your request. Please contact Admin."
+              }
+              

@@ -1,0 +1,90 @@
+Get Menu Template
+---
+summary: Get all menu templates
+tags:
+- Menu template
+operationId: MenuTemplatesGet
+deprecated: false
+produces:
+- application/json
+parameters:
+- name: Content-Type
+  in: header
+  required: true
+  type: string
+- name: X-Location
+  in: header
+  required: true
+  type: string
+- name: Authorization
+  in: header
+  required: true
+  type: string
+responses:
+  200:
+    description: ''
+    examples:
+      application/json:
+        msg: OK
+        payload:
+          MealTemplates:
+          - id: 2
+            isDeleted: false
+            name: Name of the template
+            locationId: 1
+            mealPeriod: lunch
+            timestamps:
+              created_at: 2019-07-30
+              updated_at: Tue, 30 Jul 2019 14:22:25 GMT
+          - id: 3
+            isDeleted: false
+            name: Name of the template given
+            locationId: 1
+            mealPeriod: lunch
+            timestamps:
+              created_at: 2019-07-30
+              updated_at: Tue, 30 Jul 2019 14:22:25 GMT
+          - id: 4
+            isDeleted: false
+            name: Name of the template given two
+            locationId: 1
+            mealPeriod: lunch
+            timestamps:
+              created_at: 2019-07-30
+              updated_at: Tue, 30 Jul 2019 15:20:57 GMT
+          - id: 5
+            isDeleted: false
+            name: Name of the template given to item
+            locationId: 1
+            mealPeriod: lunch
+            timestamps:
+              created_at: 2019-07-30
+              updated_at: Tue, 30 Jul 2019 15:20:57 GMT
+          - id: 6
+            isDeleted: false
+            name: Name of the template two
+            locationId: 1
+            mealPeriod: lunch
+            timestamps:
+              created_at: 2019-07-30
+              updated_at: Tue, 30 Jul 2019 17:40:14 GMT
+          - id: 7
+            isDeleted: false
+            name: Name
+            locationId: 1
+            mealPeriod: lunch
+            timestamps:
+              created_at: 2019-07-30
+              updated_at: Tue, 30 Jul 2019 17:40:14 GMT
+          meta:
+            total_rows: 6
+            total_pages: 1
+            current_page: 1
+            next_page: 
+            prev_page: 
+    headers: {}
+  400:
+    description: BAD REQUEST
+    examples:
+      application/json:
+        msg: Authorization Header is Expected

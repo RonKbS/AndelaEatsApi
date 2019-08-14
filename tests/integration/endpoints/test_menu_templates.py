@@ -1,6 +1,6 @@
+from factories import LocationFactory, MenuTemplateFactory
 from tests.base_test_case import BaseTestCase
 from tests.base_test_utils import BaseTestUtils
-from factories import LocationFactory, MenuTemplateFactory
 
 
 class TestMenuTemplate(BaseTestCase, BaseTestUtils):
@@ -155,3 +155,77 @@ class TestMenuTemplate(BaseTestCase, BaseTestUtils):
         self.assertEqual(response_json['payload']
                          ['description'], "updated")
         self.assertJSONKeysPresent(response_json['payload'], 'locationId')
+        
+    def test_get_deleted_menu_template_fails(self):
+        self.create_admin()
+        template = MenuTemplateFactory.create(
+            name="Name of the template", is_deleted=True)
+        template.save()
+        response = self.client().get(
+            self.make_url(f"/menu_template/{template.id}"), headers=self.headers())
+        response_json = self.decode_from_json_string(
+            response.data.decode('utf-8'))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            response_json['msg'], 'MenuTemplate with id {} not found'.format(template.id))
+
+    def test_get_menu_template_succeeds(self):
+        self.create_admin()
+        template = MenuTemplateFactory.create(
+            name="Name of the template")
+        template.save()
+        response = self.client().get(
+            self.make_url(f"/menu_template/{template.id}"), headers=self.headers())
+        response_json = self.decode_from_json_string(
+            response.data.decode('utf-8'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_json['msg'], 'OK')
+        self.assertJSONKeysPresent(response_json['payload'], 'name')
+        self.assertJSONKeysPresent(response_json['payload'], 'locationId')
+
+    def test_get_menu_template_with_no_permission_fails(self):
+        template = MenuTemplateFactory.create(
+            name="Name of the template")
+        response = self.client().get(
+            self.make_url(f"/menu_template/{template.id}"), headers=self.headers())
+        response_json = self.decode_from_json_string(
+            response.data.decode('utf-8'))
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response_json['msg'],
+                         'Access Error - No Role Granted')
+
+    def test_get_non_existing_menu_template_fails(self):
+        self.create_admin()
+        response = self.client().get(
+            self.make_url(f"/menu_template/123"), headers=self.headers())
+        response_json = self.decode_from_json_string(
+            response.data.decode('utf-8'))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            response_json['msg'], 'MenuTemplate with id 123 not found')
+
+    def test_get_all_menu_template_succeeds(self):
+        self.create_admin()
+        templates = MenuTemplateFactory.build_batch(10)
+        [template.save() for template in templates]
+        response = self.client().get(
+            self.make_url(f"/menu_template"), headers=self.headers())
+        response_json = self.decode_from_json_string(
+            response.data.decode('utf-8'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_json['msg'], 'OK')
+        self.assertEqual(
+            len(response_json['payload']['MealTemplates']), 10)
+        self.assertJSONKeysPresent(response_json['payload'],'meta')
+    
+    def test_get_all_menu_template_with_no_permissions_fails(self):
+        templates = MenuTemplateFactory.build_batch(10)
+        [template.save() for template in templates]
+        response = self.client().get(
+            self.make_url(f"/menu_template"), headers=self.headers())
+        response_json = self.decode_from_json_string(
+            response.data.decode('utf-8'))
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response_json['msg'],
+                         'Access Error - No Role Granted')
+        

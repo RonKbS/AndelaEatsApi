@@ -50,3 +50,4 @@ redis-stable/
 */*.log
 *.log
 app/andelaeats1.db
+app/andelaeats1.db-journal

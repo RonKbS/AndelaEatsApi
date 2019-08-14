@@ -209,6 +209,9 @@ class Security:
 
             @wraps(f)
             def decorated(*args, **kwargs):
+                if request.method == 'GET':
+                    return f(*args, **kwargs)
+
                 if not request.json:
                     return make_response(jsonify({'msg': 'Bad Request - Request Must be JSON Formatted'})), 400
 
