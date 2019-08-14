@@ -24,25 +24,24 @@ parameters:
     schema:
       type: object
       required:
-        - templateName
-        - locationId
+        - name
+        - description
         - mealPeriod
       properties:
-        templateName:
+        name:
           type: string
           example: name
         mealPeriod:
           type: string
           enum: [breakfast, lunch]
           example: lunch
-        locationId:
-          type: integer
-          format: int32
-          example: 1
+        description:
+          type: string
+          example: somethind
 definitions:
   MenuTemplatePayload:
     properties:
-      templateName:
+      name:
         type: string
       locationId:
         type: integer
