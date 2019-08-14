@@ -118,7 +118,7 @@ class TestMenuTemplate(BaseTestCase, BaseTestUtils):
             data=self.encode_to_json_string(data))
         self.assertEqual(response.status_code, 404)
 
-    def test_update_menu_template_succeeds(self):
+    def test_update_one_field_of_a_menu_template_succeeds(self):
         self.create_admin()
         template = MenuTemplateFactory.create(name="Name of the template")
         template.save()
