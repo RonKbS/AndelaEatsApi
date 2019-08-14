@@ -1,16 +1,16 @@
 """empty message
 
-Revision ID: 14bd30f1c0d2
+Revision ID: 6c383a309ff8
 Revises: 8dff842c714a
-Create Date: 2019-08-06 17:18:32.672031
+Create Date: 2019-08-14 12:01:43.066719
 
 """
 from alembic import op
 import sqlalchemy as sa
-
+from sqlalchemy.dialects.postgresql import ENUM
 
 # revision identifiers, used by Alembic.
-revision = '14bd30f1c0d2'
+revision = '6c383a309ff8'
 down_revision = '8dff842c714a'
 branch_labels = None
 depends_on = None
@@ -27,8 +27,8 @@ def upgrade():
                     sa.Column('description', sa.String(
                         length=100), nullable=False),
                     sa.Column('location_id', sa.Integer(), nullable=True),
-                    sa.Column('meal_period', sa.Enum('lunch', 'breakfast',
-                                                     name='mealperiods'), nullable=False),
+                    sa.Column('meal_period', ENUM(
+                        'lunch', 'breakfast', name="mealperiods", create_type=False), nullable=False),
                     sa.ForeignKeyConstraint(
                         ['location_id'], ['locations.id'], ),
                     sa.PrimaryKeyConstraint('id')
@@ -43,9 +43,7 @@ def upgrade():
                     sa.Column('template_id', sa.Integer(), nullable=False),
                     sa.ForeignKeyConstraint(
                         ['template_id'], ['menu_template.id'], ),
-                    sa.PrimaryKeyConstraint('id'),
-                    sa.UniqueConstraint('day'),
-                    sa.UniqueConstraint('day', 'template_id')
+                    sa.PrimaryKeyConstraint('id')
                     )
     op.create_table('menu_template_item',
                     sa.Column('id', sa.Integer(), nullable=False),
@@ -55,10 +53,9 @@ def upgrade():
                     sa.Column('main_meal_id', sa.Integer(), nullable=False),
                     sa.Column('allowed_side', sa.Integer(), nullable=True),
                     sa.Column('allowed_protein', sa.Integer(), nullable=True),
-                    sa.Column('day_id', sa.Enum('monday', 'tuesday', 'wednesday',
-                                                'thursday', 'friday', name='weekdays'), nullable=False),
+                    sa.Column('day_id', sa.Integer(), nullable=False),
                     sa.ForeignKeyConstraint(
-                        ['day_id'], ['menu_template_weekday.day'], ),
+                        ['day_id'], ['menu_template_weekday.id'], ),
                     sa.ForeignKeyConstraint(
                         ['main_meal_id'], ['meal_items.id'], ),
                     sa.PrimaryKeyConstraint('id')
