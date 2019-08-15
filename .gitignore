@@ -51,3 +51,4 @@ redis-stable/
 *.log
 app/andelaeats1.db
 app/andelaeats1.db-journal
+coverage.xml

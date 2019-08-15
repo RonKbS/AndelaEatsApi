@@ -1,14 +1,21 @@
 
-from app.utils.enums import MealPeriods, WeekDays
 from sqlalchemy.event import listens_for
 
+from app.utils.enums import MealPeriods, WeekDays
+
+from . import constants
 from .base_model import BaseModel, db
 
-side_association_table = db.Table("menu_template_items_to_meal_items",
-                                  db.Column("meal_item_id", db.Integer(),
-                                            db.ForeignKey("meal_items.id")),
-                                  db.Column("menu_template_item_id", db.Integer(), db.ForeignKey("menu_template_item.id")))
-from . import constants
+side_items_association_table = db.Table("menu_template_items_to_meal_items",
+                                        db.Column("meal_item_id", db.Integer(),
+                                                  db.ForeignKey("meal_items.id")),
+                                        db.Column("menu_template_item_id",
+                                                  db.Integer(), db.ForeignKey("menu_template_item.id")))
+protein_items_association_table = db.Table("menu_template_items_to_protein_items",
+                                           db.Column("meal_item_id", db.Integer(),
+                                                     db.ForeignKey("meal_items.id")),
+                                           db.Column("menu_template_item_id",
+                                                     db.Integer(), db.ForeignKey("menu_template_item.id")))
 
 
 class MenuTemplate(BaseModel):
@@ -49,10 +56,10 @@ class MenuTemplateItem(BaseModel):
     allowed_protein = db.Column(db.Integer())
 
     side_items = db.relationship(
-        "MealItem", secondary=side_association_table, backref=db.backref('side_items', lazy='dynamic'))
+        "MealItem", secondary=side_items_association_table, backref=db.backref('side_items', lazy='dynamic'))
 
     protein_items = db.relationship(
-        "MealItem", secondary=side_association_table, backref=db.backref('protein_items', lazy='dynamic'))
+        "MealItem", secondary=protein_items_association_table, backref=db.backref('protein_items', lazy='dynamic'))
 
     day_id = db.Column(db.Integer(), db.ForeignKey(
         'menu_template_weekday.id'), nullable=False)
