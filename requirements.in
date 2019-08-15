@@ -64,7 +64,7 @@ PyYAML
 redis
 requests
 six
-slackclient==1.2.1
+slackclient
 SQLAlchemy
 termcolor
 text-unidecode
