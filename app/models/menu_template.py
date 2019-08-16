@@ -45,7 +45,7 @@ class MenuTemplateWeekDay(BaseModel):
 
 
 class MenuTemplateItem(BaseModel):
-
+    
     __tablename__ = 'menu_template_item'
 
     main_meal_id = db.Column(db.Integer(), db.ForeignKey(

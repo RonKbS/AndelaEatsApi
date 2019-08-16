@@ -31,6 +31,7 @@ class BaseBlueprint:
 		from app.blueprints.about_blueprint import about_blueprint
 		from app.blueprints.meal_session_blueprint import meal_session_blueprint
 		from app.blueprints.menu_template_blueprint import menu_template_blueprint
+		from app.blueprints.menu_template_item_blueprint import menu_template_item_blueprint
 		
 		self.app.register_blueprint(meal_item_blueprint)
 		self.app.register_blueprint(vendor_blueprint)
@@ -49,3 +50,4 @@ class BaseBlueprint:
 		self.app.register_blueprint(about_blueprint)
 		self.app.register_blueprint(meal_session_blueprint)
 		self.app.register_blueprint(menu_template_blueprint)
+		self.app.register_blueprint(menu_template_item_blueprint)

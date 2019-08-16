@@ -11,4 +11,5 @@ from .location_factory import LocationFactory
 from .user_factory import UserFactory
 from .meal_session_factory import MealSessionFactory
 from .meal_service_factory import MealServiceFactory
-from .menu_template_factory import MenuTemplateFactory
+from .menu_template_factory import MenuTemplateWeekDayFactory, MenuTemplateFactory
+from .menu_template_item_factory import MenuTemplateItemFactory
