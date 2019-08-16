@@ -38,3 +38,10 @@ def update_menu_template(id):
 @swag_from('documentation/get_menu_template.yml')
 def get_menu_template(id):
     return menu_template_controller.get(id)
+
+
+@menu_template_blueprint.route('/<string:id>', methods=['DELETE'])
+@Auth.has_role('admin')
+@swag_from('documentation/delete_menu_template.yml')
+def delete_menu(id):
+    return menu_template_controller.delete(id)

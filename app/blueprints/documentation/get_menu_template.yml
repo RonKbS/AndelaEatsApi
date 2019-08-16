@@ -2,7 +2,7 @@ Get Menu Template
 ---
 summary: Get all menu templates
 tags:
-- Menu template
+- Menu Template
 operationId: MenuTemplatesGet
 deprecated: false
 produces:
