@@ -43,3 +43,15 @@ class MenuTemplateItemController(BaseController):
         if template_item:
             return get_ids_list(template_item.side_items) == get_ids_list(side_item_objects)\
                 and get_ids_list(template_item.protein_items) == get_ids_list(protein_item_objects)
+
+    def get_all(self):
+        query_kwargs = self.get_params_dict()
+        menu_template_items = self.menu_template_item_repo.get_menu_template_items_by_day_and_menu_template(
+            query_kwargs['day_id'], query_kwargs['template_id']
+        )
+        menu_template_item_list = []
+        if menu_template_items.items:
+            menu_template_item_list = [menu_template_item.serialize()
+                                  for menu_template_item in menu_template_items.items]
+        return self.handle_response('OK', payload={'MenuTemplateItems': menu_template_item_list,
+                                                   'meta': self.pagination_meta(menu_template_items)})

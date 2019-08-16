@@ -1,0 +1,97 @@
+Get Menu Template Items
+---
+summary: Get menu template items for particular Menu template and day
+tags:
+- Menu Template Items
+operationId: MenuTemplateItemsGet
+deprecated: false
+produces:
+- application/json
+parameters:
+- name: Content-Type
+  in: header
+  required: true
+  type: string
+- name: X-Location
+  in: header
+  required: true
+  type: string
+- name: Authorization
+  in: header
+  required: true
+  type: string
+
+responses:
+  200:
+    description: ''
+    examples:
+      application/json:
+        msg: OK
+        payload:
+          MealTemplateItems:
+          - id: 2
+            isDeleted: false
+            mainMealId: 1
+            allowedSide: 1
+            allowedProtein: 1
+            dayId: 2
+            timestamps:
+              created_at: 2019-07-30
+              updated_at: Tue, 30 Jul 2019 14:22:25 GMT
+          - id: 3
+            isDeleted: false
+            mainMealId: 1
+            allowedSide: 1
+            allowedProtein: 2
+            dayId: 1
+            timestamps:
+              created_at: 2019-07-30
+              updated_at: Tue, 30 Jul 2019 14:22:25 GMT
+          - id: 4
+            isDeleted: false
+            mainMealId: 2
+            allowedSide: 1
+            allowedProtein: 1
+            dayId: 2
+            timestamps:
+              created_at: 2019-07-30
+              updated_at: Tue, 30 Jul 2019 14:22:25 GMT
+          - id: 5
+            isDeleted: false
+            mainMealId: 1
+            allowedSide: 1
+            allowedProtein: 0
+            dayId: 2
+            timestamps:
+              created_at: 2019-07-30
+              updated_at: Tue, 31 Jul 2019 14:22:25 GMT
+          - id: 6
+            isDeleted: false
+            mainMealId: 1
+            allowedSide: 2
+            allowedProtein: 1
+            dayId: 3
+            timestamps:
+              created_at: 2019-07-30
+              updated_at: Tue, 30 Jul 2019 14:22:25 GMT
+          - id: 7
+            isDeleted: false
+            mainMealId: 1
+            allowedSide: 1
+            allowedProtein: 1
+            dayId: 2
+            timestamps:
+              created_at: 2019-07-30
+              updated_at: Tue, 20 Jul 2019 14:22:25 GMT
+          meta:
+            total_rows: 6
+            total_pages: 1
+            current_page: 1
+            next_page: 
+            prev_page: 
+    headers: {}
+  400:
+    description: BAD REQUEST
+    examples:
+      application/json:
+        msg: Authorization Header is Expected

@@ -131,3 +131,59 @@ class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
         self.assertJSONKeysPresent(response_json['payload'], 'message')
         self.assertEqual(response_json['payload']['message'],
                          'Menu Template Item already exists')
+
+    def test_get_menu_template_items_succeeds(self):
+        self.create_admin()
+        template = MenuTemplateItemFactory.create(
+            main_meal_id=1,
+            allowed_side=1,
+            allowed_protein=1,
+            day_id=1,
+        )
+        template.save()
+        # template_id in url refers to menu template and not that created above
+        response = self.client().get(
+            self.make_url("/menu_template_items?template_id=1&day_id=1"),
+            headers=self.headers()
+        )
+        response_json = self.decode_from_json_string(
+            response.data.decode('utf-8'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_json['msg'], 'OK')
+        self.assertEqual(response_json['payload']['MenuTemplateItems'][0]['id'], 1)
+
+    def test_get_menu_template_items_with_no_permission_fails(self):
+        template = MenuTemplateItemFactory.create(
+            main_meal_id=1,
+            allowed_side=1,
+            allowed_protein=1,
+            day_id=1,
+        )
+        response = self.client().get(
+            self.make_url(f"/menu_template_items?template_id={template.id}&day_id=1"),
+            headers=self.headers()
+        )
+        response_json = self.decode_from_json_string(
+            response.data.decode('utf-8'))
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response_json['msg'],
+                         'Access Error - No Role Granted')
+
+    def test_get_for_non_existant_menu_template_items_returns_empty_list(self):
+        self.create_admin()
+        template = MenuTemplateItemFactory.create(
+            main_meal_id=1,
+            allowed_side=1,
+            allowed_protein=1,
+            day_id=1,
+        )
+        template.save()
+        response = self.client().get(
+            self.make_url("/menu_template_items?template_id=2&day_id=1"),
+            headers=self.headers()
+        )
+        response_json = self.decode_from_json_string(
+            response.data.decode('utf-8'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_json['msg'], 'OK')
+        self.assertEqual(response_json['payload']['MenuTemplateItems'], [])
