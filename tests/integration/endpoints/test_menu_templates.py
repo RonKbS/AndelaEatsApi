@@ -181,6 +181,7 @@ class TestMenuTemplate(BaseTestCase, BaseTestUtils):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_json['msg'], 'OK')
         self.assertJSONKeysPresent(response_json['payload'], 'name')
+        self.assertJSONKeysPresent(response_json['payload'], 'weekdays')
         self.assertJSONKeysPresent(response_json['payload'], 'locationId')
 
     def test_get_menu_template_with_no_permission_fails(self):
