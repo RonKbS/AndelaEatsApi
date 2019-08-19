@@ -11,7 +11,6 @@ def get_location_time_zone(location_id):
     :raises: AttributeError, pytz.exceptions.UnknownTimeZoneError
     """
     location = Location.query.filter_by(id=location_id).first()
-
     try:
         return pytz.timezone('Africa/' + location.name)
     except AttributeError:

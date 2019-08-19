@@ -17,12 +17,20 @@ menu_template_blueprint = Blueprint(
 menu_template_controller = MenuTemplateController(request)
 
 
-@menu_template_blueprint.route('/', methods=['POST', 'GET'])
+@menu_template_blueprint.route('/', methods=['POST'])
 @Auth.has_role('admin')
 @Security.validator(['name|required', 'mealPeriod|required:enum_MealPeriods', 'description|required'])
 @swag_from('documentation/menu_template.yml')
 def create_menu_template():
-    return menu_template_controller.create() if request.method == 'POST' else menu_template_controller.get_all()
+    return menu_template_controller.create()
+
+
+@menu_template_blueprint.route('/', methods=['GET'])
+@Security.validate_query_params(MenuTemplate)
+@Auth.has_role('admin')
+@swag_from('documentation/menu_template.yml')
+def get_menu_templates():
+    return menu_template_controller.get_all()
 
 
 @menu_template_blueprint.route('/<int:id>', methods=['PATCH', 'PUT'])
@@ -33,14 +41,14 @@ def update_menu_template(id):
     return menu_template_controller.update(id)
 
 
-@menu_template_blueprint.route('/<string:id>', methods=['GET'])
+@menu_template_blueprint.route('/<int:id>', methods=['GET'])
 @Auth.has_role('admin')
 @swag_from('documentation/get_menu_template.yml')
 def get_menu_template(id):
     return menu_template_controller.get(id)
 
 
-@menu_template_blueprint.route('/<string:id>', methods=['DELETE'])
+@menu_template_blueprint.route('/<int:id>', methods=['DELETE'])
 @Auth.has_role('admin')
 @swag_from('documentation/delete_menu_template.yml')
 def delete_menu(id):

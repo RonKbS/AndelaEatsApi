@@ -187,6 +187,7 @@ class TestMenuTemplate(BaseTestCase, BaseTestUtils):
     def test_get_menu_template_with_no_permission_fails(self):
         template = MenuTemplateFactory.create(
             name="Name of the template")
+        template.save()
         response = self.client().get(
             self.make_url(f"/menu_template/{template.id}"), headers=self.headers())
         response_json = self.decode_from_json_string(
@@ -216,7 +217,7 @@ class TestMenuTemplate(BaseTestCase, BaseTestUtils):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_json['msg'], 'OK')
         self.assertEqual(
-            len(response_json['payload']['MealTemplates']), 10)
+            len(response_json['payload']['MenuTemplates']), 10)
         self.assertJSONKeysPresent(response_json['payload'], 'meta')
 
     def test_get_all_menu_template_with_no_permissions_fails(self):

@@ -102,6 +102,15 @@ class BaseController:
         return self.handle_response(f'{item.__table__.name} deleted {item.id}',
                                     payload={"status": "success"})
 
+    def get_all(self):
+        query_kwargs = self.get_params_dict()
+        records = self.repo.filter_by(**query_kwargs)
+        records_list = []
+        if records.items:
+            records_list = [item.serialize() for item in records.items]
+        return self.handle_response('OK', payload={f'{self.repo._model.__name__}s': records_list,
+                                                   'meta': self.pagination_meta(records)})
+
     @staticmethod
     def return_transformed_enum_items(enums, items):
         """Transform enum types to strings of returned paginated items

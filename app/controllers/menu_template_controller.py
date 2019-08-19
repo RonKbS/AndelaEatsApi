@@ -31,17 +31,8 @@ class MenuTemplateController(BaseController):
 
     def get(self, template_id):
         menu_template = self.repo.get_or_404(template_id)
-        menu_template_weekdays = [item.to_dict(only=['id', 'day']) for item in menu_template.menu_template_weekday.all()]
+        menu_template_weekdays = [item.to_dict(
+            only=['id', 'day']) for item in menu_template.menu_template_weekday.all()]
         return self.handle_response('OK', payload={'weekdays': menu_template_weekdays,
                                                    **menu_template.serialize()},
                                     status_code=200)
-
-    def get_all(self):
-        query_kwargs = self.get_params_dict()
-        menu_templates = self.repo.filter_by(**query_kwargs)
-        menu_template_list = []
-        if menu_templates.items:
-            menu_template_list = [menu_template.serialize()
-                                  for menu_template in menu_templates.items]
-        return self.handle_response('OK', payload={'MealTemplates': menu_template_list,
-                                                   'meta': self.pagination_meta(menu_templates)})
