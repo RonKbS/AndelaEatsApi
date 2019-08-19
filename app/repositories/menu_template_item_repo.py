@@ -16,7 +16,7 @@ class MenuTemplateItemRepo(BaseRepo):
         menu_template_item.save()
         return menu_template_item
 
-    def get_menu_template_items_by_day_and_menu_template(self, day_id, template_id):
+    def get_menu_template_items_by_day(self, day_id):
         return self._model.query.filter_by(
             day_id=day_id
-        ).join(MenuTemplateWeekDay).filter_by(template_id=template_id).paginate(error_out=False)
+        ).paginate(error_out=False)

@@ -46,8 +46,8 @@ class MenuTemplateItemController(BaseController):
 
     def get_all(self):
         query_kwargs = self.get_params_dict()
-        menu_template_items = self.menu_template_item_repo.get_menu_template_items_by_day_and_menu_template(
-            query_kwargs['day_id'], query_kwargs['template_id']
+        menu_template_items = self.menu_template_item_repo.get_menu_template_items_by_day(
+            query_kwargs['day_id']
         )
         menu_template_item_list = []
         if menu_template_items.items:

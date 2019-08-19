@@ -20,6 +20,10 @@ parameters:
   in: header
   required: true
   type: string
+- name: day_id
+  in: url
+  required: true
+  type: integer
 
 responses:
   200:

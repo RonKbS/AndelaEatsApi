@@ -143,7 +143,7 @@ class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
         template.save()
         # template_id in url refers to menu template and not that created above
         response = self.client().get(
-            self.make_url("/menu_template_items?template_id=1&day_id=1"),
+            self.make_url("/menu_template_items?day_id=1"),
             headers=self.headers()
         )
         response_json = self.decode_from_json_string(
@@ -160,7 +160,7 @@ class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
             day_id=1,
         )
         response = self.client().get(
-            self.make_url(f"/menu_template_items?template_id={template.id}&day_id=1"),
+            self.make_url(f"/menu_template_items?day_id=1"),
             headers=self.headers()
         )
         response_json = self.decode_from_json_string(
@@ -179,7 +179,7 @@ class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
         )
         template.save()
         response = self.client().get(
-            self.make_url("/menu_template_items?template_id=2&day_id=1"),
+            self.make_url("/menu_template_items?day_id=4"),
             headers=self.headers()
         )
         response_json = self.decode_from_json_string(
