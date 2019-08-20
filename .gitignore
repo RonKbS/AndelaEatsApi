@@ -33,6 +33,7 @@ pip-log.txt
 .coverage
 .tox
 nosetests.xml
+tests/coverage.xml
 
 # pycharm
 .idea
@@ -48,6 +49,7 @@ redis-stable/
 
 # logs
 */*.log
+/errors.log
 *.log
 app/andelaeats1.db
 app/andelaeats1.db-journal

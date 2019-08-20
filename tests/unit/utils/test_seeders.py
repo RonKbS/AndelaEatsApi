@@ -35,7 +35,11 @@ class TestSeeders(BaseTestCase):
         assert result > 0
 
     def test_flask_database_fails_with_invalid_arguments(self):
-        output= run(["flask", "seed-database", "23432"],stdout=PIPE, stderr=PIPE)
+        output = run(
+            ["flask", "seed-database", "23432"],
+            stdout=PIPE,
+            stderr=PIPE
+        )
         assert output.returncode == 2
 
     def test_flask_database_succeeds_with_testing_argument(self):

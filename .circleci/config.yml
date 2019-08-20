@@ -11,8 +11,12 @@ jobs:
           FLASK_APP: run
           FLASK_ENV: development
           APP_ENV: testing
-          DATABASE_TEST_URL: "sqlite:///andelaeats.db"
-
+          DATABASE_TEST_URL: "postgres://andela:andela@localhost:5432/test_andelaeats"
+      - image: circleci/postgres:11.5
+        environment:
+          - POSTGRES_USER=andela
+          - POSTGRES_DB=test_andelaeats
+          - POSTGRES_PASSWORD=andela
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
@@ -28,7 +32,16 @@ jobs:
             - v1-dependencies-{{ checksum "requirements.txt" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-
+      - run:
+          name: Waiting for Postgres to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 5432 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for Postgres && exit 1
       - run:
           name: install dependencies
           command: |

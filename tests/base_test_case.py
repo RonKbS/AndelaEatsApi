@@ -1,13 +1,15 @@
-from os import getenv, environ
-import jwt
 import json
+from os import getenv, environ
+
+import jwt
+from faker import Faker
+from flask_testing import TestCase
+
 from app import create_app
 from app.utils import db
 from app.utils.auth import Auth
-from flask_testing import TestCase
-from faker import Faker
-from app.utils.handled_exceptions import BaseModelValidationError
-from flask import make_response, jsonify
+from app.utils.seeders import seed_database
+
 
 config_name = 'testing'
 environ['APP_ENV'] = config_name
@@ -15,7 +17,6 @@ fake = Faker()
 
 
 class BaseTestCase(TestCase):
-
     VALID_TOKEN = None
 
     def BaseSetUp(self):
@@ -49,8 +50,8 @@ class BaseTestCase(TestCase):
         }
         payload.__setitem__('exp', exp) if exp is not None else ''
 
-        token = jwt.encode(payload, secret_key,
-                           algorithm='RS256').decode('utf-8')
+        token = jwt.encode(payload, secret_key, algorithm='RS256').decode(
+            'utf-8')
         return token
 
     @staticmethod
@@ -63,19 +64,22 @@ class BaseTestCase(TestCase):
 
     @staticmethod
     def user_id():
-        return Auth.decode_token(BaseTestCase.get_valid_token())['UserInfo']['id']
+        return \
+        Auth.decode_token(BaseTestCase.get_valid_token())['UserInfo']['id']
 
     @staticmethod
     def user_email():
-        return Auth.decode_token(BaseTestCase.get_valid_token())['UserInfo']['email']
+        return \
+        Auth.decode_token(BaseTestCase.get_valid_token())['UserInfo'][
+            'email']
 
     @staticmethod
     def user_first_and_last_name():
         return (
-            Auth.decode_token(BaseTestCase.get_valid_token())[
-                'UserInfo']['firstName'],
-            Auth.decode_token(BaseTestCase.get_valid_token())[
-                'UserInfo']['lastName']
+            Auth.decode_token(BaseTestCase.get_valid_token())['UserInfo'][
+                'firstName'],
+            Auth.decode_token(BaseTestCase.get_valid_token())['UserInfo'][
+                'lastName']
         )
 
     @staticmethod
@@ -121,11 +125,16 @@ class BaseTestCase(TestCase):
         db.create_all()
 
     @staticmethod
-    def headers(id=1):
+    def seed_database():
+        seed_database.seed_db(table_name=None, testing=False)
+
+    @staticmethod
+    def headers(location_id=1):
         return {
             'Content-Type': 'application/json',
-            'X-Location': str(id),
-            'Authorization': 'Bearer {}'.format(BaseTestCase.get_valid_token()),
+            'X-Location': f'{location_id}',
+            'Authorization': 'Bearer {}'.format(
+                BaseTestCase.get_valid_token()),
         }
 
     @staticmethod

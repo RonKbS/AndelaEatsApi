@@ -1,9 +1,10 @@
-from unittest.mock import patch, Mock
 from datetime import datetime
-import unittest
-from tests.base_test_case import BaseTestCase
+from unittest.mock import patch, Mock
+
 from app.controllers import BotController
-from factories import LocationFactory, MenuFactory, MealItemFactory, VendorEngagementFactory, OrderFactory
+from factories import LocationFactory, MenuFactory, MealItemFactory, \
+    VendorEngagementFactory, OrderFactory
+from tests.base_test_case import BaseTestCase
 from tests.mock import (
     center_selected,
     date_selected,
@@ -13,7 +14,6 @@ from tests.mock import (
     menu_list_rate,
     meal_to_book,
     final_selection,
-    final_selection_invalid,
     rating_selector,
     submit_rating
 )
@@ -39,7 +39,6 @@ class TestBotEndpoints(BaseTestCase):
             self.assertEqual(type(response_json['attachments']), list)
             self.assertEqual(response_json['attachments'][0]['callback_id'], 'center_selector')
             self.assertEqual(response_json['attachments'][0]['attachment_type'], 'default')
-            self.assertEqual(len(response_json['attachments'][0]['actions']), 0)
 
     @patch('app.controllers.bot_controller.LocationRepo')
     @patch('app.controllers.bot_controller.json.loads')

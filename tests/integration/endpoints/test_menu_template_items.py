@@ -5,22 +5,23 @@ from factories import MenuTemplateItemFactory, MenuTemplateWeekDayFactory, Locat
 
 
 class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
-    
 
     def setUp(self):
         self.BaseSetUp()
         self.meal_items = MealItemFactory.create_batch(5)
         [item.save() for item in self.meal_items]
 
-    def tearUp(self):
+    def tearDown(self):
         self.BaseTearDown()
 
     def test_create_menu_template_item_with_no_permission_fails(self):
+        day = MenuTemplateWeekDayFactory()
+        day.save()
         data = {
             "mainMealId": 1,
             "allowedSide": 1,
             "allowedProtein": 1,
-            "dayId": MenuTemplateWeekDayFactory().day
+            "dayId": day.id
         }
         response = self.client().post(
             self.make_url("/menu_template_items/"), headers=self.headers(),
@@ -33,15 +34,15 @@ class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
 
     def test_create_menu_template_item_with_permission_succeeds(self):
         self.create_admin()
-        LocationFactory.create(id=1).save()
-
+        day = MenuTemplateWeekDayFactory()
+        day.save()
         data = {
-            "mainMealId": 1,
+            "mainMealId": self.meal_items[0].id,
             "allowedSide": 1,
             "allowedProtein": 1,
             "proteinItems": [i.id for i in self.meal_items],
             "sideItems": [i.id for i in self.meal_items],
-            "dayId": MenuTemplateWeekDayFactory().day
+            "dayId": day.id
         }
         response = self.client().post(
             self.make_url("/menu_template_items/"), headers=self.headers(),
@@ -67,11 +68,12 @@ class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
 
     def test_create_menu_template_item_with_missing_fields_fails(self):
         self.create_admin()
+        day = MenuTemplateWeekDayFactory()
+        day.save()
         data = {
             "allowedSide": 1,
             "allowedProtein": 1,
-            "dayId": MenuTemplateWeekDayFactory().day
-        
+            "dayId": day.id
         }
         response = self.client().post(
             self.make_url("/menu_template_items/"), headers=self.headers(),
@@ -84,15 +86,17 @@ class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
 
     def test_create_menu_template_item_invalid_side_and_protein_item_ids_fails(self):
         self.create_admin()
+        day = MenuTemplateWeekDayFactory()
+        day.save()
         data = {
-            "mainMealId": 1,
+            "mainMealId": self.meal_items[0].id,
             "allowedSide": 1,
             "allowedProtein": 1,
             "proteinItems": [123],
             "sideItems": [233],
-            "dayId": MenuTemplateWeekDayFactory().day
+            "dayId": day.id
         }
-        
+
         response_ = self.client().post(
             self.make_url("/menu_template_items/"), headers=self.headers(),
             data=self.encode_to_json_string(data))
@@ -108,17 +112,17 @@ class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
 
     def test_create_same_exact_menu_template_item_fails(self):
         self.create_admin()
-        LocationFactory.create(id=1).save()
-        
+        day = MenuTemplateWeekDayFactory()
+        day.save()
         data = {
-            "mainMealId": 1,
+            "mainMealId": self.meal_items[0].id,
             "allowedSide": 1,
             "allowedProtein": 1,
             "proteinItems": [i.id for i in self.meal_items],
             "sideItems": [i.id for i in self.meal_items],
-            "dayId": MenuTemplateWeekDayFactory().day
+            "dayId": day.id
         }
-        
+
         response_ = self.client().post(
             self.make_url("/menu_template_items/"), headers=self.headers(),
             data=self.encode_to_json_string(data))
