@@ -22,16 +22,16 @@ class OrderController(BaseController):
 
 	def list_orders(self):
 		"""
-		List all orders in the application: should rarely be should
-		:return:
-		"""
+        List all orders in the application: should rarely be should
+        :return:
+        """
+        # get params
+		params = self.get_int_params()
 		location_id = Auth.get_location()
-		yesterday  = date.today() - timedelta(days=1)
+		yesterday = date.today() - timedelta(days=1)
 		tomorrow = date.today() + timedelta(days=1)
-
 		orders = self.order_repo.get_range_paginated_options_all(
-			start_date=yesterday, end_date=tomorrow, location_id=location_id
-		)
+			start_date=yesterday, end_date=tomorrow, location_id=location_id, **params)
 		order_list = []
 		if len(orders.items) > 0:
 			for order in orders.items:
@@ -46,7 +46,6 @@ class OrderController(BaseController):
 					item.to_dict(only=OrderController.default_meal_item_return_fields)
 					for item in meal_items
 				]
-
 
 				order_item['user'] = '{} {}'.format(user['first_name'], user['last_name']) if user else None
 
@@ -96,10 +95,10 @@ class OrderController(BaseController):
 		:param end_date:
 		:return:
 		"""
+		params = self.get_int_params()
 		location_id = Auth.get_location()
 		orders = self.order_repo.get_range_paginated_options_all(
-			start_date=start_date, end_date=end_date, location_id=location_id
-		)
+			start_date=start_date, end_date=end_date, location_id=location_id, **params)
 
 		order_list = []
 		if len(orders.items) > 0:

@@ -108,7 +108,7 @@ class TestOrderController(BaseTestCase):
                 'last_name': 'Serunjogi'
             }
             mock_pagination_meta.return_value = self.pagination_meta
-            order_controller = OrderController(self.request_context)
+            order_controller = OrderController(self.request_context.request)
 
             # Act
             result = order_controller.list_orders()
@@ -144,7 +144,7 @@ class TestOrderController(BaseTestCase):
                 'first_name': 'Joseph',
                 'last_name': 'Serunjogi'
             }
-            order_controller = OrderController(self.request_context)
+            order_controller = OrderController(self.request_context.request)
 
             # Act
             result = order_controller.list_orders_date_range(
