@@ -9,6 +9,8 @@ from app import create_app
 from app.utils import db
 from app.utils.auth import Auth
 from app.utils.seeders import seed_database
+from app import BackgroundScheduler
+from app.utils.redisset import RedisSet
 
 
 config_name = 'testing'
@@ -20,6 +22,10 @@ class BaseTestCase(TestCase):
     VALID_TOKEN = None
 
     def BaseSetUp(self):
+        # monkey patch the cron scheduler before running test
+        def fn(self):
+            pass
+        BackgroundScheduler.start = fn
         """Define test variables and initialize app"""
         self.app = self.create_app()
         self.client = self.app.test_client
@@ -30,6 +36,7 @@ class BaseTestCase(TestCase):
         db.session.close()
         db.session.remove()
         db.engine.dispose()
+        RedisSet()._delete()
 
     @staticmethod
     def generate_token(exp=None):

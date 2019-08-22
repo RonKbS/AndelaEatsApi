@@ -11,12 +11,18 @@ from app.models.location import Location
 from app.repositories.meal_session_repo import MealSessionRepo
 from app.utils.cron import Cron, MealSessionCron
 from app.business_logic.meal_session.meal_session_logic import MealSessionLogic
+from app.utils.redisset import RedisSet
+from factories.user_role_factory import UserRoleFactory
+from factories.location_factory import LocationFactory
+from app.repositories.user_role_repo import UserRoleRepo
+from factories.role_factory import RoleFactory
 
 
 class TestCron(BaseTestCase):
 
     def setUp(self):
         self.BaseSetUp()
+        self.redis_set = RedisSet()
 
     def tearDown(self):
         self.BaseTearDown()
@@ -93,3 +99,29 @@ class TestCron(BaseTestCase):
 
             meal_sessions = MealSessionRepo().fetch_all().items
             assert len(meal_sessions) == 0
+
+    def test_run_5_minute_method(self):
+        role = RoleFactory.create()
+        location = LocationFactory.create()
+        user_role = UserRoleFactory.build(
+            role_id=role.id,
+            location=location
+        )
+
+        UserRoleRepo().new_user_role(
+          user_role.role_id,
+          user_role.user_id,
+          user_role.location_id,
+          user_role.email
+        )
+
+        Cron(self.app).run_5_minute()
+
+        results = self.redis_set.get(user_role.email[0])
+        self.assertEqual(user_role.email, results[0])
+
+        results = self.redis_set.get(user_role.email[0:1])
+        self.assertEqual(user_role.email, results[0])
+
+        results = self.redis_set.get(user_role.email[0:2])
+        self.assertEqual(user_role.email, results[0])

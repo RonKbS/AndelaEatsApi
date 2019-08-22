@@ -14,9 +14,9 @@ jobs:
           DATABASE_TEST_URL: "postgres://andela:andela@localhost:5432/test_andelaeats"
       - image: circleci/postgres:11.5
         environment:
-          - POSTGRES_USER=andela
-          - POSTGRES_DB=test_andelaeats
-          - POSTGRES_PASSWORD=andela
+          POSTGRES_USER: andela
+          POSTGRES_DB: test_andelaeats
+          POSTGRES_PASSWORD: andela
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
