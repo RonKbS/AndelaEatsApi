@@ -58,7 +58,7 @@ class BaseController:
 
     def get_json(self):
         return self.request.get_json()
-    
+
     def get_int_params(self):
         params = self.get_params_dict()
         for key, value in params.items():
@@ -101,6 +101,10 @@ class BaseController:
         self.repo.update(item, is_deleted=True)
         return self.handle_response(f'{item.__table__.name} deleted {item.id}',
                                     payload={"status": "success"})
+
+    def get(self, item_id):
+        item = self.repo.get_or_404(item_id)
+        return self.handle_response('OK', payload={f'{self.repo._model.__name__}': item.serialize()}, status_code=200)
 
     def get_all(self):
         query_kwargs = self.get_params_dict()
