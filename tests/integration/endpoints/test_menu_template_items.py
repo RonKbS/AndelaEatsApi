@@ -191,3 +191,31 @@ class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_json['msg'], 'OK')
         self.assertEqual(response_json['payload']['MenuTemplateItems'], [])
+        
+    def test_delete_menu_template_item_succeeds(self):
+        self.create_admin()
+        item = MenuTemplateItemFactory.create()
+        item.save()
+        response = self.client().delete(
+            self.make_url(f"/menu_template_items/{item.id}"), headers=self.headers())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json['msg'],
+                         f'menu_template_item deleted {item.id}')
+    
+    def test_delete_menu_template_item_that_doesnot_exist_fails(self):
+        self.create_admin()
+        response = self.client().delete(
+            self.make_url(f"/menu_template_items/100"), headers=self.headers())
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json['msg'],
+                         'MenuTemplateItem with id 100 not found')
+
+    
+    def test_delete_menu_template_item_with_no_permissions_fails(self):
+        item = MenuTemplateItemFactory.create()
+        item.save()
+        response = self.client().delete(
+            self.make_url(f"/menu_template_items/{item.id}"), headers=self.headers())
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json['msg'],
+                         'Access Error - No Role Granted')

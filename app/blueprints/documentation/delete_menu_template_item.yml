@@ -1,0 +1,85 @@
+Delete a Menu Template item
+---
+tags:
+  - Menu Template Items
+schemes:
+- http
+consumes:
+- application/json
+description: ''
+summary: Delete menu template item
+
+operationId: MenuTemplateItem2Delete
+deprecated: false
+produces:
+  - application/json
+parameters:
+  - name: Content-Type
+    in: header
+    required: true
+    type: string
+    description: ''
+  - name: Authorization
+    in: header
+    required: true
+    type: string
+    description: ''
+  - name: X-Location
+    in: header
+    required: true
+    type: string
+    description: ''
+responses:
+  200:
+    description: ''
+    schema:
+      $ref: '#/definitions/Deletemenutemplateitemsuccess'
+    examples:
+      application/json:
+        msg: menu_template_item deleted 2
+        payload:
+          status: success
+    headers: {}
+  404:
+    description: NOT FOUND
+    schema:
+      $ref: '#/definitions/DeletemenutemplateCopyError'
+    examples:
+      application/json:
+        msg: MenuTemplate with id 2 not found
+definitions:
+  Deletemenutemplateitemsuccess:
+    title: Deletemenutemplateitemsuccess
+    example:
+      msg: menu_template_item deleted 2
+      payload:
+        status: success
+    type: object
+    properties:
+      msg:
+        type: string
+      payload:
+        $ref: '#/definitions/Payload4'
+    required:
+    - msg
+    - payload
+    Payload4:
+      title: Payload4
+      example:
+        status: success
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    DeletemenutemplateitemError:
+      title: DeletemenutemplateitemCopyError
+      example:
+        msg: MenuTemplateItem with id 2 not found
+      type: object
+      properties:
+        msg:
+          type: string
+      required:
+      - msg
