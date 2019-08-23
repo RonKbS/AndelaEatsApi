@@ -237,3 +237,25 @@ class TestRoleEndpoints(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_json['msg'], 'OK')
         self.assertEqual(response_json['payload']['permission'][0]['id'], new_permission.id)
+
+    def test_autocomplete_endpoint(self):
+        role = RoleFactory()
+        user_role = UserRoleFactory(role_id=role.id)
+        user = UserFactory(
+            slack_id='-LMnsyxrsj_TEYEAHCBk',
+            user_type_id=user_role.id
+        )
+
+        create_user_role('view_user_roles')
+
+        response = self.client().get(
+            self.make_url('/roles/autocomplete'),
+            query_string={'q': user_role.email[0]},
+            headers=self.headers()
+        )
+        response_json = self.decode_from_json_string(
+            response.data.decode('utf-8')
+        )
+        payload = response_json
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(user_role.email in payload['msg'])

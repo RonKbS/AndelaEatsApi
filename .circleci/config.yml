@@ -14,9 +14,11 @@ jobs:
           DATABASE_TEST_URL: "postgres://andela:andela@localhost:5432/test_andelaeats"
       - image: circleci/postgres:11.5
         environment:
-          - POSTGRES_USER=andela
-          - POSTGRES_DB=test_andelaeats
-          - POSTGRES_PASSWORD=andela
+          POSTGRES_USER: andela
+          POSTGRES_DB: test_andelaeats
+          POSTGRES_PASSWORD: andela
+      - image: circleci/redis:latest
+
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
@@ -64,6 +66,8 @@ jobs:
             . venv/bin/activate
             pytest --cov=app/ --cov-report xml
             ./tmp/cc-test-reporter format-coverage coverage.xml -t "coverage.py" -o "tmp/cc.testreport.json"
+          environment:
+            REDIS_URL: redis://localhost:6379
       - run:
           name: upload coverage
           command: |

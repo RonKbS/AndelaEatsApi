@@ -7,7 +7,7 @@ class TestMenuTemplate(BaseTestCase, BaseTestUtils):
     def setUp(self):
         self.BaseSetUp()
 
-    def tearUp(self):
+    def tearDown(self):
         self.BaseTearDown()
 
     def test_create_menu_template_with_no_permission_fails(self):

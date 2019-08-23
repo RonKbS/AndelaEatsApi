@@ -63,6 +63,7 @@ def create_app(config_name):
     scheduler.add_job(cron.run_24_hourly, trigger='interval', hours=24)
     scheduler.add_job(cron.run_meal_session_cron, 'cron', day_of_week='mon-fri', hour=0, minute=0,
                       misfire_grace_time=None)
+    scheduler.add_job(cron.run_5_minute, trigger='interval', minutes=5)
     scheduler.start()
 
     swg = Swagger(app)
