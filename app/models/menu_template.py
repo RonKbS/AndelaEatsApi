@@ -41,7 +41,7 @@ class MenuTemplateWeekDay(BaseModel):
         'menu_template.id'), nullable=False)
 
     menu_template = db.relationship(
-        'MenuTemplate', backref=db.backref('menu_template', lazy='dynamic'))
+        'MenuTemplate', backref=db.backref('menu_template_weekday', lazy='dynamic'))
 
 
 class MenuTemplateItem(BaseModel):

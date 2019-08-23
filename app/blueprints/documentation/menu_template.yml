@@ -15,6 +15,24 @@ parameters:
     required: true
     description: User's token prefix with the word "Bearer"
     in: header
+  - name: id
+    in: path
+    type: integer
+    required: optional
+    description: id of menu template
+  - name: locationId
+    in: path
+    type: integer
+    required: optional
+    description: The location of menu template
+  - name: description
+    in: path
+    type: string
+    required: optional
+  - name: name
+    in: path
+    type: string
+    required: optional
   - name: menu_template
     in: body
     required: true

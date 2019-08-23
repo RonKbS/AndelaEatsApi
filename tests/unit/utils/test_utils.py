@@ -1,8 +1,12 @@
 from datetime import datetime
 from unittest.mock import Mock, patch
 
+import pytest
+import pytz
+
 from app.utils import (check_date_current_vs_date_for, current_time_by_zone,
                        daterange, handle_exception)
+from factories import LocationFactory
 from tests.base_test_case import BaseTestCase
 
 
@@ -71,4 +75,12 @@ class TestAuth(BaseTestCase):
     def test_get_location_time_zone(self):
         from app.utils.location_time import get_location_time_zone
         res = get_location_time_zone(1)
-        self.assertTrue(res)
+        assert type(res) == type(AttributeError)
+
+    @patch('app.utils.location_time.pytz.timezone')
+    def test_get_invalid_location_time_zone(self, timezone):
+        timezone.side_effect = pytz.exceptions.UnknownTimeZoneError
+        location = LocationFactory()
+        from app.utils.location_time import get_location_time_zone
+        res = get_location_time_zone(location.id)
+        assert type(res) == type(pytz.exceptions.UnknownTimeZoneError)
