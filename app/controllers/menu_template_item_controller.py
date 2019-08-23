@@ -5,7 +5,7 @@ from app.repositories.meal_item_repo import MealItemRepo
 class MenuTemplateItemController(BaseController):
     def __init__(self, request):
         BaseController.__init__(self, request)
-        self.menu_template_item_repo = MenuTemplateItemRepo()
+        self.repo = MenuTemplateItemRepo()
         self.meal_item_repo = MealItemRepo()
         self.meal_item_fields = ['name', 'image', 'id', 'meal_type']
 
@@ -23,7 +23,7 @@ class MenuTemplateItemController(BaseController):
             return self.handle_response('error', payload={
                 'message': "Menu Template Item already exists"}, status_code=400)
 
-        template = self.menu_template_item_repo.create(
+        template = self.repo.create(
             main_meal_id, allowed_side, allowed_protein,
             protein_item_objects, side_item_objects, day_id)
 
@@ -32,7 +32,7 @@ class MenuTemplateItemController(BaseController):
 
     def check_protein_side_items_exist(self, *args):
         protein_item_objects, side_item_objects, main_meal_id, allowed_side, allowed_protein, day_id = args
-        template_item = self.menu_template_item_repo.filter_by(
+        template_item = self.repo.filter_by(
             main_meal_id=main_meal_id,
             allowed_side=allowed_side,
             allowed_protein=allowed_protein,
@@ -46,7 +46,7 @@ class MenuTemplateItemController(BaseController):
 
     def get_all(self):
         query_kwargs = self.get_params_dict()
-        menu_template_items = self.menu_template_item_repo.get_menu_template_items_by_day(
+        menu_template_items = self.repo.get_menu_template_items_by_day(
             query_kwargs['day_id']
         )
         menu_template_item_list = []
