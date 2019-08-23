@@ -56,6 +56,16 @@ class BaseController:
 	def get_json(self):
 		return self.request.get_json()
 	
+	def get_int_params(self):
+		params = self.get_params_dict()
+		for key, value in params.items():
+			try:
+				params[key] = int(value)
+			except ValueError:
+				raise ValueError(f'{key} must an integer')
+		return params
+				
+	
 	def handle_response(self, msg='OK', payload=None, status_code=200, slack_response=None):
 		
 		# If there is no specific slack formatted response, default to WEB API Response format
