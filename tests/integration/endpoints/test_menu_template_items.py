@@ -201,7 +201,7 @@ class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json['msg'],
                          f'menu_template_item deleted {item.id}')
-    
+
     def test_delete_menu_template_item_that_doesnot_exist_fails(self):
         self.create_admin()
         response = self.client().delete(
@@ -210,7 +210,6 @@ class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
         self.assertEqual(response.json['msg'],
                          'MenuTemplateItem with id 100 not found')
 
-    
     def test_delete_menu_template_item_with_no_permissions_fails(self):
         item = MenuTemplateItemFactory.create()
         item.save()
@@ -219,3 +218,51 @@ class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json['msg'],
                          'Access Error - No Role Granted')
+
+    def test_get_deleted_menu_template_item_fails(self):
+        self.create_admin()
+        item = MenuTemplateItemFactory.create(is_deleted=True)
+        item.save()
+        response = self.client().get(
+            self.make_url(f"/menu_template_items/{item.id}"), headers=self.headers())
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            response.json['msg'], 'MenuTemplateItem with id {} not found'.format(item.id))
+
+    def test_get_menu_template_item_succeeds(self):
+        self.create_admin()
+        item = MenuTemplateItemFactory.create()
+        item.save()
+        response = self.client().get(
+            self.make_url(f"/menu_template_items/{item.id}"), headers=self.headers())
+        response_json = self.decode_from_json_string(
+            response.data.decode('utf-8'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_json['msg'], 'OK')
+        self.assertJSONKeysPresent(
+            response_json['payload'], 'MenuTemplateItem')
+        self.assertJSONKeysPresent(
+            response_json['payload']['MenuTemplateItem'], 'mainMealId')
+        self.assertJSONKeysPresent(
+            response_json['payload']['MenuTemplateItem'], 'allowedProtein')
+        self.assertJSONKeysPresent(
+            response_json['payload']['MenuTemplateItem'], 'mainMealId')
+        self.assertJSONKeysPresent(
+            response_json['payload']['MenuTemplateItem'], 'allowedSide')
+
+    def test_get_menu_template_with_no_permission_fails(self):
+        item = MenuTemplateItemFactory.create()
+        item.save()
+        response = self.client().get(
+            self.make_url(f"/menu_template_items/{item.id}"), headers=self.headers())
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json['msg'],
+                         'Access Error - No Role Granted')
+
+    def test_get_non_existing_menu_template_fails(self):
+        self.create_admin()
+        response = self.client().get(
+            self.make_url(f"/menu_template_items/123"), headers=self.headers())
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            response.json['msg'], 'MenuTemplateItem with id 123 not found')
