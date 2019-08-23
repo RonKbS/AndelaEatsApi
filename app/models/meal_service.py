@@ -6,5 +6,7 @@ class MealService(BaseModel):
     __tablename__ = 'meal_services'
 
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship('User', lazy=False)
     date = db.Column(db.DateTime(), default=datetime.now())
     session_id = db.Column(db.Integer(), db.ForeignKey('meal_sessions.id'), nullable=False)
+    session = db.relationship('MealSession', lazy=False)

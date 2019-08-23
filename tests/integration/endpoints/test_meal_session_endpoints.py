@@ -14,12 +14,15 @@ class TestMealSessionEndpoints(BaseTestCase):
         self.BaseSetUp()
         self.current_date = datetime.now()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_create_non_existing_meal_session_succeeds(self):
 
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -57,7 +60,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1000, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -78,7 +81,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Try to create second meal session
@@ -96,7 +99,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -125,7 +128,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Russian Republic")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -154,7 +157,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -178,7 +181,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         import pytz
         tz = pytz.timezone('Africa/Lagos')
@@ -208,10 +211,10 @@ class TestMealSessionEndpoints(BaseTestCase):
 
     def test_create_meal_session_with_start_time_beginning_in_an_existing_session_fails(self):
 
-        new_location = LocationFactory.create(id=1, name="Lagos")
+        new_location = LocationFactory.create(name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         # Create first meal session between 1:00PM and 2:00PM
         MealSessionFactory.create(
@@ -219,7 +222,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         meal_session_data = {
@@ -237,9 +240,11 @@ class TestMealSessionEndpoints(BaseTestCase):
 
         # Create another meal session with the same name starting in between the time another with the same
         # name
+        headers = self.headers()
+        headers.update({'X-Location': new_location.id})
         response = self.client().post(self.make_url('/meals/session'),
                                       data=self.encode_to_json_string(meal_session_data),
-                                      headers=self.headers())
+                                      headers=headers)
 
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
@@ -254,7 +259,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         # Create first meal session between 1:00PM and 2:00PM
         MealSessionFactory.create(
@@ -262,7 +267,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         meal_session_data = {
@@ -297,7 +302,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         # Create first meal session between 1:00PM and 2:00PM
         MealSessionFactory.create(
@@ -305,7 +310,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         meal_session_data = {
@@ -338,7 +343,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -365,7 +370,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "some invalid name",
@@ -397,7 +402,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -428,7 +433,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -459,7 +464,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -491,7 +496,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -520,7 +525,10 @@ class TestMealSessionEndpoints(BaseTestCase):
             (response_json['payload']['mealSession']['stopTime'])[:-3], meal_session_data['endTime'])
         self.assertEqual(
             (response_json['payload']['mealSession']['date']), meal_session_data['date'])
-        self.assertEqual(response_json['payload']['mealSession']['locationId'], int(self.headers().get('X-Location')))
+        self.assertEqual(
+            response_json['payload']['mealSession']['locationId'],
+            int(self.headers().get('X-Location'))\
+        )
 
 
     def test_update_already_existing_meal_session_succeeds(self):
@@ -528,7 +536,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -549,7 +557,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Update meal session with the same data
@@ -571,7 +579,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -609,7 +617,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -648,7 +656,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location_fake = LocationFactory.create(id=2, name="Russian Republic")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -669,7 +677,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location_authentic.id
+            location=new_location_authentic
         )
 
         # Update meal session with non existing location ID
@@ -686,7 +694,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -707,7 +715,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Update meal session with non existing location ID
@@ -723,7 +731,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         import pytz
         tz = pytz.timezone('Africa/Lagos')
@@ -748,7 +756,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Update meal session with non existing location ID
@@ -765,7 +773,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         # Create first meal session between 1:00PM and 2:00PM
         MealSessionFactory.create(
@@ -773,7 +781,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         meal_session_data = {
@@ -795,7 +803,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=15, minute=0),
             stop_time=time(hour=16, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Try to update the meal session to the time of an existing one
@@ -815,7 +823,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         # Create first meal session between 1:00PM and 2:00PM
         MealSessionFactory.create(
@@ -823,7 +831,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         meal_session_data = {
@@ -845,7 +853,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=15, minute=0),
             stop_time=time(hour=16, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Try to update the meal session with the exact details of an already existing one
@@ -865,7 +873,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         # Create first meal session between 1:00PM and 2:00PM
         MealSessionFactory.create(
@@ -873,7 +881,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         meal_session_data = {
@@ -895,7 +903,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=15, minute=0),
             stop_time=time(hour=16, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Try to update the meal session to the time of an existing one
@@ -915,7 +923,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         # Create first meal session between 1:00PM and 2:00PM
         MealSessionFactory.create(
@@ -923,7 +931,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=13, minute=0),
             stop_time=time(hour=14, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         meal_session_data = {
@@ -945,7 +953,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=15, minute=0),
             stop_time=time(hour=16, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Try to update the meal session to the time of an existing one
@@ -965,7 +973,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -980,7 +988,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=15, minute=0),
             stop_time=time(hour=16, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Try to update the meal session to the time of an existing one
@@ -1000,7 +1008,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -1023,7 +1031,7 @@ class TestMealSessionEndpoints(BaseTestCase):
                 year=self.current_date.year,
                 month=self.current_date.month,
                 day=self.current_date.day) - timedelta(days=2),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Try to update the meal session to the time of an existing one
@@ -1043,7 +1051,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "some invalid name",
@@ -1063,7 +1071,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=15, minute=0),
             stop_time=time(hour=16, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Try to update the meal session to the time of an existing one
@@ -1083,7 +1091,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -1103,7 +1111,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=15, minute=0),
             stop_time=time(hour=16, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Try to update the meal session to the time of an existing one
@@ -1122,7 +1130,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -1142,7 +1150,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=15, minute=0),
             stop_time=time(hour=16, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Try to update the meal session to the time of an existing one
@@ -1161,7 +1169,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -1181,7 +1189,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=15, minute=0),
             stop_time=time(hour=16, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Try to update the meal session to the time of an existing one
@@ -1201,7 +1209,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         new_location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session_data = {
             "name": "lunch",
@@ -1220,7 +1228,7 @@ class TestMealSessionEndpoints(BaseTestCase):
             start_time=time(hour=15, minute=0),
             stop_time=time(hour=16, minute=0),
             date=datetime(year=self.current_date.year, month=self.current_date.month, day=self.current_date.day),
-            location_id=new_location.id
+            location=new_location
         )
 
         # Try to update the meal session to the time of an existing one
@@ -1243,13 +1251,13 @@ class TestMealSessionEndpoints(BaseTestCase):
         MealSessionFactory.create_batch(10)
         role1 = RoleFactory.create(name='adminn')
         user_id = BaseTestCase.user_id()
-        PermissionFactory.create(keyword='view_sessions', role_id=role1.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role1.id)
+        PermissionFactory.create(keyword='view_sessions', role=role1)
+        UserRoleFactory.create(user_id=user_id, role=role1)
 
         response = self.client().get(self.make_url('/meals/session/'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
-        self.assert400(response)
+        self.assert401(response)
         self.assertEqual(response_json['msg'], 'Access Error - This role does not have the access rights')
 
     def test_list_mealsession_with_right_permission(self):
@@ -1257,8 +1265,8 @@ class TestMealSessionEndpoints(BaseTestCase):
         MealSessionFactory.create_batch(10)
         role1 = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
-        PermissionFactory.create(keyword='view_sessions', role_id=role1.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role1.id)
+        PermissionFactory.create(keyword='view_sessions', role=role1)
+        UserRoleFactory.create(user_id=user_id, role=role1)
 
         response = self.client().get(self.make_url('/meals/session/'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -1270,8 +1278,8 @@ class TestMealSessionEndpoints(BaseTestCase):
 
         role1 = RoleFactory.create(name='admin')
         user_id = BaseTestCase.user_id()
-        PermissionFactory.create(keyword='view_sessions', role_id=role1.id)
-        UserRoleFactory.create(user_id=user_id, role_id=role1.id)
+        PermissionFactory.create(keyword='view_sessions', role=role1)
+        UserRoleFactory.create(user_id=user_id, role=role1)
 
         response = self.client().get(self.make_url('/meals/session/'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -1285,7 +1293,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session = MealSessionFactory.create(id=1, location_id=location.id)
 
@@ -1308,7 +1316,7 @@ class TestMealSessionEndpoints(BaseTestCase):
         location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         meal_session = MealSessionFactory.create(id=1, location_id=location.id, is_deleted=True)
 
@@ -1326,9 +1334,13 @@ class TestMealSessionEndpoints(BaseTestCase):
         location = LocationFactory.create(id=1, name="Lagos")
 
         new_role = RoleFactory.create(name='admin')
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
-        meal_session = MealSessionFactory.create(id=1, location_id=location.id, is_deleted=True)
+        meal_session = MealSessionFactory.create(
+            id=1,
+            location=location,
+            is_deleted=True
+        )
 
         meal_session_id = str(meal_session.id + 1)
 

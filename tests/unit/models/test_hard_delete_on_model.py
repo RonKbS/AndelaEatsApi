@@ -1,6 +1,7 @@
 from tests.base_test_case import BaseTestCase
 
 from app.models import Vendor, Activity
+from factories.location_factory import LocationFactory
 
 
 class TestHardDelete(BaseTestCase):
@@ -8,12 +9,16 @@ class TestHardDelete(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_hard_delete_on_vendor_model(self):
         vendor = Vendor(
             name='Your name',
             address='Your Address',
             tel='12345678',
             contact_person='Contact Person',
+            location=LocationFactory(),
         )
 
         vendor.save()
@@ -29,6 +34,7 @@ class TestHardDelete(BaseTestCase):
             address='Your Address',
             tel='12345678',
             contact_person='Contact Person',
+            location=LocationFactory(),
         )
         vendor.save()
 
@@ -42,6 +48,7 @@ class TestHardDelete(BaseTestCase):
             address='Your Address',
             tel='12345678',
             contact_person='Contact Person',
+            location=LocationFactory(),
         )
         vendor.save()
 
@@ -59,6 +66,7 @@ class TestHardDelete(BaseTestCase):
             address='Your Address',
             tel='12345678',
             contact_person='Contact Person',
+            location=LocationFactory(),
         )
         vendor.save()
 
@@ -67,5 +75,5 @@ class TestHardDelete(BaseTestCase):
 
         activity = [activity.action_details for activity in Activity.query.all()]
 
-        self.assertTrue("hard deleted" in activity[1])
+        self.assertTrue("hard deleted" in activity[-1])
 

@@ -1,5 +1,5 @@
 import pytz
-from datetime import datetime, time
+from datetime import date
 
 from app.repositories.base_repo import BaseRepo
 from app.models.meal_session import MealSession
@@ -33,3 +33,9 @@ class MealSessionRepo(BaseRepo):
 
         """
         return self.update(meals_session_instance, **kwargs)
+
+    @classmethod
+    def get_by_date_location(cls, meal_date: date, location_id: int):
+        return MealSession.query.filter(
+            MealSession.date == meal_date and
+            MealSession.location_id == location_id).all()

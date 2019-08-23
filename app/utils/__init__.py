@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta, datetime
+from .error_handlers import handle_exception
 
 db = SQLAlchemy()
 

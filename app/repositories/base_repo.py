@@ -10,7 +10,8 @@ def filter_deleted(func):
     def decorated(*args, **kwargs):
         if not kwargs:
             kwargs = dict(is_deleted=False)
-        kwargs.update(is_deleted=False) if not kwargs.get('is_deleted') else None
+        kwargs.update(is_deleted=False) if not kwargs.get(
+            'is_deleted') else None
 
         return func(*args, **kwargs)
 
@@ -29,10 +30,16 @@ class BaseRepo:
         """Return all the data in the model."""
         return self._model.query.paginate(error_out=False)
 
-
     def get(self, *args):
         """Return data by the Id."""
         return self._model.query.get(*args)
+
+    def get_or_404(self, *args):
+        instance = self.get(*args)
+        if instance and not instance.is_deleted:
+            return instance
+        raise BaseModelValidationError(msg='{} with id {} not found'.format(
+            self._model.__name__, args[0]), status_code=404)
 
     def update(self, model_instance, **kwargs):
         """ Update Model """
@@ -44,7 +51,8 @@ class BaseRepo:
     def paginate(self, page=None, per_page=None, error_out=False):
 
         try:
-            page = BaseRepo._positive_int('page', page) if page else BaseRepo.DEFAULT_PAGINATION_PAGE_NUMBER
+            page = BaseRepo._positive_int(
+                'page', page) if page else BaseRepo.DEFAULT_PAGINATION_PAGE_NUMBER
             per_page = BaseRepo._positive_int('per_page', per_page) if per_page else \
                 BaseRepo.DEFAULT_PAGINATION_PER_PAGE_NUMBER
         except ValueError as err:
@@ -57,21 +65,17 @@ class BaseRepo:
 
         return Pagination(self, page, per_page, all_items.count(), items)
 
-
     def count(self):
         """Return the count of all the data in the model."""
         return self._model.query.count()
-
 
     def get_first_item(self):
         """Return the first data in the model."""
         return self._model.query.first()
 
-
     def order_by(self, *args):
         """Query and order the data of the model."""
         return self._model.query.order_by(*args)
-
 
     def filter_all(self, **kwargs):
         """Query and filter the data of the model."""
@@ -80,7 +84,7 @@ class BaseRepo:
     @filter_deleted
     def filter_by(self, **kwargs):
         """Query and filter the data of the model."""
-        #return self._model.query.filter_by(is_deleted=False).paginate(**kwargs, error_out=False)
+        # return self._model.query.filter_by(is_deleted=False).paginate(**kwargs, error_out=False)
         return self._model.query.filter_by(**kwargs).paginate(error_out=False)
 
     @filter_deleted
@@ -111,10 +115,11 @@ class BaseRepo:
         filter_expression = ''
 
         for field, value in query_params.items():
-            filter_expression += alchemy_like_expression.format(model=self._model.__name__, field=field, value=value)
+            filter_expression += alchemy_like_expression.format(
+                model=self._model.__name__, field=field, value=value)
         filter_expression = eval(filter_expression)
 
-        return self._model.query.filter(*filter_expression).filter_by(is_deleted=False).all()  if filter_expression \
+        return self._model.query.filter(*filter_expression).filter_by(is_deleted=False).all() if filter_expression \
             else []
 
     @filter_deleted
@@ -157,7 +162,8 @@ class BaseRepo:
 
     def get_rating(self, user_id, rating_type, type_id):
 
-        rating = VendorRating.query.filter_by(user_id=user_id, rating_type=rating_type, type_id=type_id).first()
+        rating = VendorRating.query.filter_by(
+            user_id=user_id, rating_type=rating_type, type_id=type_id).first()
 
         return rating.rating if rating else None
 
@@ -195,4 +201,3 @@ class BaseRepo:
             if value < 0:
                 raise ValueError(f'{key} must be a non-negative value')
         return value
-

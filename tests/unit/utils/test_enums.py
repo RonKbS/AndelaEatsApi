@@ -8,6 +8,9 @@ class TestEnums(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_meal_types_enums(self):
         values = ['main', 'side', 'protein']
 

@@ -11,6 +11,9 @@ class TestAndelaService(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     @patch('app.services.andela.requests.request')
     def test_call_returns_json(
         self,

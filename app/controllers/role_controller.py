@@ -5,6 +5,7 @@ from app.repositories.user_role_repo import UserRoleRepo
 from app.repositories.permission_repo import PermissionRepo
 from app.services.andela import AndelaService
 from app.utils.auth import Auth
+from app.utils.redisset import RedisSet
 
 
 class RoleController(BaseController):
@@ -14,6 +15,7 @@ class RoleController(BaseController):
 		self.user_role_repo = UserRoleRepo()
 		self.permission_repo = PermissionRepo()
 		self.andela_service = AndelaService()
+		self.redis_set = RedisSet()
 
 	''' ROLES '''
 
@@ -182,3 +184,12 @@ class RoleController(BaseController):
 		return self.handle_response(
 			'Invalid or incorrect permission id provided', status_code=404
 		)
+
+	def autocomplete(self):
+		params = self.get_params('q')
+		rows = []
+		if params:
+			for value in self.redis_set.get(params[0]):
+				if value:
+					rows.append(value)
+		return self.handle_response(rows, status_code=200)

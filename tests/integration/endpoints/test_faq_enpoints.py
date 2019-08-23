@@ -10,6 +10,9 @@ class TestFaqEndpoints(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_get_faq_succeeds(self):
 
         new_faq = FaqFactory.create()
@@ -26,7 +29,7 @@ class TestFaqEndpoints(BaseTestCase):
 
         new_role = RoleFactory.create(name='admin')
 
-        new_user_role = UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        new_user_role = UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         faq = FaqFactory.build()
 
@@ -45,7 +48,7 @@ class TestFaqEndpoints(BaseTestCase):
     def test_update_faq_succeeds(self):
         new_role = RoleFactory.create(name='admin')
 
-        new_user_role = UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        new_user_role = UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         faq = FaqFactory()
         update_faq_info = FaqFactory.build()
@@ -70,7 +73,7 @@ class TestFaqEndpoints(BaseTestCase):
 
         new_role = RoleFactory.create(name='admin')
 
-        new_user_role = UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        new_user_role = UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         faq = FaqFactory()
 

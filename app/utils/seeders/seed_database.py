@@ -1,21 +1,47 @@
-from app.utils import db
-from app.models import Location, Role, UserRole, Permission
-from sqlalchemy.exc import SQLAlchemyError
-from .seed_data import location_data, role_data, user_role_data, permission_data
-from .test_data import test_data
 from collections import OrderedDict
-from termcolor import colored
+
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import SQLAlchemyError
+from termcolor import colored
 
+from app.models import (Location,
+                        MealItem,
+                        Role,
+                        UserRole,
+                        Permission,
+                        User,
+                        Vendor,
+                        VendorEngagement,
+                        Menu,
+                        Order)
+from app.utils import db
+from .seed_data import (location_data,
+                        meal_items_data,
+                        permission_data,
+                        role_data,
+                        user_data,
+                        user_role_data,
+                        vendor_data,
+                        vendor_engagement_data,
+                        menu_data,
+                        orders_data)
+from .test_data import test_data
 
-SEED_OPTIONS = ('location', 'role', 'user_role', 'permission')
+SEED_OPTIONS = ('location', 'role', 'user_role', 'permission', 'user',
+                'meal_item', 'vendor', 'vendor_engagement', 'menu', 'order')
 
 model_mapper = OrderedDict({
     'location': {'model': Location, 'data': location_data},
     'role': {'model': Role, 'data': role_data},
     'user_role': {'model': UserRole, 'data': user_role_data},
-    'permission': {'model': Permission, 'data': permission_data}
+    'permission': {'model': Permission, 'data': permission_data},
+    'user': {'model': User, 'data': user_data},
+    'meal_item': {'model': MealItem, 'data': meal_items_data},
+    'vendor': {'model': Vendor, 'data': vendor_data},
+    'vendor_engagement': {'model': VendorEngagement, 'data': vendor_engagement_data},
+    'menu': {'model': Menu, 'data': menu_data},
+    'order': {'model': Order, 'data': orders_data}
 })
 
 

@@ -1,8 +1,9 @@
 '''A module of application cron jobs'''
 from datetime import datetime, time, date
 import pytz
-from app.models import VendorEngagement, Location, MealSession
+from app.models import VendorEngagement, Location, MealSession, UserRole
 from app.business_logic.meal_session.meal_session_logic import MealSessionLogic
+from app.repositories.user_role_repo import UserRoleRepo
 
 
 class MealSessionCron(object):
@@ -116,6 +117,9 @@ class Cron:
 	def run_24_hourly(self):
 		self.update_engagement_status()
 
+	def run_5_minute(self):
+		self.add_user_roles_to_cache()
+
 	def run_meal_session_cron(self):
 		self.meal_session_cron.job_to_schedule()
 
@@ -128,3 +132,9 @@ class Cron:
 				if engagement.end_date < datetime.now().date():
 					engagement.status = 0
 					engagement.save()
+
+	def add_user_roles_to_cache(self):
+		'''A cron job that periodically updated the redis cache with the user emails for autocomplete '''
+		with self.app.app_context():
+			for user_role in UserRole.query.all():
+				UserRoleRepo().update_cache(user_role)

@@ -120,3 +120,10 @@ def update_permission(permission_id):
 @swag_from('documentation/delete_permissions.yml')
 def delete_role_permission(permission_id):
 	return role_controller.delete_role_permission(permission_id)
+
+
+@role_blueprint.route('/autocomplete', methods=['GET'])
+@Auth.has_permission('view_user_roles')
+@swag_from('documentation/autocomplete_roles.yml')
+def autocomplete():
+    return role_controller.autocomplete()

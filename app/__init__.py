@@ -1,18 +1,22 @@
-from flask_api import FlaskAPI
-from flask_cors import CORS
-from config import env, get_env
-from app.utils import db #, timedelta
-from app.blueprints.base_blueprint import BaseBlueprint
-from app.utils.auth import Auth
-from flasgger import Swagger
+import os
+
+import bugsnag
+import rollbar
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-from app.utils.cron import Cron
-import bugsnag
 from bugsnag.flask import handle_exceptions
-import rollbar
-import os
+from flasgger import Swagger
+from flask_api import FlaskAPI
+from flask_cors import CORS
+
+from app.blueprints.base_blueprint import BaseBlueprint
+from app.utils import db  # , timedelta
+from app.utils.auth import Auth
+from app.utils.cron import Cron
 from app.utils.date_url_validator import DateValidator
+from app.utils.error_handlers import handle_exception
+from app.utils.handled_exceptions import BaseModelValidationError
+from config import env, get_env
 
 bugsnag.configure(
     api_key=get_env('BUGSNAG_API_KEY'),
@@ -59,9 +63,15 @@ def create_app(config_name):
     scheduler.add_job(cron.run_24_hourly, trigger='interval', hours=24)
     scheduler.add_job(cron.run_meal_session_cron, 'cron', day_of_week='mon-fri', hour=0, minute=0,
                       misfire_grace_time=None)
+    scheduler.add_job(cron.run_5_minute, trigger='interval', minutes=5)
     scheduler.start()
 
     swg = Swagger(app)
     handle_exceptions(app)
+
+    # register error handlers
+    app.register_error_handler(Exception, handle_exception)
+    app.register_error_handler(
+        BaseModelValidationError, handle_exception)
 
     return app

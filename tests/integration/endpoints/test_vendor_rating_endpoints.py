@@ -1,12 +1,21 @@
 '''Module of integration tests for vendor rating endpoints'''
 import factory
+from datetime import datetime
 from tests.base_test_case import BaseTestCase
 from datetime import datetime
-from factories import VendorFactory, VendorRatingFactory, UserRoleFactory, RoleFactory, PermissionFactory, \
-    VendorEngagementFactory, OrderFactory, MealItemFactory
+from factories import (
+    VendorFactory,
+    VendorRatingFactory,
+    UserRoleFactory,
+    RoleFactory,
+    PermissionFactory,
+    LocationFactory,
+    VendorEngagementFactory,
+    OrderFactory,
+    MealItemFactory
+)
 
 from .user_role import create_user_role
-
 
 
 class TestVendorRatingEndpoints(BaseTestCase):
@@ -14,6 +23,9 @@ class TestVendorRatingEndpoints(BaseTestCase):
 
     def setUp(self):
         self.BaseSetUp()
+
+    def tearDown(self):
+        self.BaseTearDown()
 
     def test_create_vendor_rating_endpoint_no_token(self):
         rating = VendorRatingFactory.build()
@@ -119,8 +131,6 @@ class TestVendorRatingEndpoints(BaseTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response_json['msg'], 'Internal Application Error')
 
-
-
     def test_create_order_rating_endpoint(self):
         rating = VendorRatingFactory.build()
         order_id = OrderFactory.create().id
@@ -133,7 +143,6 @@ class TestVendorRatingEndpoints(BaseTestCase):
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
         payload = response_json['payload']
-
 
         self.assertEqual(response.status_code, 201)
         self.assertJSONKeyPresent(response_json, 'payload')
@@ -148,8 +157,8 @@ class TestVendorRatingEndpoints(BaseTestCase):
         rating = VendorRatingFactory.create()
         rating_id = rating.id
         role = RoleFactory.create(name='Admin')
-        permission = PermissionFactory.create(keyword='view_ratings', role_id=role.id)
-        user_role = UserRoleFactory.create(user_id=rating.user_id, role_id=role.id)
+        permission = PermissionFactory.create(keyword='view_ratings', role=role)
+        user_role = UserRoleFactory.create(user_id=rating.user_id, role=role)
 
         response = self.client().get(self.make_url(f'/ratings/{rating_id}'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
@@ -183,7 +192,7 @@ class TestVendorRatingEndpoints(BaseTestCase):
 
         response = self.client().get(self.make_url(f'/ratings/{rating_id}'), headers=self.headers())
 
-        self.assert400(response)
+        self.assert401(response)
 
     def test_update_vendor_rating_endpoint(self):
 
@@ -201,29 +210,26 @@ class TestVendorRatingEndpoints(BaseTestCase):
         self.assertEqual(payload['rating']['comment'], rating.comment)
         self.assertEqual(payload['rating']['rating'], rating.rating)
 
-
         """Updating a non-existent rating should return 400 error"""
         response = self.client().patch(self.make_url(f'/ratings/777777777'), data=self.encode_to_json_string(data), headers=self.headers())
         self.assert404(response)
 
     def test_list_rating_endpoint(self):
         vendor = VendorFactory.create()
-
         engagement = VendorEngagementFactory.create(vendor=vendor)
-
-        rating = VendorRatingFactory.create(engagement=engagement)
-
+        rating = VendorRatingFactory.create(engagement=engagement, vendor=vendor)
         create_user_role('view_ratings')
+        now = datetime.now()
 
-        response = self.client().get(self.make_url(f'/ratings/{rating.service_date.strftime("%Y-%m-%d")}'),
+        response = self.client().get(self.make_url(f'/ratings/{now.strftime("%Y-%m-%d")}'),
                                      headers=self.headers())
-        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
         self.assert404(response)
         self.assertEqual(response_json['msg'], 'No ratings for this date')
 
     def test_create_vendor_rating_endpoint(self):
-        vendor  = VendorFactory.create()
+        vendor = VendorFactory.create()
 
         engagement = VendorEngagementFactory.create(vendor=vendor)
         engagement_rating = VendorRatingFactory.build(engagement_id=engagement.id)

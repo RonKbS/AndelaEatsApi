@@ -35,6 +35,9 @@ class TestRoleController(BaseTestCase):
             updated_at=datetime.now()
         )
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     @patch.object(RoleController, 'pagination_meta')
     @patch.object(RoleRepo, 'filter_by')
     def test_list_roles_ok_response(

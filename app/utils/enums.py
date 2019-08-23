@@ -1,77 +1,65 @@
 import enum
 
 
-class MealTypes(str, enum.Enum):
+class BaseEnum(str, enum.Enum):
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
+
+    @classmethod
+    def all(cls):
+        return [status.value for status in cls]
+
+
+class MealTypes(BaseEnum):
     main = "main"
     side = "side"
     protein = "protein"
 
-    @classmethod
-    def has_value(cls, value):
-        return any(value == item.value for item in cls)
 
-
-class Channels(str, enum.Enum):
+class Channels(BaseEnum):
     web = "web"
     slack = "slack"
     mobile = "mobile"
 
-    @classmethod
-    def has_value(cls, value):
-        return any(value == item.value for item in cls)
 
-
-class MealPeriods(str, enum.Enum):
+class MealPeriods(BaseEnum):
     lunch = "lunch"
     breakfast = "breakfast"
 
-    @classmethod
-    def has_value(cls, value):
-        return any(value == item.value for item in cls)
 
-
-class OrderStatus(str, enum.Enum):
+class OrderStatus(BaseEnum):
     booked = "booked"
     collected = "collected"
     cancelled = "cancelled"
 
-    @classmethod
-    def has_value(cls, value):
-        return any(value == item.value for item in cls)
 
-
-class RatingType(str, enum.Enum):
+class RatingType(BaseEnum):
     meal = "meal"
     order = "order"
     engagement = "engagement"
 
-    @classmethod
-    def has_value(cls, value):
-        return any(value == item.value for item in cls)
 
-
-class ActionType(str, enum.Enum):
+class ActionType(BaseEnum):
     create = "create"
     update = "update"
     delete = "delete"
 
-    @classmethod
-    def has_value(cls, value):
-        return any(value == item.value for item in cls)
 
-
-class FaqCategoryType(str, enum.Enum):
+class FaqCategoryType(BaseEnum):
     user_faq = 'user_faq'
     admin_faq = 'admin_faq'
 
-    @classmethod
-    def has_value(cls, value):
-        return any(value == item.value for item in cls)
 
-class MealSessionNames(str, enum.Enum):
+class MealSessionNames(BaseEnum):
     breakfast = 'breakfast'
     lunch = 'lunch'
 
-    @classmethod
-    def has_value(cls, value):
-        return any(value == item.value for item in cls)
+
+class WeekDays(BaseEnum):
+    monday = 'monday'
+    tuesday = 'tuesday'
+    wednesday = 'wednesday'
+    thursday = 'thursday'
+    friday = 'friday'

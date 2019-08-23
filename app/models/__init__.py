@@ -18,23 +18,26 @@ from .about import About
 from .user import User
 from .meal_session import MealSession
 from .meal_service import MealService
+from .menu_template import MenuTemplate, MenuTemplateItem
 
 __all__ = (
-    'Location', 'Vendor', 'VendorEngagement', 'Role', 'Permission', 'UserRole', 'VendorRating', 'Menu',
-    'MealItem', 'Order', 'Activity', 'Faq', 'About', 'User', 'MealSession', 'MealService',
-           )
+    'Location', 'Vendor', 'VendorEngagement', 'Role', 'Permission',
+    'UserRole', 'VendorRating', 'Menu', 'MealItem', 'Order', 'Activity',
+    'Faq', 'About', 'User', 'MealSession', 'MealService', 'MenuTemplateItem',
+    'MenuTemplate'
+)
 
 from .listener_helpers import attach_listen_type
 
 tables_logged_after_every_insert = [Vendor, VendorEngagement, MealItem, Menu, Faq,
                                     Role, Permission, UserRole, Location, Order,
-                                    MealSession]
+                                    MealSession, MenuTemplate, MenuTemplateItem]
 tables_logged_after_every_update = [Vendor, VendorEngagement, MealItem, Menu, Faq,
                                     Role, Permission, UserRole, Location, Order,
-                                    MealSession]
+                                    MealSession, MenuTemplate, MenuTemplateItem]
 tables_logged_after_every_delete = [Vendor, VendorEngagement, MealItem, Menu, Faq,
                                     Role, Permission, UserRole, Location, VendorRating, Order,
-                                    MealSession]
+                                    MealSession, MenuTemplate, MenuTemplateItem]
 generate_id_tables = (User,)
 
 # attach all listeners to each admin table
@@ -50,7 +53,7 @@ def model_id_generator(mapper, connection, target):
 
     target.slack_id = target.slack_id if target.slack_id else next_id
 
-    target.user_id =  target.user_id if target.user_id else target.slack_id
+    target.user_id = target.user_id if target.user_id else target.slack_id
 
 
 for table in generate_id_tables:

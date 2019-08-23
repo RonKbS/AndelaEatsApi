@@ -16,6 +16,9 @@ class TestAboutEndpoint(BaseTestCase):
         self.html_data_wrong_key = dict(datas="<html><head <meta charset=\"UTF-8\"></head></html>")
         self.html_data_update = dict(data="<html><head <meta charset=\"UTF-8\"></head><body></body></html>")
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     def test_create_about_details_succeeds(self):
         """
         Test that the endpoint '/about/create_or_update' creates about details when a post request is
@@ -24,7 +27,7 @@ class TestAboutEndpoint(BaseTestCase):
         """
         new_role = RoleFactory.create(name='admin')
 
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         response = self.client().post(
             self.make_url("/about/create_or_update"), headers=self.headers(),
@@ -45,7 +48,7 @@ class TestAboutEndpoint(BaseTestCase):
         """
         new_role = RoleFactory.create(name='admin')
 
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         AboutFactory.create(
             details=base64.b64encode(self.html_data['data'].encode('utf-8'))
@@ -106,7 +109,7 @@ class TestAboutEndpoint(BaseTestCase):
         """
         new_role = RoleFactory.create(name='admin')
 
-        UserRoleFactory.create(user_id=self.user_id(), role_id=new_role.id)
+        UserRoleFactory.create(user_id=self.user_id(), role=new_role)
 
         response = self.client().post(
             self.make_url("/about/create_or_update"), headers=self.headers(),

@@ -11,7 +11,10 @@ class TestSlackHelper(BaseTestCase):
     def setUp(self):
         self.BaseSetUp()
 
-    @patch('app.utils.slackhelper.SlackClient.api_call')
+    def tearDown(self):
+        self.BaseTearDown()
+
+    @patch('app.utils.slackhelper.WebClient.chat_postMessage')
     def test_post_message_works(
         self,
         mock_slack_api_call
@@ -24,11 +27,11 @@ class TestSlackHelper(BaseTestCase):
 
         slack_helper = SlackHelper()
 
-        assert slack_helper.post_message(msg="Hi", recipient="Roger").get("ok") == "true"
-        assert slack_helper.post_message(msg="Hi", recipient="Roger").get("channel") == "Eat"
-        assert slack_helper.post_message(msg="Hi", recipient="Roger").get("message") == "Hi"
+        assert slack_helper.post_message(message="Hi", channel="Roger").get("ok") == "true"
+        assert slack_helper.post_message(message="Hi", channel="Roger").get("channel") == "Eat"
+        assert slack_helper.post_message(message="Hi", channel="Roger").get("message") == "Hi"
 
-    @patch('app.utils.slackhelper.SlackClient.api_call')
+    @patch('app.utils.slackhelper.WebClient.chat_update')
     def test_update_message_works(
         self,
         mock_slack_api_call
@@ -41,11 +44,11 @@ class TestSlackHelper(BaseTestCase):
 
         slack_helper = SlackHelper()
 
-        assert slack_helper.update_message(msg="Hi", recipient="Roger").get("ok") == "true"
-        assert slack_helper.update_message(msg="Hi", recipient="Roger").get("channel") == "Eat"
-        assert slack_helper.update_message(msg="Hi", recipient="Roger").get("text") == "Hi again"
+        assert slack_helper.update_message(message="Hi", channel="Roger", ts="1405894322.002768").get("ok") == "true"
+        assert slack_helper.update_message(message="Hi", channel="Roger", ts="1405894322.002768").get("channel") == "Eat"
+        assert slack_helper.update_message(message="Hi", channel="Roger", ts="1405894322.002768").get("text") == "Hi again"
 
-    @patch('app.utils.slackhelper.SlackClient.api_call')
+    @patch('app.utils.slackhelper.WebClient.users_info')
     def test_user_info_works(
         self,
         mock_slack_api_call
@@ -68,7 +71,7 @@ class TestSlackHelper(BaseTestCase):
         assert slack_helper.user_info("ururuirn4455").get("user").get("deleted") == "false"
         assert slack_helper.user_info("ururuirn4455").get("user").get("is_admin") == "true"
 
-    @patch('app.utils.slackhelper.SlackClient.api_call')
+    @patch('app.utils.slackhelper.WebClient.dialog_open')
     def test_dialog_works(
         self,
         mock_slack_api_call
@@ -98,9 +101,9 @@ class TestSlackHelper(BaseTestCase):
             ]
         }
 
-        assert slack_helper.dialog(dialog,"12.ab").get("ok") == "true"
+        assert slack_helper.dialog(dialog, "12.ab").get("ok") == "true"
 
-    @patch('app.utils.slackhelper.SlackClient.api_call')
+    @patch('app.utils.slackhelper.WebClient.users_lookupByEmail')
     def test_find_by_email_works(
         self,
         mock_slack_api_call
@@ -115,7 +118,7 @@ class TestSlackHelper(BaseTestCase):
                 "deleted": "false",
                 "is_admin": "true",
                 "profile": {
-                    "email":"eat@andela.com"
+                    "email": "eat@andela.com"
                 }
             }
         }

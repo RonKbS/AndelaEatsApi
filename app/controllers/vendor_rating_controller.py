@@ -23,6 +23,7 @@ class VendorRatingController(BaseController):
         date = datetime.strptime(date, '%Y-%m-%d')
 
         ratings = self.vendor_rating_repo.filter_by(service_date=date, **query_kwargs)
+
         if ratings.items:
             result = []
             vendor_name = self.vendor_repo.get(ratings.items[0].vendor_id).name

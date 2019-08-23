@@ -30,6 +30,9 @@ class TestUserController(BaseTestCase):
             is_active=True
         )
 
+    def tearDown(self):
+        self.BaseTearDown()
+
     @patch.object(UserController, 'pagination_meta')
     @patch('app.repositories.user_role_repo.UserRoleRepo.filter_by')
     @patch('app.services.andela.AndelaService.get_user_by_email_or_id')
@@ -53,12 +56,12 @@ class TestUserController(BaseTestCase):
                 "name": "Joseph Serunjogi"
             }
             mock_pagination_meta.return_value = {
-            "total_rows": 1,
-            "total_pages": 1,
-            "current_page": 1,
-            "next_page": None,
-            "prev_page": None
-        }
+                "total_rows": 1,
+                "total_pages": 1,
+                "current_page": 1,
+                "next_page": None,
+                "prev_page": None
+            }
             user_controller = UserController(self.request_context)
 
             # Act
@@ -101,6 +104,7 @@ class TestUserController(BaseTestCase):
         with self.app.app_context():
             user = UserFactory(slack_id="-LXTuXlk2W4Gskt8KTte")
             role = RoleFactory(name='test_role')
+            UserRoleFactory(role_id=role.id, user_id=user.id)
 
             mock_request_params.return_value = [
                 "Joseph",
@@ -126,6 +130,7 @@ class TestUserController(BaseTestCase):
         with self.app.app_context():
             user = UserFactory(user_id="-LXTuXlk2W4Gskt8KTte")
             role = RoleFactory(name='test_role')
+            UserRoleFactory(role_id=role.id, user_id=user.id)
 
             mock_request_params.return_value = [
                 "Joseph",
@@ -150,6 +155,8 @@ class TestUserController(BaseTestCase):
     def test_create_user_method_handles_user_creation_with_non_existent_role_id(self, mock_request_params):
         with self.app.app_context():
             user = UserFactory(user_id="-LXTuXlk2W4Gskt8KTte")
+            role = RoleFactory(name='test_role')
+            UserRoleFactory(role_id=role.id, user_id=user.id)
 
             non_existent_role_id = 100
 
