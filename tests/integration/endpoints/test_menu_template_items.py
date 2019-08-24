@@ -247,6 +247,10 @@ class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
         self.assertJSONKeysPresent(
             response_json['payload']['MenuTemplateItem'], 'mainMealId')
         self.assertJSONKeysPresent(
+            response_json['payload']['MenuTemplateItem'], 'sideItems')
+        self.assertJSONKeysPresent(
+            response_json['payload']['MenuTemplateItem'], 'proteinItems')
+        self.assertJSONKeysPresent(
             response_json['payload']['MenuTemplateItem'], 'allowedProtein')
         self.assertJSONKeysPresent(
             response_json['payload']['MenuTemplateItem'], 'mainMealId')
