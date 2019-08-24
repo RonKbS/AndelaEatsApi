@@ -36,3 +36,7 @@ class MenuTemplateController(BaseController):
         return self.handle_response('OK', payload={'weekdays': menu_template_weekdays,
                                                    **menu_template.serialize()},
                                     status_code=200)
+
+    def copy(self, *args, **kwargs):
+        vendorEngagementId, startDate, endDate, menuTemplateIds = self.request_params(
+            'vendorEngagementId', 'startDate', 'endDate', 'menuTemplateIds')

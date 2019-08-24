@@ -23,8 +23,9 @@ class BaseRepo:
     DEFAULT_PAGINATION_PAGE_NUMBER = 1
     DEFAULT_PAGINATION_PER_PAGE_NUMBER = 20
 
-    def __init__(self, _model):
-        self._model = _model
+    def __init__(self, _model=None):
+        if _model:
+            self._model = _model
 
     def fetch_all(self):
         """Return all the data in the model."""
