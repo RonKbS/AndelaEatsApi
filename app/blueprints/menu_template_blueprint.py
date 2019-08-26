@@ -56,8 +56,9 @@ def delete_menu(id):
 
 
 @menu_template_blueprint.route('/copy', methods=['POST'])
-@Security.validator(['vendorEngagementId|exists|vendor_engagement|id|required', 'startDate|required:date',
-                     'endDate|required:date', 'menuTemplateIds|exists|menu_template|id|required|list'])
+@Security.validator(['vendorEngagementId|required:int', 'startDate|required:date',
+                     'endDate|required:date', 'menuTemplateId|required:int'])
 @Auth.has_role('admin')
+@swag_from('documentation/copy_menu_template.yml')
 def copy_menu_template():
     return menu_template_controller.copy()

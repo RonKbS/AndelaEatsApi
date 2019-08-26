@@ -21,4 +21,3 @@ class VendorEngagementFactory(factory.alchemy.SQLAlchemyModelFactory):
     status = 1
     termination_reason = factory.Faker('paragraph')
     location = factory.SubFactory(LocationFactory)
-    # cohort_position = fake_cohort_position

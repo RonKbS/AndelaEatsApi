@@ -1,4 +1,5 @@
-from factories import LocationFactory, MenuTemplateFactory
+from factories import (LocationFactory, MenuTemplateFactory,
+                       VendorEngagementFactory, MenuTemplateItemFactory, PermissionFactory)
 from tests.base_test_case import BaseTestCase
 from tests.base_test_utils import BaseTestUtils
 
@@ -249,3 +250,72 @@ class TestMenuTemplate(BaseTestCase, BaseTestUtils):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json['msg'],
                          'MenuTemplate with id 100 not found')
+
+    def test_copy_menu_template_to_menus_with_permission_succeeds(self):
+        role = self.create_admin()
+        PermissionFactory.create(keyword='view_menu', role=role)
+        item = MenuTemplateItemFactory.create()
+        engagement = VendorEngagementFactory.create(
+            start_date='2019-10-10', end_date='2019-10-30')
+        engagement.save()
+        item.save()
+        data = {
+            "vendorEngagementId": engagement.id,
+            "startDate": "2019-10-10",
+            "endDate": "2019-10-20",
+            "menuTemplateId": item.day.template_id
+        }
+        response = self.client().post(
+            self.make_url("/menu_template/copy"), headers=self.headers(),
+            data=self.encode_to_json_string(data))
+        self.assertEqual(response.status_code, 201)
+        self.assertJSONKeyPresent(response.json, 'msg')
+        self.assertJSONKeyPresent(response.json, 'payload')
+        self.assertJSONKeyPresent(response.json['payload'], 'message')
+
+    def test_copy_menu_template_to_menus_with_permission_succeeds_and_duplicate_show_number_of_duplicates(self):
+        role = self.create_admin()
+        PermissionFactory.create(keyword='view_menu', role=role)
+        item = MenuTemplateItemFactory.create()
+        engagement = VendorEngagementFactory.create(
+            start_date='2019-10-10', end_date='2019-10-30')
+        engagement.save()
+        item.save()
+        data = {
+            "vendorEngagementId": engagement.id,
+            "startDate": "2019-10-10",
+            "endDate": "2019-10-20",
+            "menuTemplateId": item.day.template_id
+        }
+        self.client().post(
+            self.make_url("/menu_template/copy"), headers=self.headers(),
+            data=self.encode_to_json_string(data))
+        response = self.client().post(
+            self.make_url("/menu_template/copy"), headers=self.headers(),
+            data=self.encode_to_json_string(data))
+        self.assertEqual(response.status_code, 201)
+        self.assertJSONKeyPresent(response.json, 'msg')
+        self.assertJSONKeyPresent(response.json, 'payload')
+        self.assertJSONKeyPresent(response.json['payload'], 'message')
+
+    def test_copy_menu_template_to_menus_invalid_date_range_fails(self):
+        role = self.create_admin()
+        PermissionFactory.create(keyword='view_menu', role=role)
+        item = MenuTemplateItemFactory.create()
+        engagement = VendorEngagementFactory.create()
+        engagement.save()
+        item.save()
+        data = {
+            "vendorEngagementId": engagement.id,
+            "startDate": "2018-10-10",
+            "endDate": "2018-10-20",
+            "menuTemplateId": item.day.template_id
+        }
+        response = self.client().post(
+            self.make_url("/menu_template/copy"), headers=self.headers(),
+            data=self.encode_to_json_string(data))
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONKeyPresent(response.json, 'msg')
+        self.assertJSONKeyPresent(response.json, 'payload')
+        self.assertEqual(response.json['payload'], {
+            'msg': f'Start and end date should be between {engagement.start_date} and {engagement.end_date}'},)

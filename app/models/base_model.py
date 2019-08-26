@@ -35,13 +35,21 @@ class BaseModel(db.Model):
 
         # get the related objects and serialize them
         if get_children:
-            back_refs = set(inspect(self).attrs.keys())-set(self.__table__.columns.keys())
-            for item in back_refs:
-                obj = getattr(self,item)
-                if isinstance(obj,list):
-                    l = [record.serialize() for record in obj]
-                    s[to_camel_case(item)] = l
+            self.serialize_children_objects(s)
         return s
+
+    def serialize_children_objects(self, s):
+        """ Get the model related objects and serializes them
+        
+        Args:
+            s (list): serialized list object
+        """
+        back_refs = set(inspect(self).attrs.keys())-set(self.__table__.columns.keys())
+        for item in back_refs:
+            obj = getattr(self,item)
+            if isinstance(obj,list):
+                l = [record.serialize() for record in obj]
+                s[to_camel_case(item)] = l
 
     def to_dict(self, only=None, exclude=()):
 
