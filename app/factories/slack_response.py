@@ -132,19 +132,16 @@ class DaySelection(SlackResponsePage):
         Returns:
             Slack response page as a dict.
         """
-        day_meal_sessions = kwargs.get('meals', None)
+        day_meal_sessions = ['lunch', 'breakfast']
         payload_action_value = kwargs.get('payload', None)
-        if not day_meal_sessions:
-            return {'text': 'Oops - No meal sessions have been setup on the '
-                            'date you selected.'}
         if not payload_action_value:
             return _error_page()
 
         period_buttons = [{
             'name': 'meal_period',
             'type': 'button',
-            'text': f'{meal_session.name.value.capitalize()}',
-            'value': f'{meal_session.name.value}_{payload_action_value}'}
+            'text': f'{meal_session.capitalize()}',
+            'value': f'{meal_session}_{payload_action_value}'}
             for meal_session in day_meal_sessions]
 
         request_buttons = [
