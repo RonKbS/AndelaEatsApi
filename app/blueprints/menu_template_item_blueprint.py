@@ -22,7 +22,6 @@ menu_template_item_controller = MenuTemplateItemController(request)
 def create_menu_template_item():
     return menu_template_item_controller.create()
 
-
 @menu_template_item_blueprint.route('/', methods=['GET'])
 @Security.validate_query_params(MenuTemplateItem)
 @Auth.has_role('admin')
@@ -30,6 +29,15 @@ def create_menu_template_item():
 def get_menu_template_items():
     return menu_template_item_controller.get_all()
 
+@menu_template_item_blueprint.route('/<int:template_id>', methods=['PUT','PATCH'])
+@Auth.has_role('admin')
+@Security.validator([
+    'mainMealId|optional', 'allowedSide|optional:int',
+    'allowedProtein|optional','sideItems|exists|meal_item|id',
+    'proteinItems|exists|meal_item|id', 'dayId|optional'])
+@swag_from('documentation/update_menu_template_item.yml')
+def update_menu_template_item(template_id):
+    return menu_template_item_controller.update_item(template_id)
 
 @menu_template_item_blueprint.route('/<int:id>', methods=['DELETE'])
 @Auth.has_role('admin')
@@ -42,3 +50,4 @@ def delete_menu(id):
 @swag_from('documentation/get_menu_template_item.yml')
 def get_menu_template(id):
     return menu_template_item_controller.get(id)
+

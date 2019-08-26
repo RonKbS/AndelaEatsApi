@@ -1,0 +1,88 @@
+Update a Menu Template Item
+---
+tags:
+  - Menu Template Items
+summary: Updates Menu Template Item.
+consumes:
+  - application/json
+parameters:
+  - name: X-Location
+    type: integer
+    required: true
+    description: The center's location Id
+    in: header
+    example: '3'
+  - name: Authorization
+    type: string
+    required: true
+    description: User's token prefix with the word "Bearer"
+    in: header
+    requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            sideItems:
+              type: array
+              items:
+                type: integer
+        examples:
+          '0':
+          value: "{\n\t\"sideItems\": [1]\n}"
+    responses:
+    '200':
+      description: Updating a Menu Template Item
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              msg:
+                type: string
+              payload:
+                type: object
+                properties:
+                  menuTemplateItem:
+                    type: object
+                    properties:
+                      allowedSide:
+                        type: integer
+                      isDeleted:
+                        type: boolean
+                      timestamps:
+                        type: object
+                        properties:
+                          updated_at:
+                            type: string
+                          created_at:
+                            type: string
+                      dayId:
+                        type: string
+                      mainMealId:
+                        type: integer
+                      allowedProtein:
+                        type: integer
+                      id:
+                        type: integer
+          examples:
+            '0':
+              value: |
+                {
+                  "msg": "OK", 
+                  "payload": {
+                    "menuTemplateItem": {
+                      "id": 2, 
+                      "isDeleted": false, 
+                      "mainMealId": 1, 
+                      "allowedSide": 1, 
+                      "allowedProtein": 1, 
+                      "dayId": "monday", 
+                      "timestamps": {
+                        "created_at": "2019-08-09", 
+                        "updated_at": "Fri, 09 Aug 2019 12:19:51 GMT"
+                      }
+                    }
+                  }
+                }
+
