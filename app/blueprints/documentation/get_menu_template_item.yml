@@ -20,6 +20,12 @@ parameters:
     in: header
     required: true
     type: string
+  - name: id
+    in: query
+    type: string
+    required: true
+    description: the id of the menu template
+
 responses:
   200:
     description: ""
