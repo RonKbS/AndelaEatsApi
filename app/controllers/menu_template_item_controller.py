@@ -25,18 +25,6 @@ class MenuTemplateItemController(BaseController):
             create=True
         )
 
-    def get_all(self):
-        query_kwargs = self.get_params_dict()
-        menu_template_items = self.repo.get_menu_template_items_by_day(
-            query_kwargs['day_id']
-        )
-        menu_template_item_list = []
-        if menu_template_items.items:
-            menu_template_item_list = [menu_template_item.serialize()
-                                  for menu_template_item in menu_template_items.items]
-        return self.handle_response('OK', payload={'MenuTemplateItems': menu_template_item_list,
-                                                   'meta': self.pagination_meta(menu_template_items)})
-
     def update_item(self, template_id):
         """
         Handles the updating of a menu template item

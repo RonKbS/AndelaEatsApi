@@ -424,8 +424,28 @@ class TestSecurity(BaseTestCase):
 
         self.assertEqual(
             response[0].get_json()['msg'],
-            "Invalid keys ['unknown']. The supported keys are "
-            "['Id', 'IsDeleted', 'CreatedAt', 'UpdatedAt', 'Category', 'Question', 'Answer']"
+            "Invalid parameters ['unknown']. The supported keys and value-types are "
+            "['Id', 'IsDeleted', 'CreatedAt', 'UpdatedAt', 'Category', 'Question', "
+            "'Answer', 'BOOLEAN', 'DATETIME', 'INTEGER', 'VARCHAR(2000)', 'VARCHAR(9)']"
+        )
+
+
+    def test_validate_query_params_validates_model_field_types(self):
+
+        class MockRequest:
+            args = {'category': 'invalid_category_enum'}
+            method = "POST"
+
+        with patch('app.utils.security.request', new_callable=MockRequest):
+
+            response = Security.validate_query_params(
+                Faq)(lambda *args, **kwargs: ('test',))()
+
+        self.assertEqual(
+            response[0].get_json()['msg'],
+            "Invalid parameters ['invalid_category_enum']. The supported keys and value-types are "
+            "['Id', 'IsDeleted', 'CreatedAt', 'UpdatedAt', 'Category', 'Question', "
+            "'Answer', 'BOOLEAN', 'DATETIME', 'INTEGER', 'VARCHAR(2000)', 'VARCHAR(9)']"
         )
 
     def test_validate_query_params_handles_invalidate_date_formats(self):

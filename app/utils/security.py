@@ -368,6 +368,7 @@ class Security:
         model_columns = model.get_columns()
 
         model_fields = [column for column in model_columns]
+        model_field_types = set([(str(value)) for key, value in model_columns.items()])
 
         model_fields_camel = list(
             map(SnakeCaseConversion.snake_to_camel, model_fields))
@@ -380,15 +381,28 @@ class Security:
             def decorated(*args, **kwargs):
                 queries = request.args
                 invalid_query_keys = []
+                invalid_query_values = []
 
-                for key in queries:
+                for key, value in queries.items():
                     if SnakeCaseConversion.camel_to_snake(key) not in model_fields:
                         invalid_query_keys.append(key)
 
-                if invalid_query_keys:
+                    try:
+                        model_columns[key].python_type(value)
+                    except ValueError:
+                        invalid_query_values.append(value)
+                    except KeyError:
+                        continue
+
+                invalid_params = invalid_query_keys + invalid_query_values
+                listed_mfd = list(model_field_types)
+                listed_mfd.sort()
+                valid_params = model_fields_camel + listed_mfd
+
+                if invalid_query_keys or invalid_query_values:
                     return make_response(
-                        jsonify({'msg': 'Invalid keys {}. The supported keys are {}'
-                                 .format(invalid_query_keys, model_fields_camel)})), 400
+                        jsonify({'msg': 'Invalid parameters {}. The supported keys and value-types are {}'
+                                 .format(invalid_params, valid_params)})), 400
 
                 for name, val in controller.get_params_dict().items():
                     if name.endswith('ted_at'):
