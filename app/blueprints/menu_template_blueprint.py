@@ -20,7 +20,7 @@ menu_template_controller = MenuTemplateController(request)
 @menu_template_blueprint.route('/', methods=['POST'])
 @Auth.has_role('admin')
 @Security.validator(['name|required', 'mealPeriod|required:enum_MealPeriods', 'description|required'])
-@swag_from('documentation/menu_template.yml')
+@swag_from('documentation/create_menu_template.yml')
 def create_menu_template():
     return menu_template_controller.create()
 
@@ -28,7 +28,7 @@ def create_menu_template():
 @menu_template_blueprint.route('/', methods=['GET'])
 @Security.validate_query_params(MenuTemplate)
 @Auth.has_role('admin')
-@swag_from('documentation/menu_template.yml')
+@swag_from('documentation/get_menu_template.yml')
 def get_menu_templates():
     return menu_template_controller.get_all()
 
@@ -36,14 +36,14 @@ def get_menu_templates():
 @menu_template_blueprint.route('/<int:id>', methods=['PATCH', 'PUT'])
 @Auth.has_role('admin')
 @Security.validator(['name|string', 'description|string', 'mealPeriod|enum_MealPeriods'])
-@swag_from('documentation/menu_template.yml')
+@swag_from('documentation/update_menu_template.yml')
 def update_menu_template(id):
     return menu_template_controller.update(id)
 
 
 @menu_template_blueprint.route('/<int:id>', methods=['GET'])
 @Auth.has_role('admin')
-@swag_from('documentation/get_menu_template.yml')
+@swag_from('documentation/get_menu_template_item.yml')
 def get_menu_template(id):
     return menu_template_controller.get(id)
 

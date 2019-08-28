@@ -29,6 +29,11 @@ parameters:
     required: true
     type: string
     description: ''
+  - name: id
+    in: query
+    type: string
+    required: true
+    description: the id of the menu template
 responses:
   200:
     description: ''
