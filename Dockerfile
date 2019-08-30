@@ -34,4 +34,4 @@ ADD . /usr/src/
 
 WORKDIR $WORKDIR
 
-CMD ["gunicorn", "run:app", "-b", "0.0.0.0:4070", "--timeout", "360"]
+CMD ["gunicorn", "run:app", "-b", "0.0.0.0:4070", "--workers=5", "--threads=5", "--timeout", "360"]
