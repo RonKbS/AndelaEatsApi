@@ -368,7 +368,6 @@ class Security:
         model_columns = model.get_columns()
 
         model_fields = [column for column in model_columns]
-        model_field_types = set([(str(value)) for key, value in model_columns.items()])
 
         model_fields_camel = list(
             map(SnakeCaseConversion.snake_to_camel, model_fields))
@@ -394,15 +393,13 @@ class Security:
                     except KeyError:
                         continue
 
-                invalid_params = invalid_query_keys + invalid_query_values
-                listed_mfd = list(model_field_types)
-                listed_mfd.sort()
-                valid_params = model_fields_camel + listed_mfd
-
-                if invalid_query_keys or invalid_query_values:
+                if invalid_query_keys:
                     return make_response(
-                        jsonify({'msg': 'Invalid parameters {}. The supported keys and value-types are {}'
-                                 .format(invalid_params, valid_params)})), 400
+                        jsonify({'msg': 'Invalid keys {}. The supported keys are {}'
+                                 .format(invalid_query_keys, model_fields_camel)})), 400
+                elif invalid_query_values:
+                    return make_response(
+                        jsonify({'msg': 'Paramter value passed in does not match parameter-key type'})), 400
 
                 for name, val in controller.get_params_dict().items():
                     if name.endswith('ted_at'):
