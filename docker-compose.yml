@@ -7,35 +7,16 @@ services:
       - "65432:5432"
     environment:
       - POSTGRES_USER=andela
-      - POSTGRES_DB=eats
+      - POSTGRES_DB=andela
       - POSTGRES_PASSWORD=andela
   redis:
     image: redis
     command: redis-server
   api:
     build: .
+    command: ./runserver.sh
     volumes:
-      - .:/usr/src/app
-    environment:
-      - APP_ENV=development
-      - PYTHONUNBUFFERED=1
-      - PYTHONDONTWRITEBYTECODE=1
-      - ANDELA_API_TOKEN=""
-      - SECRET_KEY=""
-      - DATABASE_URL=postgres://andela:andela@postgres:5432/eats
-      - DATABASE_TEST_URL=postgres://andela:andela@postgres:5432/eats
-      - REDIS_URL=redis://redis:6379
-      - REDIS_AUTH=changeme
-      - API_AUTH_URL
-      - FLASK_APP=run
-      - FLASK_ENV=development
-      - SLACK_TOKEN=""
-      - COVERALLS_REPO_TOKEN=
-      - JWT_PUBLIC_KEY=
-      - JWT_PUBLIC_KEY_STAGING=
-      - BUGSNAG_API_KEY=
-      - BUGSNAG_PROJECT_ROOT=
-      - ROLLBAR_API_KEY=
+      - .:/usr/andelaeats
     labels:
       org.label-schema.name: "Andela-Eats"
       org.label-schema.description: "Andela Eats API"

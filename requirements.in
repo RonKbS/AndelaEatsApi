@@ -1,78 +1,38 @@
-# Base requirements
+# Everything needed in production
 
-alembic
-aniso8601
-APScheduler
-asn1crypto
-astroid
-atomicwrites
-attrs
-autopep8
-certifi
-cffi
-chardet
-click
-coverage
-coveralls
-cryptography
-docopt
-factory-boy
-Faker
-flasgger
+# Flask
 Flask
-Flask-API
-Flask-Cors
-Flask-Login
-Flask-Migrate
-Flask-RESTful
-Flask-Script
-Flask-SQLAlchemy
-flask-swagger
-flask-swagger-ui
-Flask-Testing
-gunicorn
-idna
-inflect
-isort
-itsdangerous
-Jinja2
-jsonschema
-lazy-object-proxy
-Mako
-MarkupSafe
-mccabe
-mistune
-more-itertools
-numpy
-pandas
-passlib
-pluggy
-psycopg2
-psycopg2-binary
-py
-pycodestyle
-pycparser
-PyJWT
-pylint
-pytest
-pytest-cov
-python-dateutil
-python-dotenv
-python-editor
-pytz
-PyYAML
-redis
-requests
-six
-slackclient
-SQLAlchemy
-termcolor
-text-unidecode
-tzlocal
-urllib3
-websocket-client
 Werkzeug
-wrapt
-bugsnag
-blinker
-rollbar
+click
+
+# Database
+Flask-SQLAlchemy
+SQLAlchemy
+psycopg2-binary
+
+# Migrations
+Flask-Migrate
+
+# Forms
+# Flask-WTF
+# WTForms
+
+# Deployment
+gevent
+gunicorn
+
+# Webpack
+# flask-webpack
+
+# Auth
+Flask-Login
+Flask-Bcrypt
+
+# Caching
+Flask-Caching
+
+# Debug toolbar
+Flask-DebugToolbar
+
+# Environment variable parsing
+environs

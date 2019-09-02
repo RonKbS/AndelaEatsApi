@@ -1,2 +1,0 @@
-precommit-hook
-flake8

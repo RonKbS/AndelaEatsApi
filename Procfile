@@ -1,2 +1,1 @@
-web: gunicorn --workers=5 --threads=5 --timeout 360 run:app
-release: python run.py db upgrade
+web: gunicorn andelaeats.app:create_app\(\) -b 0.0.0.0:$PORT -w 3

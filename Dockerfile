@@ -1,6 +1,6 @@
 FROM python:3.7-alpine
 
-LABEL MAINTAINER="dominic.motuka@gmail.com"
+LABEL MAINTAINER="tolu.aina@andela.com"
 
 LABEL application="eats-backend"
 
@@ -26,12 +26,6 @@ RUN pip install --upgrade pip \
     && pip install --upgrade -r /requirements.txt \
     && rm -r /root/.cache
 
-ARG WORKDIR=/usr/src/app
-
-RUN mkdir $WORKDIR
-
-ADD . /usr/src/
-
-WORKDIR $WORKDIR
-
-CMD ["gunicorn", "run:app", "-b", "0.0.0.0:4070", "--workers=5", "--threads=5", "--timeout", "360"]
+RUN mkdir /usr/andelaeats
+WORKDIR /usr/andelaeats
+COPY . /usr/
