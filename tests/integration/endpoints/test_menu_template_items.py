@@ -410,3 +410,17 @@ class TestMenuTemplateItem(BaseTestCase, BaseTestUtils):
 
         self.assert404(response)
         self.assertEqual(response_json['msg'], 'MenuTemplateItem with id 1 not found')
+
+    def test_get_menu_template_items_with_ivalid_value_params_fails(self):
+
+        response = self.client().get(
+            self.make_url("/menu_template_items?day_id='for'"),
+            headers=self.headers()
+        )
+        response_json = self.decode_from_json_string(
+            response.data.decode('utf-8'))
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            'Paramter value passed in does not match parameter-key type',
+            response_json['msg']
+        )

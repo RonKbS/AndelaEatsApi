@@ -380,15 +380,26 @@ class Security:
             def decorated(*args, **kwargs):
                 queries = request.args
                 invalid_query_keys = []
+                invalid_query_values = []
 
-                for key in queries:
+                for key, value in queries.items():
                     if SnakeCaseConversion.camel_to_snake(key) not in model_fields:
                         invalid_query_keys.append(key)
+
+                    try:
+                        model_columns[key].python_type(value)
+                    except ValueError:
+                        invalid_query_values.append(value)
+                    except KeyError:
+                        continue
 
                 if invalid_query_keys:
                     return make_response(
                         jsonify({'msg': 'Invalid keys {}. The supported keys are {}'
                                  .format(invalid_query_keys, model_fields_camel)})), 400
+                elif invalid_query_values:
+                    return make_response(
+                        jsonify({'msg': 'Paramter value passed in does not match parameter-key type'})), 400
 
                 for name, val in controller.get_params_dict().items():
                     if name.endswith('ted_at'):

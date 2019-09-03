@@ -15,8 +15,3 @@ class MenuTemplateItemRepo(BaseRepo):
             side_items=side_items, day_id=day_id)
         menu_template_item.save()
         return menu_template_item
-
-    def get_menu_template_items_by_day(self, day_id):
-        return self._model.query.filter_by(
-            day_id=day_id
-        ).paginate(error_out=False)
