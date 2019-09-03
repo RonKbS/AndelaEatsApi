@@ -20,3 +20,5 @@ class MenuTemplateItemFactory(factory.alchemy.SQLAlchemyModelFactory):
     allowed_protein = 1
     day = factory.SubFactory(MenuTemplateWeekDayFactory)
     main_meal = factory.SubFactory(MealItemFactory)
+    side_items = factory.List([factory.SubFactory(MealItemFactory) for _ in range(5)])
+    protein_items = factory.List([factory.SubFactory(MealItemFactory) for _ in range(5)])

@@ -11,7 +11,7 @@ class MenuController(BaseController):
 	'''Menu controller class'''
 	def __init__(self, request):
 		BaseController.__init__(self, request)
-		self.menu_repo = MenuRepo()
+		self.repo = MenuRepo()
 		self.meal_repo = MealItemRepo()
 
 
@@ -28,16 +28,16 @@ class MenuController(BaseController):
 				'allowedProtein', 'sideItems', 'proteinItems', 'vendorEngagementId'
 			)
 
-		if self.menu_repo.get_unpaginated(date=date, main_meal_id=main_meal_id, location_id=location_id):
+		if self.repo.get_unpaginated(date=date, main_meal_id=main_meal_id, location_id=location_id):
 			return self.handle_response('You can\'t create multiple menus with same main item on the same day', status_code=400)
-		menu = self.menu_repo.new_menu(
+		menu = self.repo.new_menu(
 			date, meal_period, main_meal_id, allowed_side,
 			allowed_protein, side_items, protein_items, vendor_engagement_id, location_id
 		).serialize()
 
 		menu['mainMeal'] = self.meal_repo.get(main_meal_id).serialize()
-		menu['proteinItems'] = self.menu_repo.get_meal_items(protein_items)
-		menu['sideItems'] = self.menu_repo.get_meal_items(side_items)
+		menu['proteinItems'] = self.repo.get_meal_items(protein_items)
+		menu['sideItems'] = self.repo.get_meal_items(side_items)
 		return self.handle_response('OK', payload={'menu': menu}, status_code=201)
 
 	def delete_menu(self, menu_id):
@@ -45,7 +45,7 @@ class MenuController(BaseController):
 		:param menu_id: id of the menu
 		:return: json object
 		'''
-		menu = self.menu_repo.get(menu_id)
+		menu = self.repo.get(menu_id)
 		updates = {}
 		if menu:
 			if menu.is_deleted:
@@ -65,7 +65,7 @@ class MenuController(BaseController):
 		'''
 		location_id = Auth.get_location()
 		if MealPeriods.has_value(menu_period):
-			menus = self.menu_repo.get_unpaginated(
+			menus = self.repo.get_unpaginated(
 				date=menu_date, meal_period=menu_period, is_deleted=False, location_id=location_id
 			)
 			menu_list = defaultdict(list)
@@ -74,8 +74,8 @@ class MenuController(BaseController):
 				arr_protein = menu.protein_items.split(",")
 				arr_side = menu.side_items.split(",")
 				serialised_menu['mainMeal'] = self.meal_repo.get(menu.main_meal_id).serialize()
-				serialised_menu['proteinItems'] = self.menu_repo.get_meal_items(arr_protein)
-				serialised_menu['sideItems'] = self.menu_repo.get_meal_items(arr_side)
+				serialised_menu['proteinItems'] = self.repo.get_meal_items(arr_protein)
+				serialised_menu['sideItems'] = self.repo.get_meal_items(arr_side)
 				menu_list[serialised_menu['date'].strftime('%Y-%m-%d')].append(serialised_menu)
 
 			grouped = [{'date': date, 'menus': menus} for date, menus in menu_list.items()]
@@ -101,7 +101,7 @@ class MenuController(BaseController):
 			if menu_start_date >= menu_end_date:
 				return self.handle_response('Provide valid date range. start_date cannot be greater than end_date',
 											status_code=400)
-			menus = self.menu_repo.get_range_paginated_options(
+			menus = self.repo.get_range_paginated_options(
 				start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period, location_id=location_id
 			)
 			menu_list = []
@@ -111,8 +111,8 @@ class MenuController(BaseController):
 				arr_side = [int(side_id) for side_id in menu.side_items.split(',')]
 
 				serialised_menu['mainMeal'] = self.meal_repo.get(menu.main_meal_id).serialize()
-				serialised_menu['proteinItems'] = self.menu_repo.get_meal_items(arr_protein)
-				serialised_menu['sideItems'] = self.menu_repo.get_meal_items(arr_side)
+				serialised_menu['proteinItems'] = self.repo.get_meal_items(arr_protein)
+				serialised_menu['sideItems'] = self.repo.get_meal_items(arr_side)
 				menu_list.append(serialised_menu)
 
 			return self.handle_response(
@@ -140,7 +140,7 @@ class MenuController(BaseController):
 
 			if menu_start_date >= menu_end_date:
 				return self.handle_response('Provide valid date range. start_date cannot be greater than end_date', status_code=400)
-			menus = self.menu_repo.get_range_paginated_options(
+			menus = self.repo.get_range_paginated_options(
 				start_date=menu_start_date, end_date=menu_end_date, meal_period=menu_period, location_id=location_id
 			)
 			menu_list = defaultdict(list)
@@ -150,8 +150,8 @@ class MenuController(BaseController):
 				arr_side = [int(side_id) for side_id in menu.side_items.split(',')]
 
 				serialised_menu['mainMeal'] = self.meal_repo.get(menu.main_meal_id).serialize()
-				serialised_menu['proteinItems'] = self.menu_repo.get_meal_items(arr_protein)
-				serialised_menu['sideItems'] = self.menu_repo.get_meal_items(arr_side)
+				serialised_menu['proteinItems'] = self.repo.get_meal_items(arr_protein)
+				serialised_menu['sideItems'] = self.repo.get_meal_items(arr_side)
 				menu_list[serialised_menu['date'].strftime('%Y-%m-%d')].append(serialised_menu)
 
 			grouped = [{'date': date, 'menus': menus} for date, menus in menu_list.items()]
@@ -178,7 +178,7 @@ class MenuController(BaseController):
 				'date', 'mealPeriod', 'mainMealId', 'allowedSide',
 				'allowedProtein', 'sideItems', 'proteinItems', 'vendorEngagementId'
 				)
-		menu = self.menu_repo.get(menu_id)
+		menu = self.repo.get(menu_id)
 
 		if menu:
 			if menu.is_deleted:
@@ -202,14 +202,14 @@ class MenuController(BaseController):
 			if vendor_engagement_id:
 				updates['vendor_engagement_id'] = vendor_engagement_id
 
-			updated_menu = self.menu_repo.update(menu, **updates)
+			updated_menu = self.repo.update(menu, **updates)
 			prot_items = [int(prot_id) for prot_id in updated_menu.protein_items.split(',')]
 			sid_items = [int(side_id) for side_id in updated_menu.side_items.split(',')]
 
 			menu = updated_menu.serialize()
 			menu['mainMeal'] = self.meal_repo.get(updated_menu.main_meal_id).serialize()
-			menu['proteinItems'] = self.menu_repo.get_meal_items(prot_items)
-			menu['sideItems'] = self.menu_repo.get_meal_items(sid_items)
+			menu['proteinItems'] = self.repo.get_meal_items(prot_items)
+			menu['sideItems'] = self.repo.get_meal_items(sid_items)
 			return self.handle_response('OK', payload={'menu': menu}, status_code=200)
 
 		return self.handle_response('This menu_id does not exist', status_code=404)

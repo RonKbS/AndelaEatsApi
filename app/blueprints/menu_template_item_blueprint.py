@@ -45,9 +45,9 @@ def update_menu_template_item(template_id):
 def delete_menu(id):
     return menu_template_item_controller.delete(id)
 
+
 @menu_template_item_blueprint.route('/<int:id>', methods=['GET'])
 @Auth.has_role('admin')
 @swag_from('documentation/get_menu_template_item.yml')
 def get_menu_template(id):
-    return menu_template_item_controller.get(id)
-
+    return menu_template_item_controller.get(id, get_children=True)

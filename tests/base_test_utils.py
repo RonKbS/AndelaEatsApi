@@ -13,3 +13,4 @@ class BaseTestUtils():
         role = RoleFactory.create(name='admin')
         user_id = self.user_id()
         UserRoleFactory.create(user_id=user_id, role=role)
+        return role

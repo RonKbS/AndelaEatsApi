@@ -3,6 +3,7 @@ from app.models import *
 from flask_sqlalchemy import Pagination
 from functools import wraps
 from app.utils.handled_exceptions import BaseModelValidationError
+from app.utils import db
 
 
 def filter_deleted(func):
@@ -23,8 +24,9 @@ class BaseRepo:
     DEFAULT_PAGINATION_PAGE_NUMBER = 1
     DEFAULT_PAGINATION_PER_PAGE_NUMBER = 20
 
-    def __init__(self, _model):
-        self._model = _model
+    def __init__(self, _model=None):
+        if _model:
+            self._model = _model
 
     def fetch_all(self):
         """Return all the data in the model."""
@@ -33,6 +35,13 @@ class BaseRepo:
     def get(self, *args):
         """Return data by the Id."""
         return self._model.query.get(*args)
+
+    def bulk_create(self, records):
+        record_list = [self._model(**item) for item in records]
+        db.session.add_all(record_list)
+        db.session.commit()
+        return record_list
+
 
     def get_or_404(self, *args):
         instance = self.get(*args)

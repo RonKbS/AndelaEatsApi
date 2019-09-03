@@ -102,9 +102,9 @@ class BaseController:
         return self.handle_response(f'{item.__table__.name} deleted {item.id}',
                                     payload={"status": "success"})
 
-    def get(self, item_id):
+    def get(self, item_id, get_children=False):
         item = self.repo.get_or_404(item_id)
-        return self.handle_response('OK', payload={f'{self.repo._model.__name__}': item.serialize()}, status_code=200)
+        return self.handle_response('OK', payload={f'{self.repo._model.__name__}': item.serialize(get_children=get_children)}, status_code=200)
 
     def get_all(self):
         query_kwargs = self.get_params_dict()

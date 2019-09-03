@@ -1,0 +1,118 @@
+Copy  Menu Template to menu
+---
+tags:
+  - Menu Template
+summary: Copies a new menu template to menu
+parameters:
+  - name: X-Location
+    type: integer
+    required: true
+    description: The center's location Id
+    in: header
+    example: '1'
+  - name: Authorization
+    type: string
+    required: true
+    description: User's token prefix with the word "Bearer"
+    in: header
+  - name: Body
+    in: body
+    required: true
+    schema:
+      $ref: '#/definitions/CopymenutemplatetomenuCopyRequest'
+responses:
+  201:
+    description: ''
+    schema:
+      $ref: '#/definitions/%28200%29copytemplatetomenu'
+    examples:
+      application/json:
+        msg: OK
+        payload:
+          message: 0 menu items successfully copied, 0 duplicates found
+    headers: {}
+  400:
+    description: BAD REQUEST
+    schema:
+      $ref: '#/definitions/CopymenutemplatetomenuCopyError'
+    examples:
+      application/json:
+        msg: OK
+        payload:
+          msg: Start and end date should be between 2019-08-21 and 2019-09-20
+
+definitions:
+  CopymenutemplatetomenuCopyRequest:
+    title: CopymenutemplatetomenuCopyRequest
+    example:
+      vendorEngagementId: 1
+      startDate: 2019-08-21
+      endDate: 2019-08-23
+      menuTemplateId: 3
+    type: object
+    properties:
+      vendorEngagementId:
+        type: integer
+        format: int32
+      startDate:
+        type: string
+      endDate:
+        type: string
+      menuTemplateId:
+        type: integer
+        format: int32
+    required:
+    - vendorEngagementId
+    - startDate
+    - endDate
+    - menuTemplateId
+  CopymenutemplatetomenuCopyError:
+    title: CopymenutemplatetomenuCopyError
+    example:
+      msg: OK
+      payload:
+        msg: Start and end date should be between 2019-08-21 and 2019-09-20
+    type: object
+    properties:
+      msg:
+        type: string
+      payload:
+        $ref: '#/definitions/Payload'
+    required:
+    - msg
+    - payload
+  Payload:
+    title: Payload
+    example:
+      msg: Start and end date should be between 2019-08-21 and 2019-09-20
+    type: object
+    properties:
+      msg:
+        type: string
+    required:
+    - msg
+  (200)copytemplatetomenu:
+    title: (200)copytemplatetomenu
+    example:
+      msg: OK
+      payload:
+        message: 0 menu items successfully copied, 0 duplicates found
+    type: object
+    properties:
+      msg:
+        type: string
+      payload:
+        $ref: '#/definitions/Payload2'
+    required:
+    - msg
+    - payload
+  Payload2:
+    title: Payload2
+    example:
+      message: 0 menu items successfully copied, 0 duplicates found
+    type: object
+    properties:
+      message:
+        type: string
+    required:
+    - message

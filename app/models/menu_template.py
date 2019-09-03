@@ -45,7 +45,7 @@ class MenuTemplateWeekDay(BaseModel):
 
 
 class MenuTemplateItem(BaseModel):
-    
+
     __tablename__ = 'menu_template_item'
 
     main_meal_id = db.Column(db.Integer(), db.ForeignKey(
@@ -65,7 +65,8 @@ class MenuTemplateItem(BaseModel):
         'menu_template_weekday.id'), nullable=False)
 
     main_meal = db.relationship('MealItem', lazy=False)
-    day = db.relationship('MenuTemplateWeekDay', lazy=True)
+    day = db.relationship('MenuTemplateWeekDay',
+                          backref=db.backref('items', lazy=True))
 
 
 @listens_for(MenuTemplate, 'after_insert')

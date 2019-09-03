@@ -53,3 +53,12 @@ def get_menu_template(id):
 @swag_from('documentation/delete_menu_template.yml')
 def delete_menu(id):
     return menu_template_controller.delete(id)
+
+
+@menu_template_blueprint.route('/copy', methods=['POST'])
+@Security.validator(['vendorEngagementId|required:int', 'startDate|required:date',
+                     'endDate|required:date', 'menuTemplateId|required:int'])
+@Auth.has_role('admin')
+@swag_from('documentation/copy_menu_template.yml')
+def copy_menu_template():
+    return menu_template_controller.copy()
