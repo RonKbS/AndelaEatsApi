@@ -15,6 +15,7 @@ Flask-Migrate
 
 # Forms
 # Flask-WTF
+Flask-WTF
 # WTForms
 
 # Deployment
