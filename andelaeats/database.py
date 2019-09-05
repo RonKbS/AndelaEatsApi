@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Database module, including the SQLAlchemy database object and DB-related utilities."""
+from datetime import datetime
 from uuid import uuid4
 
 from .compat import basestring
@@ -46,6 +47,7 @@ class Model(CRUDMixin, db.Model):
         index=True,
         nullable=False,
     )
+    created_at = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow)
 
 
 # From Mike Bayer's "Building the app" talk

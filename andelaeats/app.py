@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The app module, containing the app factory function."""
 import logging
 import sys
@@ -6,7 +5,13 @@ import sys
 from flask import Flask, render_template
 
 from andelaeats import commands, location, meal, order, rating, user, vendor
-from andelaeats.extensions import cache, csrf_protect, db, debug_toolbar, migrate
+from andelaeats.extensions import (  # noqa
+    cache,
+    csrf_protect,
+    db,
+    debug_toolbar,
+    migrate,
+)
 
 
 def create_app(config_object="andelaeats.settings"):

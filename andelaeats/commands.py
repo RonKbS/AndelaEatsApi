@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Click commands."""
 import os
-from glob import glob
 from subprocess import call
 
 import click
@@ -37,14 +36,7 @@ def test():
 )
 def lint(fix_imports, check):
     """Lint and check code style with black, flake8 and isort."""
-    skip = ["requirements", "migrations"]
-    root_files = glob("*.py")
-    root_directories = [
-        name for name in next(os.walk("."))[1] if not name.startswith(".")
-    ]
-    files_and_directories = [
-        arg for arg in root_files + root_directories if arg not in skip
-    ]
+    files_and_directories = ["autoapp.py", "tests", "make", "scripts", "andelaeats"]
 
     def execute_tool(description, *args):
         """Execute a checking tool with its arguments."""
@@ -62,4 +54,4 @@ def lint(fix_imports, check):
     if fix_imports:
         execute_tool("Fixing import order", "isort", *isort_args)
     execute_tool("Formatting style", "black", *black_args)
-    execute_tool("Checking code style", "flake8")
+    # execute_tool("Checking code style", "flake8")

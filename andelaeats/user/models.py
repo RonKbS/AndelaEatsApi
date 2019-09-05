@@ -18,7 +18,6 @@ class User(SurrogatePK, Model):
     first_name = db.Column(db.String(30), nullable=False)
     last_name = db.Column(db.String(30), nullable=False)
     active = db.Column(db.Boolean(), default=True, nullable=False)
-    created = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow)
     modified = db.Column(db.DateTime(), nullable=True, onupdate=datetime.utcnow)
     image_url = db.Column(db.String(255))
 
