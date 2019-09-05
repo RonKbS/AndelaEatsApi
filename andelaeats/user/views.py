@@ -1,25 +1,27 @@
 # -*- coding: utf-8 -*-
 """User views."""
 from flask import Blueprint, jsonify
+from flask.views import MethodView
 
-# from flask_login import login_required
 from .models import User
 from .schema import UserSchema
 
 blueprint = Blueprint("user", __name__, url_prefix="/users", static_folder="../static")
 
 
-@blueprint.route("/")
-# @login_required
-def users():
-    """List users."""
-    all_users = User.query.all()
-    schema = UserSchema(many=True)
-    return jsonify(schema.dump(all_users))
+class UsersView(MethodView):
+    def get(self):
+        all_users = User.query.all()
+        schema = UserSchema(many=True)
+        return jsonify(schema.dump(all_users))
 
 
-@blueprint.route("/<id>")
-def user(id):
-    user = User.get(id)
-    schema = UserSchema()
-    return jsonify(schema.dump(user))
+class SingleUserView(MethodView):
+    def get(self, id):
+        user = User.get(id)
+        schema = UserSchema()
+        return jsonify(schema.dump(user))
+
+
+blueprint.add_url_rule("/", view_func=UsersView.as_view("users"))
+blueprint.add_url_rule("/<id>", view_func=UsersView.as_view("user"))

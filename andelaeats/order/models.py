@@ -28,13 +28,11 @@ class Order(SurrogatePK, Model):
 
     __tablename__ = "order"
 
-    user_id = reference_col("user_id", nullable=False)
-    user = db.relationship("User", backref="meal_services")
-    meal_vendor_engagement_id = reference_col(
-        "meal_vendor_engagement_id", nullable=False
-    )
+    user_id = reference_col("user", nullable=False)
+    user = db.relationship("User", backref="order")
+    meal_vendor_engagement_id = reference_col("meal_vendor_engagement", nullable=False)
     meal_vendor_engagement = db.relationship("MealVendorEngagement", backref="orders")
-    city_id = reference_col("city_id", nullable=False)
+    city_id = reference_col("city", nullable=False)
     city = db.relationship("City", backref="orders")
     date = db.Column(db.DateTime(), nullable=False)
     status = db.Column(db.Enum(OrderStatus))

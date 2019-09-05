@@ -31,7 +31,7 @@ class Meal(SurrogatePK, Model):
 
     name = db.Column(db.String(80), unique=True, nullable=False, index=True)
     sides = db.Column(db.Integer(), unique=True, index=True)
-    protein = db.Column(db.Integer(30), nullable=False)
+    proteins = db.Column(db.Integer(), nullable=False)
     created = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow)
     modified = db.Column(db.DateTime(), nullable=True, onupdate=datetime.utcnow)
     image_url = db.Column(db.String(255))
@@ -88,7 +88,7 @@ class MealVendorEngagement(SurrogatePK, Model):
     __tablename__ = "meal_vendor_engagement"
 
     meal_id = reference_col("meal", nullable=False)
-    meal = db.relationship("Meal", backref="meal_items")
+    meal = db.relationship("Meal", backref="vendor_meal_items")
     vendor_engagement_id = reference_col("vendor_engagement", nullable=False)
     vendor_engagement = db.relationship(
         "VendorEngagement", backref="meal_vendor_engagements"
@@ -120,7 +120,7 @@ class MealGroupItem(SurrogatePK, Model):
     __tablename__ = "meal_group_item"
 
     meal_id = reference_col("meal", nullable=False)
-    meal = db.relationship("Meal", backref="meal_items")
+    meal = db.relationship("Meal", backref="meal_items_group")
     group_id = reference_col("meal_group", nullable=False)
     group = db.relationship("MealGroup", backref="meal_group_items")
 
@@ -137,10 +137,10 @@ class MealService(SurrogatePK, Model):
     meal_vendor_engagement = db.relationship(
         "MealVendorEngagement", backref="meal_services"
     )
-    user_id = reference_col("user_id", nullable=False)
+    user_id = reference_col("user", nullable=False)
     user = db.relationship("User", backref="meal_services")
     date = db.Column(db.Date(), default=datetime.utcnow)
-    city_id = reference_col("city_id", nullable=False)
+    city_id = reference_col("city", nullable=False)
     city = db.relationship("City", backref="meal_services")
 
 
