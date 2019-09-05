@@ -6,4 +6,4 @@ class VendorSchema(Schema):
 
     class Meta:
         # Fields to expose
-        fields = ('name', 'address', 'telephone', 'active', 'image_url')
+        fields = ("name", "address", "telephone", "active", "image_url")

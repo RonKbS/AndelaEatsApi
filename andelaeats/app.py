@@ -6,21 +6,15 @@ import sys
 from flask import Flask, render_template
 
 from andelaeats import commands, location, meal, order, rating, user, vendor
-from andelaeats.extensions import (
-    cache,
-    csrf_protect,
-    db,
-    debug_toolbar,
-    migrate,
-)
+from andelaeats.extensions import cache, csrf_protect, db, debug_toolbar, migrate
 
 
-def create_app(config_object='andelaeats.settings'):
+def create_app(config_object="andelaeats.settings"):
     """Create application factory, as explained here: http://flask.pocoo.org/docs/patterns/appfactories/.
 
     :param config_object: The configuration object to use.
     """
-    app = Flask(__name__.split('.')[0])
+    app = Flask(__name__.split(".")[0])
     app.config.from_object(config_object)
     register_extensions(app)
     register_blueprints(app)

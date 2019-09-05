@@ -2,10 +2,10 @@
 """Rating views."""
 from flask import Blueprint, jsonify
 
-blueprint = Blueprint('rating', __name__, url_prefix='/ratings')
+blueprint = Blueprint("rating", __name__, url_prefix="/ratings")
 
 
-@blueprint.route('/')
+@blueprint.route("/")
 def rating():
     """List ratings."""
-    return jsonify({'view': 'Rating'})
+    return jsonify({"view": "Rating"})

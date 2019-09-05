@@ -7,4 +7,4 @@ class InvalidAuthTokenError(Exception):
     def __init__(self, token_id):
         """Return error with customised message."""
         self.token_id = token_id
-        super().__init__(f'Invalid aith key')
+        super().__init__(f"Invalid aith key")

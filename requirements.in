@@ -37,3 +37,11 @@ Flask-DebugToolbar
 
 # Environment variable parsing
 environs
+
+
+# web test
+WebTest
+
+# lint
+black 
+flake8

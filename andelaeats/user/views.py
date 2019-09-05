@@ -6,15 +6,10 @@ from flask import Blueprint, jsonify
 from .models import User
 from .schema import UserSchema
 
-blueprint = Blueprint(
-    'user',
-    __name__,
-    url_prefix='/users',
-    static_folder='../static'
-)
+blueprint = Blueprint("user", __name__, url_prefix="/users", static_folder="../static")
 
 
-@blueprint.route('/')
+@blueprint.route("/")
 # @login_required
 def users():
     """List users."""
@@ -23,7 +18,7 @@ def users():
     return jsonify(schema.dump(all_users))
 
 
-@blueprint.route('/<id>')
+@blueprint.route("/<id>")
 def user(id):
     user = User.get(id)
     schema = UserSchema()

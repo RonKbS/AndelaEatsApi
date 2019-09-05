@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Database module, including the SQLAlchemy database object and DB-related utilities."""
+from uuid import uuid4
+
 from .compat import basestring
 from .extensions import db
 
@@ -37,6 +39,14 @@ class Model(CRUDMixin, db.Model):
 
     __abstract__ = True
 
+    uuid = db.Column(
+        db.String(100),
+        default=lambda: str(uuid4()),
+        unique=True,
+        index=True,
+        nullable=False,
+    )
+
 
 # From Mike Bayer's "Building the app" talk
 # https://speakerdeck.com/zzzeek/building-the-app
@@ -61,11 +71,7 @@ class SurrogatePK(object):
 
 
 def reference_col(
-    tablename,
-    nullable=False,
-    pk_name='id',
-    foreign_key_kwargs=None,
-    column_kwargs=None
+    tablename, nullable=False, pk_name="id", foreign_key_kwargs=None, column_kwargs=None
 ):
     """Column that adds primary key foreign key reference.
 
@@ -78,7 +84,7 @@ def reference_col(
     column_kwargs = column_kwargs or {}
 
     return db.Column(
-        db.ForeignKey(f'{tablename}.{pk_name}', **foreign_key_kwargs),
+        db.ForeignKey(f"{tablename}.{pk_name}", **foreign_key_kwargs),
         nullable=nullable,
-        **column_kwargs
+        **column_kwargs,
     )
