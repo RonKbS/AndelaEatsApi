@@ -36,7 +36,7 @@ def test():
 )
 def lint(fix_imports, check):
     """Lint and check code style with black, flake8 and isort."""
-    files_and_directories = ["autoapp.py", "tests", "make", "scripts", "andelaeats"]
+    files_and_directories = ["run.py", "tests", "make", "scripts", "andelaeats"]
 
     def execute_tool(description, *args):
         """Execute a checking tool with its arguments."""
