@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 env = Env()
 env.read_env()
 
-ENV = env.str("FLASK_ENV", default="development")
+APP_ENV = env.str("FLASK_ENV", default="development")
 
 TESTING = sys.argv[0].endswith("pytest")
 if TESTING:
@@ -30,7 +30,7 @@ CACHE_TYPE = "simple"  # Can be 'memcached', 'redis', etc.
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # Debugging
-DEBUG = ENV == "development"
+DEBUG = APP_ENV == "development"
 DEBUG_TB_ENABLED = DEBUG
 DEBUG_TB_INTERCEPT_REDIRECTS = False
 
@@ -46,3 +46,12 @@ REDIS_SOCKET_TIMEOUT = env.int("REDIS_SOCKET_TIMEOUT", default=5)
 JWT_SECRET_KEY = env.str("JWT_PUBLIC_KEY")
 JWT_ALGORITHM = env.str("JWT_ALGORITHM", default="HS256")
 JWT_AUTH_SCHEME = env.str("JWT_AUTH_SCHEME", default="JWT")
+
+
+# Andela API token
+ANDELA_API_TOKEN = env.str("ANDELA_API_TOKEN")
+API_AUTH_URL = env.str("API_AUTH_URL")
+
+
+# slack token
+SLACK_TOKEN = env.str("SLACK_TOKEN")
