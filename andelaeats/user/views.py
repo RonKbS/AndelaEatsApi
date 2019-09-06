@@ -6,7 +6,9 @@ from flask.views import MethodView
 from .models import User
 from .schema import UserSchema
 
-blueprint = Blueprint("user", __name__, url_prefix="/users", static_folder="../static")
+blueprint = Blueprint(
+    "user", __name__, url_prefix="/api/v1/users", static_folder="../static"
+)
 
 
 class UsersView(MethodView):

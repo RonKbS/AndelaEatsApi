@@ -12,6 +12,7 @@ from andelaeats.extensions import (  # noqa
     debug_toolbar,
     migrate,
 )
+from andelaeats.utils.auth import Auth
 from andelaeats.utils.error_handlers import handle_exception
 from andelaeats.utils.handled_errors import BaseModelValidationError
 
@@ -28,6 +29,7 @@ def create_app(config_object="andelaeats.settings"):
     register_errorhandlers(app)
     register_shellcontext(app)
     register_commands(app)
+    register_before_register(app)
     configure_logger(app)
     return app
 
@@ -83,3 +85,8 @@ def configure_logger(app):
     handler = logging.StreamHandler(sys.stdout)
     if not app.logger.handlers:
         app.logger.addHandler(handler)
+
+
+def register_before_register(app):
+    app.before_request(Auth.check_token)
+    app.before_request(Auth.check_location_header)
