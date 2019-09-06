@@ -2,6 +2,7 @@ from factories import (LocationFactory, MenuTemplateFactory,
                        VendorEngagementFactory, MenuTemplateItemFactory, PermissionFactory)
 from tests.base_test_case import BaseTestCase
 from tests.base_test_utils import BaseTestUtils
+import faker 
 
 
 class TestMenuTemplate(BaseTestCase, BaseTestUtils):
@@ -319,3 +320,18 @@ class TestMenuTemplate(BaseTestCase, BaseTestUtils):
         self.assertJSONKeyPresent(response.json, 'payload')
         self.assertEqual(response.json['payload'], {
             'msg': f'Start and end date should be between {engagement.start_date} and {engagement.end_date}'},)
+    
+
+    def test_create_menu_template_with_name_greater_than_50_fails(self):
+        self.create_admin()
+        LocationFactory.create(id=1).save()
+        data = {
+            "name": faker.Faker().text(150),
+            "mealPeriod": "lunch",
+            "description": "somehting"
+        }
+        response = self.client().post(
+            self.make_url("/menu_template/"), headers=self.headers(),
+            data=self.encode_to_json_string(data))
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json['msg'],'Bad Request - name can only have a len of 50')
