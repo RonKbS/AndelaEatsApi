@@ -10,6 +10,7 @@ Flask-SQLAlchemy
 SQLAlchemy
 psycopg2-binary
 
+
 # Migrations
 Flask-Migrate
 
@@ -45,3 +46,25 @@ WebTest
 # lint
 black 
 flake8
+
+# marshals
+flask-marshmallow
+marshmallow_sqlalchemy
+
+
+# jwt
+PyJWT
+cryptography
+
+# logging
+rollbar
+
+
+# pytest
+pytest
+
+# faker
+faker
+
+# coverage
+pytest-cov
