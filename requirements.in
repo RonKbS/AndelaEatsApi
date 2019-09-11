@@ -29,6 +29,11 @@ gunicorn
 # Auth
 Flask-Login
 Flask-Bcrypt
+cryptography
+PyJWT
+
+# error reporting
+rollbar
 
 # Caching
 Flask-Caching
@@ -42,6 +47,11 @@ environs
 
 # web test
 WebTest
+
+# testing
+Pytest
+pytest-cov
+factory-boy
 
 # lint
 black 

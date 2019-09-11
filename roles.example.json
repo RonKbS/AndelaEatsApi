@@ -1,0 +1,6 @@
+{
+    "roles_field_on_user_model": 
+    {
+        "admin": ["create_user"]
+    }
+}

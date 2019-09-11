@@ -20,12 +20,24 @@ class User(SurrogatePK, Model):
     active = db.Column(db.Boolean(), default=True, nullable=False)
     modified = db.Column(db.DateTime(), nullable=True, onupdate=datetime.utcnow)
     image_url = db.Column(db.String(255))
+    # roles structure as defined in the roles.example.json file
+    roles = db.Column(db.JSON, nullable=True)
 
     def __init__(self, first_name, last_name, email, **kwargs):
         """Create instance."""
         db.Model.__init__(
             self, first_name=first_name, last_name=last_name, email=email, **kwargs
         )
+
+    def has_role_or_permission(self, permission=None, role=None):
+        """check that user has given permission or role"""
+
+        if role:
+            roles = self.roles.keys()
+            return role in roles
+        elif permission:
+            permissions = set(*self.roles.values())
+            return permission in permissions
 
     @property
     def fullname(self):
@@ -35,74 +47,3 @@ class User(SurrogatePK, Model):
     def __repr__(self):
         """Represent instance as a unique string."""
         return f"<User({self.fullname})>"
-
-
-class Role(SurrogatePK, Model):
-    """A role for a user.
-
-    e.g admin, staff, dev, ops, vendor
-    """
-
-    __tablename__ = "role"
-    name = db.Column(db.String(80), unique=True, nullable=False, index=True)
-
-    description = db.Column(db.Text())
-
-    def __init__(self, name, **kwargs):
-        """Create instance."""
-        db.Model.__init__(self, name=name, **kwargs)
-
-    def __repr__(self):
-        """Represent instance as a unique string."""
-        return f"<Role({self.name})>"
-
-
-class Permission(SurrogatePK, Model):
-    """Permissions for a user.
-
-    e.g delete_user, create_meal, create_template, delete_template,
-        create_vendor, view_meals, rate_meal
-    """
-
-    __tablename__ = "permission"
-    name = db.Column(db.String(80), unique=True, nullable=False, index=True)
-
-    description = db.Column(db.Text())
-
-    def __init__(self, name, **kwargs):
-        """Create instance."""
-        db.Model.__init__(self, name=name, **kwargs)
-
-    def __repr__(self):
-        """Represent instance as a unique string."""
-        return f"<Permission({self.name})>"
-
-
-class UserRole(SurrogatePK, Model):
-    """User Role model class."""
-
-    __tablename__ = "user_role"
-    __table_args__ = (UniqueConstraint("user_id", "role_id"),)
-
-    user_id = reference_col("user", nullable=False)
-    user = db.relationship("User", backref="user_roles")
-    role_id = reference_col("role", nullable=False)
-    role = db.relationship("Role", backref="user_roles")
-
-
-sa.Index("user_role_idx", UserRole.user_id, UserRole.role_id)
-
-
-class RolePermission(SurrogatePK, Model):
-    """Role Permission model class."""
-
-    __tablename__ = "role_permission"
-    __table_args__ = (UniqueConstraint("role_id", "permission_id"),)
-
-    role_id = reference_col("role", nullable=False)
-    role = db.relationship("Role", backref="role_permissions")
-    permission_id = reference_col("permission", nullable=False)
-    permission = db.relationship("Permission", backref="role_permissions")
-
-
-sa.Index("role_permission_idx", RolePermission.role_id, RolePermission.permission_id)

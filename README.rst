@@ -16,7 +16,7 @@ Run the following commands to bootstrap your environment ::
 
 
 Getting Started!
----------------
+----------------
 
 Ready to contribute? Here's how to set up `AndelaEatsApi` for local development.
 
@@ -28,6 +28,16 @@ Ready to contribute? Here's how to set up `AndelaEatsApi` for local development.
 
     $ cd andelaeats_api/
     $ make up
+
+    ---Using virtual env locally---
+    $ cd andelaeats_api/
+    $ python3 -m venv <env_name> && . venv/bin/activate
+    $ pip install pip-tools
+    $ pip install -r requirements.txt
+
+    ---Incase new packages are installed---
+    1. add packages to the requirements.in, then run
+    $ pip-compile requirements.in
 
 3. Additionally, you can run the tests with::
 

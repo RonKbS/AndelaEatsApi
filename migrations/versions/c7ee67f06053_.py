@@ -1,16 +1,16 @@
 """empty message
 
-Revision ID: e5a8a5539c5d
+Revision ID: c7ee67f06053
 Revises: 
-Create Date: 2019-09-05 19:21:43.901046
+Create Date: 2019-09-11 15:56:02.482736
 
 """
 from alembic import op
 import sqlalchemy as sa
-
+from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'e5a8a5539c5d'
+revision = 'c7ee67f06053'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -28,7 +28,6 @@ def upgrade():
     )
     op.create_index(op.f('ix_city_name'), 'city', ['name'], unique=True)
     op.create_index(op.f('ix_city_uuid'), 'city', ['uuid'], unique=True)
-
     op.create_table('meal',
     sa.Column('uuid', sa.String(length=100), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -45,8 +44,6 @@ def upgrade():
     op.create_index(op.f('ix_meal_sides'), 'meal', ['sides'], unique=True)
     op.create_index(op.f('ix_meal_uuid'), 'meal', ['uuid'], unique=True)
     op.create_index('meal_idx', 'meal', ['name', 'sides', 'proteins'], unique=False)
-
-
     op.create_table('meal_group',
     sa.Column('uuid', sa.String(length=100), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -56,8 +53,6 @@ def upgrade():
     )
     op.create_index(op.f('ix_meal_group_name'), 'meal_group', ['name'], unique=True)
     op.create_index(op.f('ix_meal_group_uuid'), 'meal_group', ['uuid'], unique=True)
-
-
     op.create_table('meal_item',
     sa.Column('uuid', sa.String(length=100), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -68,20 +63,6 @@ def upgrade():
     )
     op.create_index(op.f('ix_meal_item_name'), 'meal_item', ['name'], unique=True)
     op.create_index(op.f('ix_meal_item_uuid'), 'meal_item', ['uuid'], unique=True)
-
-
-    op.create_table('permission',
-    sa.Column('uuid', sa.String(length=100), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=80), nullable=False),
-    sa.Column('description', sa.Text(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_permission_name'), 'permission', ['name'], unique=True)
-    op.create_index(op.f('ix_permission_uuid'), 'permission', ['uuid'], unique=True)
-
-
     op.create_table('rating_type',
     sa.Column('uuid', sa.String(length=100), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -91,20 +72,6 @@ def upgrade():
     )
     op.create_index(op.f('ix_rating_type_name'), 'rating_type', ['name'], unique=True)
     op.create_index(op.f('ix_rating_type_uuid'), 'rating_type', ['uuid'], unique=True)
-
-
-    op.create_table('role',
-    sa.Column('uuid', sa.String(length=100), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=80), nullable=False),
-    sa.Column('description', sa.Text(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_role_name'), 'role', ['name'], unique=True)
-    op.create_index(op.f('ix_role_uuid'), 'role', ['uuid'], unique=True)
-
-
     op.create_table('user',
     sa.Column('uuid', sa.String(length=100), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -116,13 +83,12 @@ def upgrade():
     sa.Column('active', sa.Boolean(), nullable=False),
     sa.Column('modified', sa.DateTime(), nullable=True),
     sa.Column('image_url', sa.String(length=255), nullable=True),
+    sa.Column('roles', postgresql.JSON(astext_type=sa.Text()), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_user_email'), 'user', ['email'], unique=True)
     op.create_index(op.f('ix_user_slack_id'), 'user', ['slack_id'], unique=True)
     op.create_index(op.f('ix_user_uuid'), 'user', ['uuid'], unique=True)
-
-
     op.create_table('meal_group_item',
     sa.Column('uuid', sa.String(length=100), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -135,8 +101,6 @@ def upgrade():
     )
     op.create_index(op.f('ix_meal_group_item_uuid'), 'meal_group_item', ['uuid'], unique=True)
     op.create_index('meal_group_item_idx', 'meal_group_item', ['group_id', 'meal_id'], unique=False)
-
-
     op.create_table('meal_items',
     sa.Column('uuid', sa.String(length=100), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -149,38 +113,6 @@ def upgrade():
     )
     op.create_index(op.f('ix_meal_items_uuid'), 'meal_items', ['uuid'], unique=True)
     op.create_index('meal_items_idx', 'meal_items', ['meal_id', 'meal_item_id'], unique=False)
-
-
-    op.create_table('role_permission',
-    sa.Column('uuid', sa.String(length=100), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('role_id', sa.Integer(), nullable=False),
-    sa.Column('permission_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['permission_id'], ['permission.id'], ),
-    sa.ForeignKeyConstraint(['role_id'], ['role.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('role_id', 'permission_id')
-    )
-    op.create_index(op.f('ix_role_permission_uuid'), 'role_permission', ['uuid'], unique=True)
-    op.create_index('role_permission_idx', 'role_permission', ['role_id', 'permission_id'], unique=False)
-
-
-    op.create_table('user_role',
-    sa.Column('uuid', sa.String(length=100), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('role_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['role_id'], ['role.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('user_id', 'role_id')
-    )
-    op.create_index(op.f('ix_user_role_uuid'), 'user_role', ['uuid'], unique=True)
-    op.create_index('user_role_idx', 'user_role', ['user_id', 'role_id'], unique=False)
-
-
     op.create_table('vendor',
     sa.Column('uuid', sa.String(length=100), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -197,8 +129,6 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_vendor_uuid'), 'vendor', ['uuid'], unique=True)
-
-
     op.create_table('rating',
     sa.Column('uuid', sa.String(length=100), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -217,8 +147,6 @@ def upgrade():
     op.create_index(op.f('ix_rating_name'), 'rating', ['name'], unique=True)
     op.create_index(op.f('ix_rating_uuid'), 'rating', ['uuid'], unique=True)
     op.create_index('rating_idx', 'rating', ['user_id', 'rating_type_id', 'source_id'], unique=False)
-
-
     op.create_table('vendor_engagement',
     sa.Column('uuid', sa.String(length=100), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -232,8 +160,6 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_vendor_engagement_uuid'), 'vendor_engagement', ['uuid'], unique=True)
-
-
     op.create_table('meal_vendor_engagement',
     sa.Column('uuid', sa.String(length=100), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -249,8 +175,6 @@ def upgrade():
     )
     op.create_index(op.f('ix_meal_vendor_engagement_uuid'), 'meal_vendor_engagement', ['uuid'], unique=True)
     op.create_index('meal_vendor_engagement_idx', 'meal_vendor_engagement', ['meal_id', 'vendor_engagement_id', 'meal_period'], unique=False)
-
-
     op.create_table('meal_service',
     sa.Column('uuid', sa.String(length=100), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -266,8 +190,6 @@ def upgrade():
     )
     op.create_index(op.f('ix_meal_service_uuid'), 'meal_service', ['uuid'], unique=True)
     op.create_index('meal_service_idx', 'meal_service', ['user_id', 'city_id', 'meal_vendor_engagement_id'], unique=False)
-
-    
     op.create_table('order',
     sa.Column('uuid', sa.String(length=100), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -307,12 +229,6 @@ def downgrade():
     op.drop_table('rating')
     op.drop_index(op.f('ix_vendor_uuid'), table_name='vendor')
     op.drop_table('vendor')
-    op.drop_index('user_role_idx', table_name='user_role')
-    op.drop_index(op.f('ix_user_role_uuid'), table_name='user_role')
-    op.drop_table('user_role')
-    op.drop_index('role_permission_idx', table_name='role_permission')
-    op.drop_index(op.f('ix_role_permission_uuid'), table_name='role_permission')
-    op.drop_table('role_permission')
     op.drop_index('meal_items_idx', table_name='meal_items')
     op.drop_index(op.f('ix_meal_items_uuid'), table_name='meal_items')
     op.drop_table('meal_items')
@@ -323,15 +239,9 @@ def downgrade():
     op.drop_index(op.f('ix_user_slack_id'), table_name='user')
     op.drop_index(op.f('ix_user_email'), table_name='user')
     op.drop_table('user')
-    op.drop_index(op.f('ix_role_uuid'), table_name='role')
-    op.drop_index(op.f('ix_role_name'), table_name='role')
-    op.drop_table('role')
     op.drop_index(op.f('ix_rating_type_uuid'), table_name='rating_type')
     op.drop_index(op.f('ix_rating_type_name'), table_name='rating_type')
     op.drop_table('rating_type')
-    op.drop_index(op.f('ix_permission_uuid'), table_name='permission')
-    op.drop_index(op.f('ix_permission_name'), table_name='permission')
-    op.drop_table('permission')
     op.drop_index(op.f('ix_meal_item_uuid'), table_name='meal_item')
     op.drop_index(op.f('ix_meal_item_name'), table_name='meal_item')
     op.drop_table('meal_item')

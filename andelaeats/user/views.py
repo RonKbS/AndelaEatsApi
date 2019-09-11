@@ -15,15 +15,7 @@ class UsersView(MethodView):
     def get(self):
         all_users = User.query.all()
         schema = UserSchema(many=True)
-        return jsonify(schema.dump(all_users))
-
-
-class SingleUserView(MethodView):
-    def get(self, id):
-        user = User.get(id)
-        schema = UserSchema()
-        return jsonify(schema.dump(user))
+        return jsonify(users=schema.dump(all_users))
 
 
 blueprint.add_url_rule("/", view_func=UsersView.as_view("users"))
-blueprint.add_url_rule("/<id>", view_func=UsersView.as_view("user"))
