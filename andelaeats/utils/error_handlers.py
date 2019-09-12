@@ -4,6 +4,7 @@ import traceback
 
 import rollbar
 from flask import jsonify, make_response
+from marshmallow.exceptions import ValidationError
 from werkzeug.exceptions import HTTPException
 
 error_logger = logging.getLogger(__name__)
@@ -22,7 +23,10 @@ def handle_exception(error):
         "msg": "An error occurred while processing your request. Please contact Admin."
     }
     if isinstance(error, HTTPException):
-        return make_response(jsonify({"msg": error.description})), error.code
+        return make_response(jsonify({"msg": error.description}), error.code)
+
+    if isinstance(error, ValidationError):
+        return make_response(jsonify({"error": error.messages}), 400)
 
     traceback.print_exc()
     error_logger.exception(str(error))

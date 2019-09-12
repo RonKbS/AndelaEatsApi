@@ -1,9 +1,17 @@
-from marshmallow import Schema
+from marshmallow import fields, ValidationError
+
+from andelaeats.utils.base_schema import BaseSchema
+
+from .models import City
 
 
-class CitySchema(Schema):
-    """CitySchema endpoint schema."""
+def validate_name(name):
+    if City.query.filter_by(name=name).all():
+        raise ValidationError(f"City with name '{name}' already exists")
 
-    class Meta:  # noqa
-        # Fields to expose
-        fields = ("name",)
+
+class CitySchema(BaseSchema):
+    name = fields.Str(validate=validate_name)
+
+    class Meta:
+        model = City

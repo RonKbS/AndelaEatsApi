@@ -5,6 +5,7 @@ from uuid import uuid4
 
 from .compat import basestring
 from .extensions import db
+from .utils.handled_errors import BaseModelValidationError
 
 
 class CRUDMixin(object):
@@ -70,6 +71,16 @@ class SurrogatePK(object):
         ):
             return cls.query.get(int(record_id))
         return None
+
+    @classmethod
+    def get_or_404(cls, record_id):
+        instance = cls.get_by_id(record_id)
+        if instance:
+            return instance
+        raise BaseModelValidationError(
+            msg="{} with id {} not found".format(cls.__name__, record_id),
+            status_code=404,
+        )
 
 
 def reference_col(

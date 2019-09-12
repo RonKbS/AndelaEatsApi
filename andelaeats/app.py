@@ -3,6 +3,7 @@ import logging
 import sys
 
 from flask import Flask, render_template
+from flask_marshmallow import Marshmallow
 
 from andelaeats import commands, location, meal, order, rating, user, vendor
 from andelaeats.extensions import (  # noqa
@@ -15,6 +16,7 @@ from andelaeats.extensions import (  # noqa
 from andelaeats.utils.auth import Auth
 from andelaeats.utils.error_handlers import handle_exception
 from andelaeats.utils.handled_errors import BaseModelValidationError
+from andelaeats.utils.validators import json_validator
 
 
 def create_app(config_object="andelaeats.settings"):
@@ -24,6 +26,8 @@ def create_app(config_object="andelaeats.settings"):
     """
     app = Flask(__name__.split(".")[0])
     app.config.from_object(config_object)
+    app.url_map.strict_slashes = False
+
     register_extensions(app)
     register_blueprints(app)
     register_errorhandlers(app)
@@ -39,10 +43,13 @@ def register_extensions(app):
     # bcrypt.init_app(app)
     cache.init_app(app)
     db.init_app(app)
-    csrf_protect.init_app(app)
+    # csrf_protect.init_app(app)
     # login_manager.init_app(app)
     debug_toolbar.init_app(app)
     migrate.init_app(app, db)
+
+    ma = Marshmallow(app)
+
     return None
 
 
@@ -90,3 +97,4 @@ def configure_logger(app):
 def register_before_register(app):
     app.before_request(Auth.check_token)
     app.before_request(Auth.check_location_header)
+    app.before_request(json_validator)

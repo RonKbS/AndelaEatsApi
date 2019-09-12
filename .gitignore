@@ -54,3 +54,4 @@ redis-stable/
 app/andelaeats1.db
 app/andelaeats1.db-journal
 coverage.xml
+exit/
