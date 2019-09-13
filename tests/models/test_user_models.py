@@ -4,7 +4,7 @@ import datetime as dt
 
 import pytest
 
-from andelaeats.user.models import Role, User, UserRole
+from andelaeats.user.models import User
 
 from ..factories import UserFactory
 
@@ -23,14 +23,14 @@ class TestUser:
         assert bool(user.created_at)
         assert isinstance(user.created_at, dt.datetime)
 
-    def test_full_name(self, user):
-        """User full name."""
+    def test_representation(self, user):
+        """User full name and __repr__"""
         assert user.fullname == f"{user.first_name} {user.last_name}"
+        assert user.__repr__() == f"<User({user.fullname})>"
 
     def test_roles(self, user):
         """Add a role to a user."""
-        role = Role(name="admin")
-        role.save()
-        user_role = UserRole(user_id=user.id, role_id=role.id)
-        user_role.save()
-        assert user_role in user.user_roles
+        roles = {"roles": {"admin": ["create_user"]}}
+        user.update(**roles)
+        assert "admin" in user.roles
+        assert user.has_role_or_permission(permission="create_user") is True
