@@ -16,6 +16,17 @@ class SlackResponsePage:
     """Concrete slack response page for the factory."""
 
     _locations = []
+    _back_button = {
+        "text": "",
+        "callback_id": "back_button",
+        "color": "#3AA3E3",
+        "attachment_type": "default",
+        "actions": [{
+            'name': 'back_button', 'type': 'button',
+            "text": "Back",
+            "value": True
+        }]
+    }
 
     def slack_response(self, **kwargs) -> dict:
         pass
@@ -104,7 +115,8 @@ class CenterSelection(SlackResponsePage):
                 "color": "#3AA3E3",
                 "attachment_type": "default",
                 "actions": date_buttons
-            }
+            },
+            self._back_button
         ]
 
         return {
@@ -135,8 +147,12 @@ class DaySelection(SlackResponsePage):
         day_meal_sessions = kwargs.get('meals', None)
         payload_action_value = kwargs.get('payload', None)
         if not day_meal_sessions:
-            return {'text': 'Oops - No meal sessions have been setup on the '
-                            'date you selected.'}
+            return {
+                'text':
+                    'Oops - No meal sessions have been setup on the '
+                    'date you selected.',
+                'attachments': [self._back_button]
+            }
         if not payload_action_value:
             return _error_page()
 
@@ -154,7 +170,8 @@ class DaySelection(SlackResponsePage):
                 "color": "#3AA3E3",
                 "attachment_type": "default",
                 "actions": period_buttons
-            }
+            },
+            self._back_button
         ]
 
         return {
@@ -210,7 +227,8 @@ class PeriodSelection(SlackResponsePage):
                             "value": f'{period}_{date}_order_{location_id}'
                         }
                     ]
-                }
+                },
+                self._back_button
             ]
         }
 

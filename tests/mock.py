@@ -167,3 +167,20 @@ submit_rating = {
         'response_url': os.environ.get('SLACK_RESPONSE_URL','url'),
         'state': '7_breakfast_2019-02-20_rate_1_1'
 }
+
+
+back_button_selected = {
+        'type': 'interactive_message',
+        'actions': [{'name': 'back_button', 'type': 'button', 'value': True}],
+        'callback_id': 'back_button',
+        'team': {'id': 'T02R3LKBA', 'domain': 'andela'},
+        'channel': {'id': 'GBE9NJMGQ', 'name': 'privategroup'},
+        'user': {'id': 'U882C5UC8', 'name': 'victor.adukwu'},
+        'action_ts': '1550264646.456293',
+        'message_ts': '1550264324.003400',
+        'attachment_id': '1',
+        'token': os.environ.get('TEST_TOKEN'),
+        'is_app_unfurl': False,
+        'response_url': os.environ.get('SLACK_RESPONSE_URL','url'),
+        'trigger_id': '552645730370.2853699384.9f96d124dec19b1e47f87d42a4d28196'
+}

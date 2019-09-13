@@ -15,7 +15,8 @@ from tests.mock import (
     meal_to_book,
     final_selection,
     rating_selector,
-    submit_rating
+    submit_rating,
+    back_button_selected
 )
 
 
@@ -48,6 +49,23 @@ class TestBotEndpoints(BaseTestCase):
         mock_get_menu_start_end_on.return_value = (datetime(2019, 2, 15), datetime(2019, 2, 15))
         mock_locationrepo_get.get.return_value = LocationFactory.create(id=1)
 
+        response = self.client().post(self.make_url(f'/bot/interactions/'), headers=self.headers())
+        response_json = self.decode_from_json_string(response.data.decode('utf-8'))
+
+        self.assert200(response)
+        self.assertEqual(response_json['type'], 'interactive_message')
+        self.assertEqual(type(response_json['actions']), list)
+
+    @patch('app.controllers.bot_controller.LocationRepo')
+    @patch('app.controllers.bot_controller.json.loads')
+    def test_interactions_for_back_button(self, mock_json_loads, mock_locationrepo_get):
+
+        # simulate previous interaction
+        mock_json_loads.return_value = center_selected
+        mock_locationrepo_get.get.return_value = LocationFactory.create(id=1)
+        self.client().post(self.make_url(f'/bot/interactions/'), headers=self.headers())
+
+        mock_json_loads.return_value = back_button_selected
         response = self.client().post(self.make_url(f'/bot/interactions/'), headers=self.headers())
         response_json = self.decode_from_json_string(response.data.decode('utf-8'))
 

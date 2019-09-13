@@ -30,6 +30,19 @@ class BotController(BaseController):
         self.engagement_repo = VendorEngagementRepo()
         self.andela_service = AndelaService()
         self.vendor_rating_repo = VendorRatingRepo()
+        self.previous_interation = {}
+        self.previous_payload = None
+        self._back_button = {
+            "text": "",
+            "callback_id": "back_button",
+            "color": "#3AA3E3",
+            "attachment_type": "default",
+            "actions": [{
+                'name': 'back_button', 'type': 'button',
+                "text": "Back",
+                "value": True
+            }]
+        }
 
     def _get_meal_items_by_ids(self, meal_item_ids: List) -> List[MealItem]:
         """
@@ -102,7 +115,8 @@ class BotController(BaseController):
                         "color": "#3AA3E3",
                         "attachment_type": "default",
                         "actions": back_buttons
-                    }
+                    },
+                    self._back_button
                 ]
                 return self.handle_response(slack_response={
                     'text': f'Sorry no menu found for date: {date}, '
@@ -171,7 +185,8 @@ class BotController(BaseController):
                     "color": "#3AA3E3",
                     "attachment_type": "default",
                     "actions": back_buttons
-                }
+                },
+                self._back_button
             ]
             return self.handle_response(slack_response={
                 'text': f'Sorry No Menu found for Date: {selected_date},'
@@ -193,7 +208,8 @@ class BotController(BaseController):
                 "color": "#3AA3E3",
                 "attachment_type": "default",
                 "actions": meal_buttons
-            }
+            },
+            self._back_button
         ]
 
         return self.handle_response(
@@ -266,7 +282,8 @@ class BotController(BaseController):
                     "color": "#3AA3E3",
                     "attachment_type": "default",
                     "actions": back_buttons
-                }
+                },
+                self._back_button
             ]
             return self.handle_response(slack_response={
                 'text': f'Sorry No Menu found forr Date: {selected_date}, Meal Period: {meal_period}', 'attachments': request_buttons})
@@ -284,7 +301,8 @@ class BotController(BaseController):
                 "color": "#3AA3E3",
                 "attachment_type": "default",
                 "actions": meal_buttons
-            }
+            },
+            self._back_button
         ]
 
         return self.handle_response(
@@ -396,29 +414,51 @@ class BotController(BaseController):
             return self.handle_dialog_submission(payload, slack_id, webhook_url)
 
         if payload['type'] == 'interactive_message'\
+                and payload['callback_id'] == 'back_button':
+
+            fn = list(self.previous_interation.keys())[0]
+            previous_payload = self.previous_interation[fn]
+
+            return fn(previous_payload) if fn != self.bot else fn()
+
+        if payload['type'] == 'interactive_message'\
                 and payload['callback_id'] == 'center_selector':
+            self.previous_interation = {self.bot: payload}
+            self.previous_payload = payload
             return self.handle_center_selection(payload)
 
         if payload['type'] == 'interactive_message'\
                 and payload['callback_id'] == 'day_selector':
+            self.previous_interation = {self.handle_center_selection: self.previous_payload}
+            self.previous_payload = payload
             return self.handle_day_selection(payload)
 
         if payload['type'] == 'interactive_message'\
                 and payload['callback_id'] == 'period_selector':
+            self.previous_interation = {self.handle_day_selection: self.previous_payload}
+            self.previous_payload = payload
             return self.handle_period_selection(payload)
 
         if (payload['type'] == 'interactive_message'and payload['callback_id'] == 'action_selector' and
             payload['actions'][0]['value'].split('_')[2] == 'order') or (payload['callback_id'] == 'after_menu_list' and payload['actions'][0]['value'].split('_')[2] == 'order'):
+            self.previous_interation = {self.handle_period_selection: self.previous_payload}
+            self.previous_payload = payload
             return self.handle_placing_order(payload)
 
         if payload['type'] == 'interactive_message'\
                 and payload['callback_id'] == 'action_selector':
+            self.previous_interation = {self.handle_placing_order: self.previous_payload}
+            self.previous_payload = payload
             return self.handle_action_selection(payload)
 
         if payload['type'] == 'interactive_message' and payload['callback_id'] == 'meal_action_selector':
+            self.previous_interation = {self.handle_action_selection: self.previous_payload}
+            self.previous_payload = payload
             return self.handle_meal_action_selection(payload, webhook_url)
 
         if payload['callback_id'] == 'after_menu_list' and payload['actions'][0]['value'].split('_')[2] == 'rate':
+            self.previous_interation = {self.handle_meal_action_selection: self.previous_payload}
+            self.previous_payload = payload
             return self.handle_rating(payload)
 
         if payload['callback_id'] == 'rating_selector':
