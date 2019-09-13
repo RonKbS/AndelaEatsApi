@@ -1,1 +1,4 @@
-messages = {"deleted": "{0} successfully deleted"}
+messages = {
+    "deleted": "{0} successfully deleted",
+    "DUPLICATE_ID": "{} with {} '{}' already exists",
+}

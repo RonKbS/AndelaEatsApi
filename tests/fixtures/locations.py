@@ -6,6 +6,6 @@ from ..factories import LocationFactory
 
 @pytest.fixture
 def location(db):
-    city = LocationFactory()
+    location = LocationFactory()
     db.session.commit()
-    return city
+    return location

@@ -32,8 +32,8 @@ class Order(SurrogatePK, Model):
     user = db.relationship("User", backref="order")
     meal_vendor_engagement_id = reference_col("meal_vendor_engagement", nullable=False)
     meal_vendor_engagement = db.relationship("MealVendorEngagement", backref="orders")
-    city_id = reference_col("city", nullable=False)
-    city = db.relationship("City", backref="orders")
+    location_id = reference_col("location", nullable=False)
+    location = db.relationship("Location", backref="orders")
     date = db.Column(db.DateTime(), nullable=False)
     status = db.Column(db.Enum(OrderStatus))
     channel = db.Column(db.Enum(Channels))
@@ -43,6 +43,6 @@ sa.Index(
     "order_idx",
     Order.user_id,
     Order.meal_vendor_engagement_id,
-    Order.city_id,
+    Order.location_id,
     Order.status,
 )

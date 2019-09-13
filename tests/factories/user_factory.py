@@ -1,3 +1,5 @@
+import json
+
 import factory
 
 from andelaeats.user.models import User
@@ -13,6 +15,7 @@ class UserFactory(BaseFactory):
 
     slack_id = factory.Sequence(lambda n: n)
     first_name = factory.Faker("name")
-    email = factory.Faker("name")
+    email = factory.Faker("email")
     last_name = factory.Faker("name")
     image_url = factory.Faker("url")
+    user_id = factory.Sequence(lambda n: n + 1)

@@ -140,13 +140,13 @@ class MealService(SurrogatePK, Model):
     user_id = reference_col("user", nullable=False)
     user = db.relationship("User", backref="meal_services")
     date = db.Column(db.Date(), default=datetime.utcnow)
-    city_id = reference_col("city", nullable=False)
-    city = db.relationship("City", backref="meal_services")
+    location_id = reference_col("location", nullable=False)
+    location = db.relationship("Location", backref="meal_services")
 
 
 sa.Index(
     "meal_service_idx",
     MealService.user_id,
-    MealService.city_id,
+    MealService.location_id,
     MealService.meal_vendor_engagement_id,
 )

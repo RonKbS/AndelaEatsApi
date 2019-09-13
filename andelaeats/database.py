@@ -3,9 +3,13 @@
 from datetime import datetime
 from uuid import uuid4
 
+import inflect
+
 from .compat import basestring
 from .extensions import db
 from .utils.handled_errors import BaseModelValidationError
+
+inf = inflect.engine()
 
 
 class CRUDMixin(object):
@@ -50,6 +54,23 @@ class Model(CRUDMixin, db.Model):
     )
     created_at = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow)
 
+    @classmethod
+    def plural_name(cls):
+        return inf.plural(cls.__name__.lower())
+
+    @classmethod
+    def get(cls, uuid):
+        return cls.query.filter_by(uuid=uuid).first()
+
+    @classmethod
+    def get_or_404(cls, uuid):
+        instance = cls.get(uuid)
+        if instance:
+            return instance
+        raise BaseModelValidationError(
+            msg="{} with id {} not found".format(cls.__name__, uuid), status_code=404
+        )
+
 
 # From Mike Bayer's "Building the app" talk
 # https://speakerdeck.com/zzzeek/building-the-app
@@ -71,16 +92,6 @@ class SurrogatePK(object):
         ):
             return cls.query.get(int(record_id))
         return None
-
-    @classmethod
-    def get_or_404(cls, record_id):
-        instance = cls.get_by_id(record_id)
-        if instance:
-            return instance
-        raise BaseModelValidationError(
-            msg="{} with id {} not found".format(cls.__name__, record_id),
-            status_code=404,
-        )
 
 
 def reference_col(

@@ -3,6 +3,12 @@
 from flask import Blueprint, jsonify
 from flask.views import MethodView
 
+from andelaeats.utils.mixins import (
+    ModelListCreateMixin,
+    ModelUpdateMixin,
+    RetrieveDeleteMixin,
+)
+
 from .models import User
 from .schema import UserSchema
 
@@ -11,11 +17,15 @@ blueprint = Blueprint(
 )
 
 
-class UsersView(MethodView):
-    def get(self):
-        all_users = User.query.all()
-        schema = UserSchema(many=True)
-        return jsonify(users=schema.dump(all_users))
+class UsersView(MethodView, ModelListCreateMixin):
+    schema = UserSchema
+    model = User
+
+
+class SingleUserView(MethodView, RetrieveDeleteMixin, ModelUpdateMixin):
+    schema = UserSchema
+    model = User
 
 
 blueprint.add_url_rule("/", view_func=UsersView.as_view("users"))
+blueprint.add_url_rule("/<string:uuid>", view_func=SingleUserView.as_view("user"))
