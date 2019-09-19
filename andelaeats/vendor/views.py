@@ -12,7 +12,7 @@ from andelaeats.utils.mixins import (
 from .models import Vendor, VendorEngagement
 from .schema import VendorSchema
 
-blueprint = Blueprint("vendor", __name__, url_prefix="/vendors")
+blueprint = Blueprint("vendors", __name__, url_prefix="/api/v1/vendors")
 
 
 class VendorsView(MethodView, ModelListCreateMixin):

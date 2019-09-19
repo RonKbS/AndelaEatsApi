@@ -24,7 +24,6 @@ class Vendor(SurrogatePK, Model):
     contact_id = reference_col("user", nullable=False)
     contact = db.relationship("User", backref="vendors")
     active = db.Column(db.Boolean(), default=True, nullable=False)
-    created = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow)
     modified = db.Column(db.DateTime(), nullable=True, onupdate=datetime.utcnow)
     image_url = db.Column(db.String(255))
 

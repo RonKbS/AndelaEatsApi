@@ -1,9 +1,22 @@
-from marshmallow import Schema
+from marshmallow import fields, ValidationError
+
+from andelaeats.utils.base_schema import BaseSchema
+
+from ..constants.success import messages
+from ..user.models import User
+from .models import Vendor
 
 
-class VendorSchema(Schema):
+def validate_contact_id(uuid):
+    if not User.query.filter_by(id=uuid).first():
+        raise ValidationError(messages["NOT_FOUND"].format("contact_id", "id", uuid))
+
+
+class VendorSchema(BaseSchema):
     """Vendor endpoint schema."""
 
+    contact_id = fields.Integer(validate=validate_contact_id, required=True)
+
     class Meta:
-        # Fields to expose
-        fields = ("name", "address", "telephone", "active", "image_url")
+        model = Vendor
+        exclude = ("active", "modified")
