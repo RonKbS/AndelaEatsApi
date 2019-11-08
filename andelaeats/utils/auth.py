@@ -1,8 +1,6 @@
 """Module for token validation"""
 
 from base64 import b64decode
-from functools import wraps
-from os import getenv
 
 import jwt
 from flask import current_app, jsonify, make_response, request

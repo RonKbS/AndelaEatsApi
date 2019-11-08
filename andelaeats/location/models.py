@@ -3,13 +3,13 @@
 from andelaeats.database import db, Model, SurrogatePK
 
 
-class City(SurrogatePK, Model):
-    """A city location.
+class Location(SurrogatePK, Model):
+    """A location location.
 
     e.g Lagos, Kampala, Accra, New York
     """
 
-    __tablename__ = "city"
+    __tablename__ = "location"
     name = db.Column(db.String(80), unique=True, nullable=False, index=True)
     timezone = db.Column(db.String(80), nullable=False)
 
@@ -19,4 +19,4 @@ class City(SurrogatePK, Model):
 
     def __repr__(self):
         """Represent instance as a unique string."""
-        return f"<City({self.name})>"
+        return f"<Location({self.name})>"

@@ -3,42 +3,43 @@ import json
 import pytest
 
 from andelaeats.constants.success import messages
-from andelaeats.location.models import City
+from andelaeats.location.models import Location
+from andelaeats.location.schema import LocationSchema
 
 from ...factories import LocationFactory
+from ..generator import ViewTestsMeta
 
 api_version = "api/v1"
 
 
 @pytest.mark.usefixtures("db")
-class TestLocationsEndpoints:
-    def test_get_all_cities(self, client, location):
-        response = client.get(f"{api_version}/locations")
-        assert response.status_code == 200
-        assert response.json["locations"][0]["name"] == location.name
+class TestLocationsEndpoints(metaclass=ViewTestsMeta):
+    url = "location.locations"
+    schema = LocationSchema
+    factory = LocationFactory
+    model = Location
 
-    def test_get_location_succeeds(self, client, location):
-        response = client.get(f"{api_version}/locations")
-        assert response.status_code == 200
-        assert response.json["locations"][0]["name"] == location.name
-
-    def test_get_specific_location_succeeds(self, client, location):
-        response = client.get(f"{api_version}/locations/{location.id}")
-        assert response.status_code == 200
-        assert response.json["location"]["name"] == location.name
-
-    def test_create_location_succeeds(self, client):
-        location = LocationFactory.build()
+    def test_create_location_with_existing_name_fails(self, client, location):
+        location = LocationFactory.build(name=location.name)
         location_data = json.dumps(
             {"name": location.name, "timezone": location.timezone}
         )
         response = client.post(f"{api_version}/locations/", data=location_data)
-        assert response.status_code == 201
-        assert response.json["location"]["name"] == location.name
+        assert response.status_code == 400
+        assert (
+            response.json["error"]["name"][0]
+            == f"Location with name '{location.name}' already exists"
+        )
 
     def test_create_location_with_missing_fields_fails(self, client):
         location = LocationFactory.build()
         location_data = json.dumps({"name": location.name})
+        response = client.post(f"{api_version}/locations/", data=location_data)
+        assert response.status_code == 400
+
+    def test_create_location_with_invalid_json_fails(self, client):
+        location = LocationFactory.build()
+        location_data = {"name": location.name}
         response = client.post(f"{api_version}/locations/", data=location_data)
         assert response.status_code == 400
 
@@ -48,31 +49,28 @@ class TestLocationsEndpoints:
         response = client.post(f"{api_version}/locations/", data=location_data)
         assert response.status_code == 400
 
-    def test_update_existing_location_succeeds(self, client, location):
+    def test_update_location_with_missing_fields_fails(self, client, location):
         new_location = LocationFactory.build()
-
         update = json.dumps({"name": new_location.name})
-
-        response = client.put(f"{api_version}/locations/{location.id}", data=update)
-        assert response.status_code == 200
-        assert response.json["location"]["name"] == new_location.name
+        response = client.put(f"{api_version}/locations/{location.uuid}", data=update)
+        assert response.status_code == 400
+        assert response.json["error"] == {
+            "timezone": ["Missing data for required field."]
+        }
 
     def test_update_non_existing_location_with_fails(self, client):
         new_location = LocationFactory.build()
-        city_id = 100
+        location_id = 100
         update = json.dumps({"name": new_location.name})
-        response = client.put(f"{api_version}/locations/{city_id}", data=update)
+        response = client.put(f"{api_version}/locations/{location_id}", data=update)
         assert response.status_code == 404
-        assert response.json["msg"] == f"City with id {city_id} not found"
+        assert response.json["msg"] == f"Location with id {location_id} not found"
 
-    def test_delete_existing_location_succeeds(self, client, location):
-        response = client.delete(f"{api_version}/locations/{location.id}")
+    def test_patch_existing_location_succeeds(self, client, location):
+        new_location = LocationFactory.build()
+
+        update = json.dumps({"name": new_location.name})
+
+        response = client.patch(f"{api_version}/locations/{location.uuid}", data=update)
         assert response.status_code == 200
-        assert response.json["msg"] == "OK"
-        assert response.json["payload"] == "Location successfully deleted"
-
-    def test_delete_non_existing_location_fails(self, client):
-        city_id = 100
-        response = client.delete(f"{api_version}/locations/{city_id}")
-        assert response.status_code == 404
-        assert response.json["msg"] == f"City with id {city_id} not found"
+        assert response.json["location"]["name"] == new_location.name

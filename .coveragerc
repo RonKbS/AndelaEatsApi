@@ -1,0 +1,3 @@
+  
+[report]
+omit = andelaeats/compat.py,andelaeats/commands.py,andelaeats/settings.py

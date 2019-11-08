@@ -5,7 +5,6 @@ import sys
 from flask import Flask, render_template
 from flask_marshmallow import Marshmallow
 
-from andelaeats import commands, location, meal, order, rating, user, vendor
 from andelaeats.extensions import (  # noqa
     cache,
     csrf_protect,
@@ -17,6 +16,16 @@ from andelaeats.utils.auth import Auth
 from andelaeats.utils.error_handlers import handle_exception
 from andelaeats.utils.handled_errors import BaseModelValidationError
 from andelaeats.utils.validators import json_validator
+
+from andelaeats import (  # noqa # isort:skip
+    commands,
+    user,
+    location,
+    meal,
+    order,
+    vendor,
+    rating,
+)
 
 
 def create_app(config_object="andelaeats.settings"):
@@ -57,10 +66,10 @@ def register_blueprints(app):
     """Register Flask blueprints."""
     app.register_blueprint(user.views.blueprint)
     app.register_blueprint(location.views.blueprint)
-    app.register_blueprint(rating.views.blueprint)
     app.register_blueprint(meal.views.blueprint)
     app.register_blueprint(vendor.views.blueprint)
     app.register_blueprint(order.views.blueprint)
+    app.register_blueprint(rating.views.blueprint)
     return None
 
 

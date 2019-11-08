@@ -2,16 +2,16 @@ from marshmallow import fields, ValidationError
 
 from andelaeats.utils.base_schema import BaseSchema
 
-from .models import City
+from .models import Location
 
 
 def validate_name(name):
-    if City.query.filter_by(name=name).all():
-        raise ValidationError(f"City with name '{name}' already exists")
+    if Location.query.filter_by(name=name).all():
+        raise ValidationError(f"Location with name '{name}' already exists")
 
 
-class CitySchema(BaseSchema):
+class LocationSchema(BaseSchema):
     name = fields.Str(validate=validate_name)
 
     class Meta:
-        model = City
+        model = Location

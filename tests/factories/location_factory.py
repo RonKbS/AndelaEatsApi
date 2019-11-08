@@ -1,14 +1,14 @@
 import factory
 
-from andelaeats.constants.time_zones import timezone
-from andelaeats.location.models import City
+from andelaeats.constants.zones import locations, timezone
+from andelaeats.location.models import Location
 
 from .base import BaseFactory
 
 
 class LocationFactory(BaseFactory):
     class Meta:
-        model = City
+        model = Location
 
-    name = factory.Faker("city")
+    name = factory.Iterator(locations)
     timezone = factory.Iterator(timezone)

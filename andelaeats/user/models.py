@@ -20,8 +20,9 @@ class User(SurrogatePK, Model):
     active = db.Column(db.Boolean(), default=True, nullable=False)
     modified = db.Column(db.DateTime(), nullable=True, onupdate=datetime.utcnow)
     image_url = db.Column(db.String(255))
-    # roles structure as defined in the roles.example.json file
-    roles = db.Column(db.JSON, nullable=True)
+
+    # id provided by the andela API
+    user_id = db.Column(db.String(30), unique=True, index=True)
 
     def __init__(self, first_name, last_name, email, **kwargs):
         """Create instance."""
